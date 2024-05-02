@@ -1,32 +1,18 @@
 package main
 
 import (
-	"db"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"sync"
+
+	"db"
+	"forms"
 
 	"github.com/joho/godotenv"
 )
 
-var (
-	postMu sync.Mutex
-)
-
-func handleHTTP(w http.ResponseWriter, r *http.Request) {
-	postMu.Lock()
-	defer postMu.Unlock()
-
-	r.Header.Set("Content-type", "application/json")
-
-	// Logic here
-	json.NewEncoder(w).Encode(/* This param should be a struct */ nil)
-}
-
-func initRoute() {
-	http.HandleFunc("/loginAuth", )
+func initRoutes() {
+	http.HandleFunc("/loginAuth", forms.LoginAuthHandler)
 }
 
 func main() {
@@ -47,7 +33,7 @@ func main() {
 	db.Connect(os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_URL"), 
 		os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
 
-	http.HandleFunc("/api/x", handleHTTP)
+	initRoutes()
 
 	fmt.Printf("API Server is running on http://%s:%s\n", SERVER_URL, SERVER_PORT)
 
