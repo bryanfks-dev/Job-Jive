@@ -25,6 +25,10 @@ func handleHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(/* This param should be a struct */ nil)
 }
 
+func initRoute() {
+	http.HandleFunc("/loginAuth", )
+}
+
 func main() {
 	// Load .env
 	err := godotenv.Load()
@@ -43,7 +47,6 @@ func main() {
 	db.Connect(os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_URL"), 
 		os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
 
-	// Server endpoints
 	http.HandleFunc("/api/x", handleHTTP)
 
 	fmt.Printf("API Server is running on http://%s:%s\n", SERVER_URL, SERVER_PORT)
