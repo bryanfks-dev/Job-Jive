@@ -44,6 +44,17 @@ func SearchUser(email string) models.User {
 	return user_data
 }
 
+func InsertNewEmployee(user models.User) {
+	stmt := "INSERT INTO `users` (User_ID, Full_Name, Email, Password, Manager_ID, Address, NIK, Gander, Phone_Number, Department_ID, First_Login) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+	_, err := db.Exec(stmt, user.FullName, user.Email, user.Password, user.ManagerId, 
+		user.Address, user.NIK, user.Gender, user.PhoneNumber, user.DepartmentId, user.FirstLogin)
+
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
 func Connect(user string, password string, url string, port string, db_name string) {
 	// Open connection to database
 	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
