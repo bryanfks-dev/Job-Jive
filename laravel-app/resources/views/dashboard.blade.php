@@ -39,7 +39,7 @@
             </svg>
             <span class="sr-only">Toggle sidebar</span>
           </button>
-          <a href="https://flowbite.com" class="hidden md:flex items-center justify-between mr-4">
+          <a href="#" class="hidden md:flex items-center justify-between mr-4">
             <img
               src="https://flowbite.s3.amazonaws.com/logo.svg"
               class="mr-3 h-8"
@@ -105,49 +105,14 @@
       id="drawer-navigation"
     >
       <div class="flex flex-col overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800 justify-between">
-        <form action="#" method="GET" class="md:hidden mb-2">
-          <label for="sidebar-search" class="sr-only">Search</label>
-          <div class="relative">
-            <div
-              class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none"
-            >
-              <svg
-                class="w-5 h-5 text-gray-500 dark:text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                ></path>
-              </svg>
-            </div>
-            <input
-              type="text"
-              name="search"
-              id="sidebar-search"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              placeholder="Search"
-            />
-          </div>
-        </form>
         <ul class="space-y-2">
           <li>
             <a
               href="#"
               class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
-              <svg
-                aria-hidden="true"
-                class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+             <svg class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
+                <path d="M16.52 4.19205C16.3751 4.06811 16.1907 4 16 4C15.8093 4 15.6249 4.06811 15.48 4.19205L4 14.032V25.6C4 26.2365 4.25286 26.847 4.70294 27.2971C5.15303 27.7471 5.76348 28 6.39999 28H12.8C13.0122 28 13.2156 27.9157 13.3657 27.7657C13.5157 27.6157 13.6 27.4122 13.6 27.2V22.4C13.6 21.7635 13.8528 21.153 14.3029 20.703C14.753 20.2529 15.3635 20 16 20C16.6365 20 17.2469 20.2529 17.697 20.703C18.1471 21.153 18.4 21.7635 18.4 22.4V27.2C18.4 27.4122 18.4843 27.6157 18.6343 27.7657C18.7843 27.9157 18.9878 28 19.2 28H25.6C26.2365 28 26.8469 27.7471 27.297 27.2971C27.7471 26.847 27.9999 26.2365 27.9999 25.6V14.032L16.52 4.19205Z"/>
               </svg>
               <span class="ml-3">Dashboard</span>
             </a>
@@ -157,15 +122,10 @@
               href="#"
               class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
-              <svg
-                aria-hidden="true"
-                class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+              class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              fill="currentColor" viewBox="0 0 32 32">
+                <path d="M21.5385 6.76923H26.1539V28H5.84619V6.76923H10.4616V8.61538H21.5385V6.76923ZM9.5385 16H22.4616V14.1538H9.5385V16ZM9.5385 23.3846H22.4616V21.5385H9.5385V23.3846ZM12.3077 6.76923V4H19.6923V6.76923H12.3077Z"/>
               </svg>
               <span class="ml-3">Attendance</span>
             </a>
@@ -175,15 +135,10 @@
               href="#"
               class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
-              <svg
-                aria-hidden="true"
-                class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+              class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              fill="currentColor" viewBox="0 0 32 32">
+                <path d="M20.8 22.6V25H4V22.6C4 22.6 4 17.8 12.4 17.8C20.8 17.8 20.8 22.6 20.8 22.6ZM16.6 11.2C16.6 10.3693 16.3537 9.55731 15.8922 8.86663C15.4307 8.17594 14.7747 7.63762 14.0073 7.31973C13.2398 7.00184 12.3953 6.91867 11.5806 7.08072C10.7659 7.24278 10.0175 7.64279 9.43015 8.23017C8.84277 8.81755 8.44276 9.56592 8.2807 10.3806C8.11864 11.1954 8.20182 12.0398 8.51971 12.8073C8.83759 13.5747 9.37592 14.2307 10.0666 14.6922C10.7573 15.1537 11.5693 15.4 12.4 15.4C13.5139 15.4 14.5822 14.9575 15.3698 14.1699C16.1575 13.3822 16.6 12.3139 16.6 11.2ZM20.728 17.8C21.4657 18.3709 22.0693 19.0965 22.4964 19.9258C22.9235 20.7551 23.1637 21.6679 23.2 22.6V25H28V22.6C28 22.6 28 18.244 20.728 17.8ZM19.6 7.00002C18.7741 6.99618 17.9666 7.24306 17.284 7.70802C18.0129 8.72651 18.4049 9.94756 18.4049 11.2C18.4049 12.4525 18.0129 13.6735 17.284 14.692C17.9666 15.157 18.7741 15.4039 19.6 15.4C20.7139 15.4 21.7822 14.9575 22.5699 14.1699C23.3575 13.3822 23.8 12.3139 23.8 11.2C23.8 10.0861 23.3575 9.01783 22.5699 8.23017C21.7822 7.44252 20.7139 7.00002 19.6 7.00002Z"/>
               </svg>
               <span class="ml-3">Employees</span>
             </a>
