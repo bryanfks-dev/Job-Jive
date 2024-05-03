@@ -3,9 +3,10 @@ package forms
 import (
 	"net/http"
 	"sync"
+
 	"golang.org/x/crypto/bcrypt"
 
-	"db"
+	"models"
 )
 
 var (
@@ -23,23 +24,26 @@ func LoginAuthHandler(w http.ResponseWriter, r *http.Request) {
 		login_cred := map[string] string {
 			"email": r.FormValue("email"),
 			"password": r.FormValue("password"),
+			"remember": r.FormValue("remember"),
 		}
 
-		user_data := db.SearchUser(login_cred["email"])
+		user_data := models.User.Search(models.User{}, login_cred["email"])
 
-		// Which means user data is available in users table
+		// User data is available in users table
 		if user_data.Id != 0 {
 			err := bcrypt.
-				CompareHashAndPassword([]byte(user_data.Password), []byte(login_cred["passowrd"]))
+				CompareHashAndPassword([]byte(user_data.Password), []byte(login_cred["password"]))
 
 			// Not nil value in err possibly cause of hash and password 
 			// values are not match, otherwise, if err is nil, means hash 
 			// and password values are match
 			if err == nil {
-				w.WriteHeader(200)
-			} else {
-				w.WriteHeader(401)
+				w.WriteHeader(http.StatusOK) // 200 OK
+
+				return
 			}
 		}
+
+		w.WriteHeader(http.StatusUnauthorized) // 401 Unauthorized
 	}
 }
