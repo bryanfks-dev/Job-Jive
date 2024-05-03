@@ -33,19 +33,19 @@
                         <ul class="space-y-4">
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Email</span>
-                                <span class="text-md font-normal break-words">xxxxxxxxx@gmail.com</span>
+                                <span class="text-md font-normal truncate">xxxxxxxxx@gmail.com</span>
                             </li>
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">NIK</span>
-                                <span class="text-md font-normal break-words">xxxxxxxxxxxxxxx</span>
+                                <span class="text-md font-normal truncate">xxxxxxxxxxxxxxx</span>
                             </li>
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Phone Number</span>
-                                <span class="text-md font-normal break-words">xxxxxxxxxxxxx</span>
+                                <span class="text-md font-normal truncate">xxxxxxxxxxxxx</span>
                             </li>
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Department</span>
-                                <span class="text-md font-normal break-words">xxxxxxxxxx</span>
+                                <span class="text-md font-normal truncate">xxxxxxxxxx</span>
                             </li>
                         </ul>
                     </div>
@@ -57,11 +57,11 @@
                             </li>
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Gender</span>
-                                <span class="text-md font-normal break-words">xxxxxx</span>
+                                <span class="text-md font-normal truncate">xxxxxx</span>
                             </li>
                             <li class="flex flex-col">
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Salary</span>
-                                <span class="text-md font-normal break-words">xxxx</span>
+                                <span class="text-md font-normal truncate">xxxx</span>
                             </li>
                         </ul>
                     </div>
