@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
         Division::factory(5)->create();
 
         User::create([
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'Gender' => 'Laki-laki',
             'Phone_Number' => '08123456789',
             'Department_ID' => 1,
-            'First_Login' => now()    
+            'First_Login' => now()
         ]);
 
         User::create([
@@ -41,15 +41,14 @@ class DatabaseSeeder extends Seeder
             'Gender' => 'Laki-laki',
             'Phone_Number' => '08123456789',
             'Department_ID' => 1,
-            'First_Login' => now()    
+            'First_Login' => now()
         ]);
 
         User::factory(4)->create();
-       
-        
+
         Attendance::factory(15)->create();
         EmployeeWorkAssessment::factory(13)->create();
         Salary::factory(10)->create();
-        
+
     }
 }

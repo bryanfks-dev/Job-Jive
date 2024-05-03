@@ -20,7 +20,7 @@ class EmployeeWorkAssessmentFactory extends Factory
             //
             'User_ID' => mt_rand(3, 6),
             'Feedback' => fake()->sentence(4),
-            'Date' => now()
+            'Date_Time' => now()
         ];
     }
 }
