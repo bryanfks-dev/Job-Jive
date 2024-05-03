@@ -17,15 +17,15 @@ return new class extends Migration
             $table->string('Email')->unique();
             $table->string('Password');
             $table->integer('Manager_ID')->unsigned()->nullable();
-            $table->foreign('Manager_ID')->references('User_ID')->on('users')->onDelete('cascade');
             $table->string('Address');
-            $table->string('NIK');
-            $table->string('Gender');
-            $table->string('Phone_Number');
+            $table->string('NIK', 16);
+            $table->string('Gender', 10);
+            $table->string('Phone_Number', 13);
             $table->integer('Department_ID')->unsigned();
-            $table->foreign('Department_ID')->references('Department_ID')->on('divisions')->onDelete('cascade');
             $table->date('First_Login');
-            $table->timestamps();
+
+            $table->foreign('Manager_ID')->references('User_ID')->on('users')->onDelete('cascade');
+            $table->foreign('Department_ID')->references('Department_ID')->on('divisions')->onDelete('cascade');
         });
     }
 

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('divisions', function (Blueprint $table) {
             $table->increments('Department_ID');
             $table->string('Department_Name');
-            $table->timestamps();
         });
     }
 

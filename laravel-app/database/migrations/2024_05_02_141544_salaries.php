@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('salaries', function (Blueprint $table) {
             $table->integer('User_ID')->unsigned();
-            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
             $table->integer('Initial_Salary')->nullable();
             $table->integer('Final_Salary')->nullable();
-            $table->timestamps();
+
+            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
         });
     }
 
