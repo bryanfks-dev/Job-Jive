@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('User_ID')->unsigned();
             $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
             $table->text('Feedback');
-            $table->date('Date');
+            $table->dateTime('Date');
             $table->timestamps();
         });
     }

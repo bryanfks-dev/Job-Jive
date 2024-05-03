@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->integer('User_ID')->unsigned();
             $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
-            $table->dateTime('Date');
+            // $table->dateTime('Date');
             $table->timestamps();
         });
     }
