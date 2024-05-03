@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('employee_work_assessments', function (Blueprint $table) {
             $table->integer('User_ID')->unsigned();
-            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
             $table->text('Feedback');
-            $table->dateTime('Date');
-            $table->timestamps();
+            $table->timestamp('Date');
+
+            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
         });
     }
 
