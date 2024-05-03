@@ -1,0 +1,10 @@
+go 1.22.2
+
+use (
+	.
+	./apis
+	./configs
+	./db
+	./forms
+	./models
+)
