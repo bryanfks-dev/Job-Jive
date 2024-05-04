@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
         Division::factory(5)->create();
 
         User::create([
@@ -49,6 +48,5 @@ class DatabaseSeeder extends Seeder
         Attendance::factory(15)->create();
         EmployeeWorkAssessment::factory(13)->create();
         Salary::factory(10)->create();
-
     }
 }

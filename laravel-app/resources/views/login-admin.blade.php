@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('content')
     <section class="bg-gray-50 dark:bg-gray-900">

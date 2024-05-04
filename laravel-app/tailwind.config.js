@@ -14,15 +14,17 @@ module.exports = {
 
     fontFamily: {
       'body': [
-    'Inter',
+    'Inter', 
   ],
       'sans': [
-    'Inter',
+    'Inter', 
   ]
   }
 
   },
   plugins: [
-      require('flowbite/plugin')
+      require('flowbite/plugin')({
+        charts: true,
+      }),
   ],
 }
