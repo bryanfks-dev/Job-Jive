@@ -1,4 +1,4 @@
-<div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-700 divide-y divider-gray-200 dark:divide-gray-700">
+<div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-600 divide-y divider-gray-200 dark:divide-gray-700">
     <time class="text-lg font-semibold text-gray-900 dark:text-white">Wednesday, March 24th 2024</time>
     <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
         <li class="items-center block p-3 sm:flex">
