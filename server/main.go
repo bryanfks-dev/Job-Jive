@@ -3,19 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
+	"configs"
 	"db"
 	"forms"
 
 	"github.com/joho/godotenv"
 )
 
-func initRoutes() {
-	http.HandleFunc("/loginAuth", forms.LoginAuthHandler)
-}
-
-func main() {
+func loadConfig() (configs.Server, configs.Database) {
 	// Load .env
 	err := godotenv.Load()
 
@@ -23,24 +19,32 @@ func main() {
 		panic(err.Error())
 	}
 
-	// Server credentials
-	var (
-		SERVER_URL = os.Getenv("SERVER_URL")
-		SERVER_PORT = os.Getenv("SERVER_PORT")
-	)
+	configs.Session.Init(configs.Session{})
+
+	return configs.Server.Get(configs.Server{}), 
+		configs.Database.Get(configs.Database{})
+}
+
+func initRoutes() {
+	http.HandleFunc("/loginAuth", forms.LoginAuthHandler)
+}
+
+func main() {
+	serverConf, dbConf := loadConfig()
 
 	// Connect to database
-	db.Connect(os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_URL"), 
-		os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
+	db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
 
 	initRoutes()
 
-	fmt.Printf("API Server is running on http://%s:%s\n", SERVER_URL, SERVER_PORT)
+	fmt.Printf("API Server is running on http://%s:%s\n", serverConf.Host, serverConf.Port)
 
 	// Open server connection
-	err = http.ListenAndServe(SERVER_URL + ":" + SERVER_PORT, nil)
+	err := http.ListenAndServe(serverConf.Host + ":" + serverConf.Port, nil)
 
 	if err != nil {
 		panic(err.Error())
 	}
+
+	defer db.Conn.Close()
 }

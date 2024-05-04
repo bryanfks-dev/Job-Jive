@@ -27,7 +27,6 @@
         @yield('content')
         @include('layouts.footer')
     @endsection
-
 </body>
 
 </html>

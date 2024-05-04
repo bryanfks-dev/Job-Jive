@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LoginController;
+
 Route::get('/', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/login-user', function () {
-    return view('login-user');
+Route::get('/login-user', [LoginController::class, 'viewUser'];
 })->name('login-user');
 
 Route::get('/login-admin', function () {
@@ -29,3 +30,7 @@ Route::get('/employees', function () {
 Route::get('/sandbox', function () {
     return view('sandbox');
 })->name('sandbox');
+
+Route::get('/profile', function() {
+    return view('profile');
+})->name('profile');

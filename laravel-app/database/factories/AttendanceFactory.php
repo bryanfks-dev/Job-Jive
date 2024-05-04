@@ -19,7 +19,7 @@ class AttendanceFactory extends Factory
         return [
             //
             'User_ID' => mt_rand(1, 6),
-            'Date' => now()
+            'Date_Time' => now()
         ];
     }
 }

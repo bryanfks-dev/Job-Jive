@@ -13,4 +13,7 @@ start php artisan migrate
 :: Install node modules
 start npm install
 
+cd ../server
+start copy .env.example .env
+
 echo Installation Done..
