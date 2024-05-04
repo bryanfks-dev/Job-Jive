@@ -8,8 +8,8 @@ Route::get('/', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/login-user', [LoginController::class, 'viewUser'];
-})->name('login-user');
+Route::get('/login-user', [LoginController::class, 'viewUser']
+)->name('login-user');
 
 Route::get('/login-admin', function () {
     return view('login-admin');

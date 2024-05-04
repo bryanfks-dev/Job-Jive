@@ -2,11 +2,7 @@
 
 @section('content')
 <div class="antialiased bg-gray-50 dark:bg-gray-900">
-    @include('components.topbar')
-
-    @include('components.sidebar')
-
-    <main class="p-4 md:ml-64 min-h-screen pt-20">
+    <main>
         <!-- Profile Picture -->
         <div class="p-5 mb-4 border border-gray-200 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-700 divide-y divider-gray-200 dark:divide-gray-700">
             <span class="text-lg font-semibold text-gray-900 dark:text-white">Profile</span>
