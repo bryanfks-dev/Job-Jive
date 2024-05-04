@@ -8,7 +8,7 @@
         <div class="mt-2 py-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div class="space-y-4">
                 <!-- Today -->
-                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">Today</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">4 / 8
@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <!-- This Week -->
-                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">This Week</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">36 / 40
@@ -32,7 +32,7 @@
             </div>
             <div class="space-y-4">
                 <!-- This Month -->
-                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">This Month</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">150 / 160
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <!-- Annual Leaves -->
-                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">Annual Leaves</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">3 / 14
