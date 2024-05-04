@@ -1,6 +1,6 @@
 <div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-700 divide-y divider-gray-200 dark:divide-gray-700">
     <time class="text-lg font-semibold text-gray-900 dark:text-white">Wednesday, March 24th 2024</time>
-    <ol class="mt-3 flex gap-6 text-gray-900 dark:text-white">
+    <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
         <li class="items-center block p-3 sm:flex">
             <svg class="fill-green-500 w-11 h-11 mb-3 me-3 rounded-full sm:mb-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path></svg>
             <span class="font-medium">Succeeded Check-In</span>

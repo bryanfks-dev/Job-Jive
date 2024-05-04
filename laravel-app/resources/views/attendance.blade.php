@@ -5,8 +5,55 @@
     <!-- Attendance -->
     <div class="p-5 mb-4 border border-gray-200 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-700 divide-y divider-gray-200 dark:divide-gray-700">
         <span class="text-lg font-semibold text-gray-900 dark:text-white">Attendance Statistics</span>
-        <div class="mt-2">
-
+        <div class="mt-2 py-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div class="space-y-4">
+                <!-- Today -->
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium text-gray-900 dark:text-white">Today</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">4 / 8
+                            <span class="font-normal">hrs</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="h-2.5 rounded-full bg-green-600 dark:bg-green-500" style="width: 45%"></div>
+                    </div>
+                </div>
+                <!-- This Week -->
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium text-gray-900 dark:text-white">This Week</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">36 / 40
+                            <span class="font-normal">hrs</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="h-2.5 rounded-full bg-red-600 dark:bg-red-500" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <!-- This Month -->
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium text-gray-900 dark:text-white">This Month</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">150 / 160
+                            <span class="font-normal">hrs</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="h-2.5 rounded-full bg-yellow-400" style="width: 93.75%"></div>
+                    </div>
+                </div>
+                <!-- Annual Leaves -->
+                <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-700">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium text-gray-900 dark:text-white">Annual Leaves</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">3 / 14
+                            <span class="font-normal">days</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500" style="width: 78.5%"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
