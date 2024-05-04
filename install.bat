@@ -2,18 +2,9 @@
 
 cd ./laravel-app
 
-:: Install Composer
-start composer install
-:: Create .env file
-start copy .env.example .env
-:: Generate laravel app key
-start php artisan key:generate
-:: Migrate laravel database
-start php artisan migrate
-:: Install node modules
-start npm install
+:: Frontend
+start composer install && copy .env.example .env && php artisan key:generate && php artisan migrate && npm install && echo Frontend Installation Done..
 
+:: Backend
 cd ../server
-start copy .env.example .env
-
-echo Installation Done..
+start copy .env.example .env && echo Backend Installation Done..
