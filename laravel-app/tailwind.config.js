@@ -14,10 +14,10 @@ module.exports = {
 
     fontFamily: {
       'body': [
-    'Inter', 
+    'Inter',
   ],
       'sans': [
-    'Inter', 
+    'Inter',
   ]
   }
 

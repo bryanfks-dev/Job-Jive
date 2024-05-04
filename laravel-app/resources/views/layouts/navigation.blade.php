@@ -64,7 +64,7 @@
         </button>
         <!-- Dropdown menu -->
         <div
-          class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
+          class="hidden z-50 my-4 w-56 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
           id="dropdown"
         >
           <div class="py-3 px-4">
@@ -158,7 +158,7 @@
     </div>
   </aside>
 
-  <main class="flex flex-col justify-between p-4 md:ml-64 h-screen pt-20">
+  <main class="flex flex-col justify-between p-4 md:ml-64 h-screen pt-20 overflow-scroll">
     @yield('main')
   </main>
 
