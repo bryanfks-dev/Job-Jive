@@ -1,44 +1,62 @@
 package forms
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 
-	"models"
-	"db"
 	"configs"
+	"db"
+	"models"
 )
-
-type LoginCred struct {
-	Email string
-	Password string
-	Remember bool
-}
 
 var (
 	postMu sync.Mutex
 )
 
-func userVerified(cred LoginCred) bool {
+type UserCred struct {
+	Email string
+	Password string
+	Remember bool
+}
+
+type AdminCred struct {
+	Username string
+	Password string
+}
+
+func VerifyPassword(hashed_pwd string, cred_pwd string) bool {
+	// Database failed to find user
+	if len(hashed_pwd) == 0 {
+		return false
+	}
+
+	// Comparing hashed password from database and login credential
+	err := bcrypt.CompareHashAndPassword([]byte(hashed_pwd), []byte(cred_pwd))
+
+	// Not nil value in err possibly cause of hash and password 
+	// values are not match, otherwise, means hash and password 
+	// values are match
+	return err == nil
+}
+
+func userVerified[T UserCred|AdminCred](cred T) bool {
 	if db.ConnectionEstablished() {
-		user_data := models.User.Search(models.User{}, cred.Email)
+		switch any(cred).(type) {
+			case UserCred: {
+				hashed_pwd := models.User.GetHashedPassword(models.User{}, any(cred).(UserCred).Email)
 
-		// Means database failed to find user data
-		if user_data.Id == 0 {
-			return false
+				return VerifyPassword(hashed_pwd, any(cred).(UserCred).Password)
+			}
+			case AdminCred: {
+				hashed_pwd := models.Admin.GetHashedPassword(models.Admin{}, any(cred).(AdminCred).Username)
+
+				return VerifyPassword(hashed_pwd, any(cred).(AdminCred).Password)
+			}
 		}
-
-		// Comparing hashed password from database and login credential
-		err := bcrypt.CompareHashAndPassword(
-			[]byte(user_data.Password), []byte(cred.Password))
-
-		// Not nil value in err possibly cause of hash and password 
-		// values are not match, otherwise, means hash and password 
-		// values are match
-		return err == nil
 	}
 
 	return false
@@ -62,7 +80,7 @@ func createSession(w http.ResponseWriter, r *http.Request, value int) {
 	}
 }
 
-func LoginAuthHandler(w http.ResponseWriter, r *http.Request) {
+func LoginUserAuthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		postMu.Lock()
 		defer postMu.Unlock()
@@ -75,7 +93,7 @@ func LoginAuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Get login credential
-		login_cred := LoginCred{
+		login_cred := UserCred{
 			Email: strings.TrimSpace(r.Form.Get("email")),
 			Password: r.Form.Get("password"),
 			Remember: r.Form.Get("remember") != "",
@@ -88,5 +106,27 @@ func LoginAuthHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "http://localhost:8000" + "/login?msg=Invalid+Login+Credentials", 
 			http.StatusSeeOther)
+	}
+}
+
+func LoginAdminAuthHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		err := r.ParseForm()
+
+		if err != nil {
+			http.Error(w, "Interal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Get login credential
+		login_cred := AdminCred{
+			Username: strings.TrimSpace(r.Form.Get("username")),
+			Password: r.Form.Get("password"),
+		}
+
+		fmt.Println(login_cred)
 	}
 }
