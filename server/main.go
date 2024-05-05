@@ -26,7 +26,7 @@ func loadConfig() (configs.Server, configs.Database) {
 }
 
 func initRoutes() {
-	http.HandleFunc("/loginAuth", forms.LoginAuthHandler)
+	http.HandleFunc("/loginAuth", forms.LoginUserAuthHandler)
 }
 
 func main() {
@@ -34,6 +34,7 @@ func main() {
 
 	// Connect to database
 	db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+
 
 	initRoutes()
 
