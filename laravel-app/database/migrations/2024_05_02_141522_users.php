@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('Gender', 10);
             $table->string('Phone_Number', 13);
             $table->integer('Department_ID')->unsigned();
-            $table->date('First_Login');
+            $table->date('First_Login')->nullable();
 
             $table->foreign('Manager_ID')->references('User_ID')->on('users')->onDelete('cascade');
             $table->foreign('Department_ID')->references('Department_ID')->on('divisions')->onDelete('cascade');
