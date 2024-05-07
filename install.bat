@@ -1,19 +1,10 @@
 @echo off
 
-cd ./laravel-app
+:: Frontend
+start cd laravel-app && composer install && copy .env.example .env 
+    && php artisan key:generate && php artisan migrate && npm install 
+    && echo Frontend Installation Done..
 
-:: Install Composer
-start composer install
-:: Create .env file
-start copy .env.example .env
-:: Generate laravel app key
-start php artisan key:generate
-:: Migrate laravel database
-start php artisan migrate
-:: Install node modules
-start npm install
-
-cd ../server
-start copy .env.example .env
-
-echo Installation Done..
+:: Backend
+start cd server && copy .env.example .env && cd utils && go build ./addAdmin.go 
+    && echo Backend Installation Done..

@@ -1,18 +1,8 @@
 package models
 
 import (
-	"time"
-
-	// "cloud.google.com/go/civil"
-
 	"db"
 )
-
-type DateType time.Time
-
-func (t DateType) String() string {
-	return time.Time(t).String()
-}
 
 type User struct {
 	Id           int        `json:"id"`
@@ -39,8 +29,8 @@ func (user User) Insert() {
 	}
 }
 
-func (user User) Search(email string) User {
-	stmt := "SELECT * FROM `users` WHERE email = ?"
+func (user User) GetHashedPassword(email string) string {
+	stmt := "SELECT Password FROM `users` WHERE Email = ?"
 
 	row, err := db.Conn.Query(stmt, email)
 
@@ -50,21 +40,17 @@ func (user User) Search(email string) User {
 
 	defer row.Close()
 
+	var user_pwd string
+
 	// Query result from user table with given email should
 	// be returning 1 row, since the email value is unique
-	var user_data User
-
 	if row.Next() {
-		// Store row into user struct
-		err := row.Scan(&user_data.Id, &user_data.FullName, &user_data.Email,
-			&user_data.Password, &user_data.ManagerId, &user_data.Address,
-			&user_data.NIK, &user_data.Gender, &user_data.PhoneNumber,
-			&user_data.DepartmentId, &user_data.FirstLogin)
+		err := row.Scan(&user_pwd)
 
 		if err != nil {
 			panic(err.Error())
 		}
 	}
-
-	return user_data
+=======
+	return user_pwd
 }

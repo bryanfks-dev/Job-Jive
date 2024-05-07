@@ -26,7 +26,7 @@ func loadConfig() (configs.Server, configs.Database) {
 }
 
 func initRoutes() {
-	http.HandleFunc("/loginAuth", forms.LoginAuthHandler)
+	http.HandleFunc("/loginAuth", forms.LoginUserAuthHandler)
 }
 
 func main() {

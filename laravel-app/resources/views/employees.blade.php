@@ -17,19 +17,12 @@
                     </div>
                 </div>
             </div>
-
-
             <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700" style="grid-column: span 3; background-image: url('https://images.unsplash.com/photo-1523841589119-b55aee0f66e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); background-size: cover;">
                 <div class="flex flex-col justify-between p-4 leading-normal">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Department Name</h5>
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Jl. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
                 </div>
             </a>
-            
-
-
-
-
         </div>
 
         <div class="flex flex-col items-center p-7">
@@ -124,17 +117,5 @@
                     </div>
                 </div>
             </div>
-
-
-            
-
-  
-
-
-            
-
-
         </div>
-
-
 @endsection
