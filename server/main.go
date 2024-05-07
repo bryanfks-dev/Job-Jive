@@ -35,7 +35,6 @@ func main() {
 	// Connect to database
 	db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
 
-
 	initRoutes()
 
 	fmt.Printf("API Server is running on http://%s:%s\n", serverConf.Host, serverConf.Port)

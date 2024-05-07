@@ -27,6 +27,10 @@ Route::get('/employees', function () {
     return view('employees');
 })->name('employees');
 
+Route::get('/employees/view', function () {
+    return view('view');
+})->name('view');
+
 Route::get('/sandbox', function () {
     return view('sandbox');
 })->name('sandbox');

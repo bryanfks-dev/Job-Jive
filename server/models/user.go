@@ -1,8 +1,6 @@
 package models
 
 import (
-	// "cloud.google.com/go/civil"
-
 	"db"
 )
 
@@ -53,6 +51,6 @@ func (user User) GetHashedPassword(email string) string {
 			panic(err.Error())
 		}
 	}
-
+=======
 	return user_pwd
 }
