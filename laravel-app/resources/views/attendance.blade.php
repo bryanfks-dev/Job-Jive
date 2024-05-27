@@ -22,11 +22,11 @@
                 <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">This Week</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">36 / 40
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">32 / 40
                             <span class="font-normal">hrs</span></span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                        <div class="h-2.5 rounded-full bg-red-600 dark:bg-red-500" style="width: 90%"></div>
+                        <div class="h-2.5 rounded-full bg-red-600 dark:bg-red-500" style="width: 80%"></div>
                     </div>
                 </div>
             </div>
@@ -35,22 +35,22 @@
                 <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">This Month</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">150 / 160
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">136 / 160
                             <span class="font-normal">hrs</span></span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                        <div class="h-2.5 rounded-full bg-yellow-400" style="width: 93.75%"></div>
+                        <div class="h-2.5 rounded-full bg-yellow-400" style="width: 85%"></div>
                     </div>
                 </div>
                 <!-- Annual Leaves -->
                 <div class="border rounded-xl p-5 border-gray-300 dark:border-gray-600">
                     <div class="flex justify-between mb-1">
                         <span class="text-base font-medium text-gray-900 dark:text-white">Annual Leaves</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">3 / 14
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">8 / 14
                             <span class="font-normal">days</span></span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                        <div class="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500" style="width: 78.5%"></div>
+                        <div class="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500" style="width: 57.15%"></div>
                     </div>
                 </div>
             </div>
@@ -73,12 +73,47 @@
             </div>
             <div>
                 @include('layouts.attendances.today_card')
-                @include('layouts.attendances.regular_card')
-                @include('layouts.attendances.regular_card')
-                @include('layouts.attendances.regular_card')
-                @include('layouts.attendances.regular_card')
-                @include('layouts.attendances.regular_card')
-                @include('layouts.attendances.regular_card')
+                
+                <div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-600 divide-y divider-gray-200 dark:divide-gray-700">
+                    <time class="text-lg font-semibold text-gray-900 dark:text-white">Wednesday, March 24th 2024</time>
+                    <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
+                        <li class="items-center block p-3 sm:flex">
+                            <svg class="fill-green-500 w-11 h-11 mb-3 me-3 rounded-full sm:mb-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path></svg>
+                            <span class="font-medium">Succeeded Check-In</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-600 divide-y divider-gray-200 dark:divide-gray-700">
+                    <time class="text-lg font-semibold text-gray-900 dark:text-white">Tuesday, March 23th 2024</time>
+                    <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
+                        <li class="items-center block p-3 sm:flex">
+                            <svg class="fill-green-500 w-11 h-11 mb-3 me-3 rounded-full sm:mb-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path></svg>
+                            <span class="font-medium">Succeeded Check-In</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-600 divide-y divider-gray-200 dark:divide-gray-700">
+                    <time class="text-lg font-semibold text-gray-900 dark:text-white">Monday, March 22th 2024</time>
+                    <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
+                        <li class="items-center block p-3 sm:flex">
+                            <svg class="fill-green-500 w-11 h-11 mb-3 me-3 rounded-full sm:mb-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path></svg>
+                            <span class="font-medium">Succeeded Check-In</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="p-5 mb-4 border border-gray-300 rounded-lg shadow bg-white dark:bg-gray-800 dark:border-gray-600 divide-y divider-gray-200 dark:divide-gray-700">
+                    <time class="text-lg font-semibold text-gray-900 dark:text-white">Friday, March 19th 2024</time>
+                    <ol class="mt-3 flex flex-wrap md:gap-6 text-gray-900 dark:text-white">
+                        <li class="items-center block p-3 sm:flex">
+                            <svg class="fill-green-500 w-11 h-11 mb-3 me-3 rounded-full sm:mb-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path></svg>
+                            <span class="font-medium">Succeeded Check-In</span>
+                        </li>
+                    </ol>
+                </div>
+
             </div>
 
             <!-- Pagination -->

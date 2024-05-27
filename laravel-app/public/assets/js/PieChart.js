@@ -1,7 +1,7 @@
 
 const getChartOptions = () => {
     return {
-      series: [52.8, 26.8],
+      series: [92, 8],
       colors: ["#1C64F2", "#16BDCA"],
       chart: {
         height: 300,

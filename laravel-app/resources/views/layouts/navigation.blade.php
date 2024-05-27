@@ -57,8 +57,8 @@
         >
           <span class="sr-only">Open user menu</span>
           <img
-            class="w-10 h-10 rounded-full"
-            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
+            class="w-10 h-10 rounded-full object-cover"
+            src="https://source.unsplash.com/v6771a4avV4"
             alt="user photo"
           />
         </button>
@@ -70,11 +70,11 @@
           <div class="py-3 px-4">
             <span
               class="block text-sm font-semibold text-gray-900 dark:text-white"
-              >Full Name</span
+              >Aldo Arista</span
             >
             <span
               class="block text-sm text-gray-900 truncate dark:text-white"
-              >Job Title</span
+              >Manager</span
             >
           </div>
           <ul
