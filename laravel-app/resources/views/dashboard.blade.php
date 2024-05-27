@@ -112,7 +112,7 @@
             {{-- Headline Top Attendance --}}
             <div class="flex gap-2 mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="12" class="fill-green-400" />
+                    <circle cx="12" cy="12" r="12" fill="#6DB653" />
                     <path
                         d="M17.7459 15.3512L13.0824 7.27389C12.4871 6.24204 11.5129 6.24204 10.9176 7.27389L6.25407 15.3512C5.65877 16.3831 6.14583 17.2259 7.33644 17.2259H16.6636C17.8542 17.2259 18.3412 16.3817 17.7459 15.3512Z"
                         fill="white" />
@@ -189,7 +189,7 @@
                     </tbody>
                 </table>
 
-                {{-- Headline Top Attendance --}}
+                {{-- Headline Worst Attendance --}}
                 <div class="flex gap-2 mb-2 mt-8">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                         fill="none">
