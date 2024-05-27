@@ -6,7 +6,7 @@
           data-drawer-target="drawer-navigation"
           data-drawer-toggle="drawer-navigation"
           aria-controls="drawer-navigation"
-          class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer md:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
         >
           <svg
             aria-hidden="true"
@@ -36,7 +36,7 @@
           </svg>
           <span class="sr-only">Toggle sidebar</span>
         </button>
-        <a href="#" class="hidden md:flex items-center justify-between mr-4">
+        <a href="#" class="hidden lg:flex items-center justify-between mr-4">
           <img
             src="https://flowbite.s3.amazonaws.com/logo.svg"
             class="mr-3 h-8"
@@ -50,7 +50,7 @@
         <!-- Profile dropdown -->
         <button
           type="button"
-          class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+          class="flex mx-3 text-sm bg-gray-800 rounded-full lg:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
           id="user-menu-button"
           aria-expanded="false"
           data-dropdown-toggle="dropdown"
@@ -97,7 +97,7 @@
   <!-- Sidebar -->
 
   <aside
-    class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+    class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
     aria-label="Sidenav"
     id="drawer-navigation"
   >
@@ -158,7 +158,7 @@
     </div>
   </aside>
 
-  <main class="flex flex-col justify-between p-4 md:ml-64 h-screen pt-20 overflow-scroll">
+  <main class="flex flex-col justify-between p-4 lg:ml-64 h-screen pt-20 overflow-scroll">
     @yield('main')
   </main>
 

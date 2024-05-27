@@ -110,7 +110,7 @@
             <h1 class="font-bold text-xl mb-8">Employee Performance</h1>
 
             {{-- Headline Top Attendance --}}
-            <div class="flex gap-2 mb-2">
+            <div class="flex gap-3 mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="12" fill="#6DB653" />
                     <path
@@ -122,19 +122,19 @@
 
             {{-- Table Top Attendance --}}
             <div class="w-full overflow-x-auto">
-                <table class="w-full text-sm text-left">
+                <table class="w-full table-fixed text-sm text-left">
                     <thead class="opacity-50 border-b-[1.5px]">
                         <tr>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[12%] py-3 font-medium">
                                 No
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[48%] py-3 font-medium">
                                 Name
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[20%] py-3 font-medium">
                                 Att/Abs
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[20%] py-3 font-medium">
                                 Percentage
                             </th>
                         </tr>
@@ -190,7 +190,7 @@
                 </table>
 
                 {{-- Headline Worst Attendance --}}
-                <div class="flex gap-2 mb-2 mt-8">
+                <div class="flex gap-3 mb-2 mt-8">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                         fill="none">
                         <circle cx="12" cy="12" r="12" transform="rotate(180 12 12)" fill="#C64747" />
@@ -202,19 +202,19 @@
                 </div>
 
                 {{-- Table Worst Attendance --}}
-                <table class="w-full text-sm text-left">
+                <table class="w-full table-fixed text-sm text-left">
                     <thead class="opacity-50 border-b-[1.5px]">
                         <tr>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[12%] py-3 font-medium">
                                 No
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[48%] py-3 font-medium">
                                 Name
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[20%] py-3 font-medium">
                                 Att/Abs
                             </th>
-                            <th scope="col" class="py-3 font-medium">
+                            <th scope="col" class="w-[20%] py-3 font-medium">
                                 Percentage
                             </th>
                         </tr>
