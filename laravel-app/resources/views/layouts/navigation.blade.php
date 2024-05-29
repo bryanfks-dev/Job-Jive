@@ -144,7 +144,7 @@
       <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
         <li>
           <a
-            href="{{ route('login-user') }}"
+            href="{{ route('user.login') }}"
             class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
           >
             <svg class="h-6 w-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" width="30" height="30" viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

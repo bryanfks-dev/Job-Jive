@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\UserLoginController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\UserLoginController;
 use App\Http\Controllers\AdminLoginController;
 
 Route::get('/', function () {
@@ -13,7 +13,7 @@ Route::get('/', function () {
 Route::group(['prefix'=> '/'], function () {
     // Login route
     Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [UserLoginController::class, 'index']);
+        Route::get('/', [UserLoginController::class, 'index'])->name('user.login');
     });
 });
 
@@ -21,13 +21,9 @@ Route::group(['prefix'=> '/'], function () {
 Route::group(['prefix'=> '/admin'], function () {
     // Login route
     Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [AdminLoginController::class, 'index']);
+        Route::get('/', [AdminLoginController::class, 'index'])->name('admin.login');
     });
 });
-
-Route::get('/register', function () {
-    return view('register');
-})->name('register');
 
 Route::get('/attendance', function () {
     return view('attendance');
