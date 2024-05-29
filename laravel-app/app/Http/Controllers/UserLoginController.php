@@ -17,12 +17,14 @@ class UserLoginController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
-            'remember' => ['accepted']
         ]);
 
         // Send request to be server
         $response =
-            Http::post('http://127.0.0.1:5000/auth/user/login', $credentials);
+            Http::post('http://127.0.0.1:5000/auth/user/login', array_merge(
+                $credentials, [
+                'remember' => ($request->input('remember') === "on"),
+            ]));
 
         switch ($response['status']) {
             case 401:

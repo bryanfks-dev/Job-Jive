@@ -23,7 +23,7 @@ func loadConfig() (configs.Server, configs.Database) {
 		panic(err.Error())
 	}
 
-	return configs.Server.Get(configs.Server{}), 
+	return configs.Server.Get(configs.Server{}),
 		configs.Database.Get(configs.Database{})
 }
 
@@ -44,7 +44,7 @@ func main() {
 	fmt.Println("Logs:")
 
 	// Open server connection
-	err := http.ListenAndServe(serverConf.Host + ":" + serverConf.Port, mux)
+	err := http.ListenAndServe(serverConf.Host+":"+serverConf.Port, mux)
 
 	if err != nil {
 		panic(err.Error())
