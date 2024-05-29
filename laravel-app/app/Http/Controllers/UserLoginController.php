@@ -16,7 +16,8 @@ class UserLoginController extends Controller
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
-            'password' => ['required']
+            'password' => ['required'],
+            'remember' => ['accepted']
         ]);
 
         // Send request to be server
