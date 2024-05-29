@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BackendServer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -19,16 +20,32 @@ class AdminLoginController extends Controller
             'password' => ['required']
         ]);
 
-        // Send request to be server
-        $response =
-            Http::post('http://127.0.0.1:5000/auth/admin/login', $credentials);
+        try {
+            // Send request to be server
+            $response =
+            Http::withHeaders([
+                'Content-type' => 'application/json'
+            ])->post(BackendServer::url() . '/auth/admin/login', $credentials);
 
-        switch ($response['status']) {
-            case 401:
-                return redirect()->back();
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 401:
+                        return redirect()->back();
 
-            case 200:
-                return redirect()->intended(route('admin.dashboard'));
+                    case 500:
+                        return redirect()->back();
+
+                    case 200:
+                        // Create session token
+                        session(['token' => $response['token']]);
+
+                        return redirect()->intended(route('admin.dashboard'));
+                }
+            }
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back();
         }
     }
 }

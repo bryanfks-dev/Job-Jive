@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UserLoginController;
@@ -19,6 +20,10 @@ Route::group(['prefix'=> '/'], function () {
     Route::get('/', function () {
         return view('dashboard');
     })->name('user.dashboard');
+
+    // Profile route
+    Route::get('/profile', [UserProfileController::class, 'index'])
+        ->name('user.profile');
 });
 
 // Admin routes
@@ -27,7 +32,7 @@ Route::group(['prefix'=> '/admin'], function () {
     Route::group(['prefix'=> '/login'], function () {
         Route::get('/', [AdminLoginController::class, 'index'])
             ->name('admin.login');
-        
+
         Route::post('/', [AdminLoginController::class, 'login']);
     });
 });
@@ -47,7 +52,3 @@ Route::get('/employees/view', function () {
 Route::get('/sandbox', function () {
     return view('sandbox');
 })->name('sandbox');
-
-Route::get('/profile', function() {
-    return view('profile');
-})->name('profile');

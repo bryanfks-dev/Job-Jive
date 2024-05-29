@@ -15,6 +15,7 @@ type UserCred struct {
 type User struct {
 	Id           uint    `json:"id"`
 	FullName     string  `json:"full_name"`
+	PhotoPath    string  `json:"photo_path"`
 	Email        string  `json:"email"`
 	Password     string  `json:"password"`
 	ManagerId    *int    `json:"manager_id"`
