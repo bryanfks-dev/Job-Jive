@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('Date_of_Birth');
             $table->string('Address');
             $table->string('NIK', 16);
+            $table->string('Photo');
             $table->enum('Gender', ['Male', 'Female']);
             $table->string('Phone_Number', 13);
             $table->tinyInteger('Department_ID')->unsigned()->nullable();
