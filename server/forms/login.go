@@ -114,6 +114,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		// Send response
 		w.Header().Set("Content-Type", "application/json")
 
 		json.NewEncoder(w).Encode(response)
