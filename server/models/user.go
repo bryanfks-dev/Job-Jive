@@ -1,11 +1,19 @@
 package models
 
 import (
+	// "cloud.google.com/go/civil"
+
 	"db"
 )
 
+type UserCred struct {
+	Email string
+	Password string
+	Remember bool
+}
+
 type User struct {
-	Id           int        `json:"id"`
+	Id           uint        `json:"id"`
 	FullName     string     `json:"full_name"`
 	Email        string     `json:"email"`
 	Password     string     `json:"password"`
@@ -51,6 +59,6 @@ func (user User) GetHashedPassword(email string) string {
 			panic(err.Error())
 		}
 	}
-=======
+
 	return user_pwd
 }

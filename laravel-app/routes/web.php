@@ -1,19 +1,29 @@
 <?php
 
+use App\Http\Controllers\UserLoginController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AdminLoginController;
 
 Route::get('/', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/login-user', [LoginController::class, 'viewUser']
-)->name('login-user');
+// User routes
+Route::group(['prefix'=> '/'], function () {
+    // Login route
+    Route::group(['prefix'=> '/login'], function () {
+        Route::get('/', [UserLoginController::class, 'index']);
+    });
+});
 
-Route::get('/login-admin', function () {
-    return view('login-admin');
-})->name('login-admin');
+// Admin routes
+Route::group(['prefix'=> '/admin'], function () {
+    // Login route
+    Route::group(['prefix'=> '/login'], function () {
+        Route::get('/', [AdminLoginController::class, 'index']);
+    });
+});
 
 Route::get('/register', function () {
     return view('register');

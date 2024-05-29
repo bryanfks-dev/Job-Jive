@@ -1,37 +1,40 @@
 package forms
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 
-	"configs"
 	"db"
 	"models"
 )
 
-var (
-	postMu sync.Mutex
+type (
+	UserCred models.UserCred
+	AdminCred models.AdminCred
 )
 
-type UserCred struct {
-	Email string
-	Password string
-	Remember bool
+var (
+	postMu sync.Mutex
+	errUserNotFound = errors.New("user not found")
+	errDBConnNotEstablished = errors.New("cannot established connection with database")
+)
+
+func sendJson(w http.ResponseWriter, status int, v any) error {
+	w.WriteHeader(status)
+	w.Header().Set("Content-Type", "application/json")
+
+	return json.NewEncoder(w).Encode(v)
 }
 
-type AdminCred struct {
-	Username string
-	Password string
-}
-
-func VerifyPassword(hashed_pwd string, cred_pwd string) bool {
+func verifyPassword(hashed_pwd string, cred_pwd string) (bool, error) {
 	// Database failed to find user
 	if len(hashed_pwd) == 0 {
-		return false
+		return false, errUserNotFound
 	}
 
 	// Comparing hashed password from database and login credential
@@ -40,44 +43,26 @@ func VerifyPassword(hashed_pwd string, cred_pwd string) bool {
 	// Not nil value in err possibly cause of hash and password 
 	// values are not match, otherwise, means hash and password 
 	// values are match
-	return err == nil
+	return err == nil, err
 }
 
-func userVerified[T UserCred|AdminCred](cred T) bool {
+func userVerified[T UserCred|AdminCred](cred T) (bool, error) {
 	if db.ConnectionEstablished() {
 		switch any(cred).(type) {
 			case UserCred: {
 				hashed_pwd := models.User.GetHashedPassword(models.User{}, any(cred).(UserCred).Email)
 
-				return VerifyPassword(hashed_pwd, any(cred).(UserCred).Password)
+				return verifyPassword(hashed_pwd, any(cred).(UserCred).Password)
 			}
 			case AdminCred: {
 				hashed_pwd := models.Admin.GetHashedPassword(models.Admin{}, any(cred).(AdminCred).Username)
 
-				return VerifyPassword(hashed_pwd, any(cred).(AdminCred).Password)
+				return verifyPassword(hashed_pwd, any(cred).(AdminCred).Password)
 			}
 		}
 	}
 
-	return false
-}
-
-func createSession(w http.ResponseWriter, r *http.Request, value int) { 
-	session, err := configs.UserSession.Store.Get(r, "user-sessions")
-
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	session.Values["key"] = value
-
-	err = session.Save(r, w)
-
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	return false, errDBConnNotEstablished
 }
 
 func LoginUserAuthHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,13 +84,17 @@ func LoginUserAuthHandler(w http.ResponseWriter, r *http.Request) {
 			Remember: r.Form.Get("remember") != "",
 		}
 
-		if userVerified(login_cred) {
-			http.Redirect(w, r, "http://localhost:8000/", http.StatusSeeOther)
-			return
-		}
+		verified, err := userVerified(login_cred)
 
-		http.Redirect(w, r, "http://localhost:8000" + "/login?msg=Invalid+Login+Credentials", 
-			http.StatusSeeOther)
+		if verified {
+			sendJson(w, http.StatusOK, map[string]string{
+				"message": "Login Success",
+			})
+		} else if !verified && (err == errUserNotFound || err == bcrypt.ErrMismatchedHashAndPassword) {
+			sendJson(w, http.StatusUnauthorized, map[string]string{
+				"message": "Invalid Login Credentials",
+			})
+		}
 	}
 }
 
@@ -127,6 +116,16 @@ func LoginAdminAuthHandler(w http.ResponseWriter, r *http.Request) {
 			Password: r.Form.Get("password"),
 		}
 
-		fmt.Println(login_cred)
+		verified, err := userVerified(login_cred)
+
+		if verified {
+			sendJson(w, http.StatusOK, map[string]string{
+				"message": "Login Success",
+			})
+		} else if !verified && (err == errUserNotFound || err == bcrypt.ErrMismatchedHashAndPassword) {
+			sendJson(w, http.StatusUnauthorized, map[string]string{
+				"message": "Invalid Login Credentials",
+			})
+		}
 	}
 }

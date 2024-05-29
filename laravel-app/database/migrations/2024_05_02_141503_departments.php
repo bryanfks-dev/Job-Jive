@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salaries', function (Blueprint $table) {
-            $table->integerIncrements('User_ID')->unsigned();
-            $table->integer('Initial_Salary');
-            $table->integer('Final_Salary');
-
-            $table->foreign('User_ID')->references('User_ID')
-                ->on('users')->onDelete('cascade');
+        Schema::create('departments', function (Blueprint $table) {
+            $table->tinyIncrements('Department_ID')->primary();
+            $table->string('Department_Name');
 
             $table->timestamps();
         });
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salaries');
+        Schema::dropIfExists('departments');
     }
 };

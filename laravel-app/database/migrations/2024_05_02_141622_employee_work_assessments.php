@@ -16,7 +16,8 @@ return new class extends Migration
             $table->text('Feedback');
             $table->timestamp('Date_Time')->default(now());
 
-            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
+            $table->foreign('User_ID')->references('User_ID')
+                ->on('users')->onDelete('cascade');
         });
     }
 

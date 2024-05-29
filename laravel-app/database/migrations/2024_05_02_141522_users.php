@@ -12,20 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->increments('User_ID');
+            $table->integerIncrements('User_ID')->primary();
             $table->string('Full_Name');
             $table->string('Email')->unique();
             $table->string('Password');
             $table->integer('Manager_ID')->unsigned()->nullable();
+            $table->date('Date_of_Birth');
             $table->string('Address');
             $table->string('NIK', 16);
-            $table->string('Gender', 10);
+            $table->enum('Gender', ['Male', 'Female']);
             $table->string('Phone_Number', 13);
-            $table->integer('Department_ID')->unsigned();
+            $table->tinyInteger('Department_ID')->unsigned()->nullable();
             $table->date('First_Login')->nullable();
 
-            $table->foreign('Manager_ID')->references('User_ID')->on('users')->onDelete('cascade');
-            $table->foreign('Department_ID')->references('Department_ID')->on('divisions')->onDelete('cascade');
+            $table->foreign('Manager_ID')->references('User_ID')
+                ->on('users')->onDelete('set null');
+            $table->foreign('Department_ID')->references('Department_ID')
+                ->on('departments')->onDelete('set null');
+
+            $table->timestamps();
         });
     }
 
