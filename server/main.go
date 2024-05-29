@@ -29,6 +29,7 @@ func loadConfig() (configs.Server, configs.Database) {
 
 func initEndPoints() {
 	mux.HandleFunc("/auth/user/login", forms.UserLoginHandler)
+	mux.HandleFunc("/auth/admin/login", forms.AdminLoginHandler)
 }
 
 func main() {
