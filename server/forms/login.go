@@ -120,3 +120,64 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 }
+
+func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Decode json to struct
+		req_json := json.NewDecoder(r.Body)
+
+		var login_cred AdminCred
+
+		err := req_json.Decode(&login_cred)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		verified, err := userVerified(login_cred)
+
+		var response map[string]interface{}
+
+		// Errors other than user not found and invalid password
+		if err != nil && (err != errUserNotFound && err != bcrypt.ErrMismatchedHashAndPassword) {
+			response = map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			}
+		} else {
+			// User is veified
+			if verified {
+				token, err := models.CreateToken(login_cred.Password)
+
+				// Failed generate token
+				if err != nil {
+					response = map[string]interface{}{
+						"status":  http.StatusInternalServerError,
+						"message": "Server error",
+					}
+				} else {
+					log.Println("Admin ", login_cred.Username, " logged in")
+
+					response = map[string]interface{}{
+						"status":  http.StatusOK,
+						"message": "Login success",
+						"token":   token,
+					}
+				}
+			} else { // User not found or invalid password
+				response = map[string]interface{}{
+					"status":  http.StatusUnauthorized,
+					"message": "Invalid credentials",
+				}
+			}
+		}
+
+		// Send response
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(response)
+	}
+}

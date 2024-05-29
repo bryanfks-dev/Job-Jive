@@ -19,6 +19,7 @@ class UserLoginController extends Controller
             'password' => ['required']
         ]);
 
+        // Send request to be server
         $response =
             Http::post('http://127.0.0.1:5000/auth/user/login', $credentials);
 
