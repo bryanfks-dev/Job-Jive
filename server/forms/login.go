@@ -91,7 +91,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			if verified {
 				token, err := models.CreateToken(login_cred.Password)
 
-				// Failed to generate token
+				// Failed generate token
 				if err != nil {
 					response = map[string]interface{}{
 						"status":  http.StatusInternalServerError,
