@@ -25,7 +25,7 @@ func CreateToken(credential string) (string, error) {
 	// Init token
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
 		"credential": credential,
-		"exp": time.Now().Add(time.Hour * (24 * 7)).Unix(),
+		"exp": time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
 	})
 
 	// Hash token
