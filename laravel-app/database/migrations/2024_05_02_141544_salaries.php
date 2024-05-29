@@ -12,11 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('salaries', function (Blueprint $table) {
-            $table->integer('User_ID')->unsigned();
-            $table->integer('Initial_Salary')->nullable();
-            $table->integer('Final_Salary')->nullable();
+            $table->integerIncrements('User_ID')->unsigned();
+            $table->integer('Initial_Salary');
+            $table->integer('Final_Salary');
 
-            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
+            $table->foreign('User_ID')->references('User_ID')
+                ->on('users')->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 

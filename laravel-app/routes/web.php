@@ -2,22 +2,33 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\UserLoginController;
+use App\Http\Controllers\AdminLoginController;
 
-Route::get('/', function () {
-    return view('dashboard');
-})->name('dashboard');
+// User routes
+Route::group(['prefix'=> '/'], function () {
+    // Login route
+    Route::group(['prefix'=> '/login'], function () {
+        Route::get('/', [UserLoginController::class, 'index'])
+            ->name('user.login');
 
-Route::get('/login-user', [LoginController::class, 'viewUser']
-)->name('login-user');
+        Route::post('/', [UserLoginController::class, 'login']);
+    });
 
-Route::get('/login-admin', function () {
-    return view('login-admin');
-})->name('login-admin');
+    // Dashboard route
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('user.dashboard');
+});
 
-Route::get('/register', function () {
-    return view('register');
-})->name('register');
+// Admin routes
+Route::group(['prefix'=> '/admin'], function () {
+    // Login route
+    Route::group(['prefix'=> '/login'], function () {
+        Route::get('/', [AdminLoginController::class, 'index'])
+            ->name('admin.login');
+    });
+});
 
 Route::get('/attendance', function () {
     return view('attendance');

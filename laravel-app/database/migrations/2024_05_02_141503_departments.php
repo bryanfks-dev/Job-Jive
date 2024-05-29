@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('divisions', function (Blueprint $table) {
-            $table->increments('Department_ID');
+        Schema::create('departments', function (Blueprint $table) {
+            $table->tinyIncrements('Department_ID')->primary();
             $table->string('Department_Name');
+
+            $table->timestamps();
         });
     }
 
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('divisions');
+        Schema::dropIfExists('departments');
     }
 };

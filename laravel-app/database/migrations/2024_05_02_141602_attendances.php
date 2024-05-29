@@ -16,7 +16,8 @@ return new class extends Migration
             $table->timestamp('Date_Time')->default(now());
             $table->enum('Type', ['Check-In', 'Check-Out']);
 
-            $table->foreign('User_ID')->references('User_ID')->on('users')->onDelete('cascade');
+            $table->foreign('User_ID')->references('User_ID')
+                ->on('users')->onDelete('cascade');
         });
     }
 

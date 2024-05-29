@@ -1,20 +1,28 @@
 package models
 
 import (
+	// "cloud.google.com/go/civil"
+
 	"db"
 )
 
+type UserCred struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Remember bool   `json:"remember"`
+}
+
 type User struct {
-	Id           int        `json:"id"`
-	FullName     string     `json:"full_name"`
-	Email        string     `json:"email"`
-	Password     string     `json:"password"`
-	ManagerId    *int       `json:"manager_id"`
-	Address      string     `json:"address"`
-	NIK          string     `json:"nik"`
-	Gender       string     `json:"gender"`
-	PhoneNumber  string     `json:"phone_number"`
-	DepartmentId int        `json:"department_id"`
+	Id           uint    `json:"id"`
+	FullName     string  `json:"full_name"`
+	Email        string  `json:"email"`
+	Password     string  `json:"password"`
+	ManagerId    *int    `json:"manager_id"`
+	Address      string  `json:"address"`
+	NIK          string  `json:"nik"`
+	Gender       string  `json:"gender"`
+	PhoneNumber  string  `json:"phone_number"`
+	DepartmentId int     `json:"department_id"`
 	FirstLogin   *string `json:"first_login"`
 }
 
@@ -51,6 +59,6 @@ func (user User) GetHashedPassword(email string) string {
 			panic(err.Error())
 		}
 	}
-=======
+
 	return user_pwd
 }
