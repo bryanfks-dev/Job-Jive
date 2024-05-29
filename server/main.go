@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 
 	"configs"
@@ -29,11 +28,7 @@ func loadConfig() (configs.Server, configs.Database) {
 }
 
 func initEndPoints() {
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, string("wllwlw"))
-	})
-	
-	mux.HandleFunc("/loginAuth", forms.LoginUserAuthHandler)
+	mux.HandleFunc("/auth/user/login", forms.UserLoginHandler)
 }
 
 func main() {
@@ -45,6 +40,7 @@ func main() {
 	initEndPoints()
 
 	fmt.Printf("API Server is running on http://%s:%s\n", serverConf.Host, serverConf.Port)
+	fmt.Println("Logs:")
 
 	// Open server connection
 	err := http.ListenAndServe(serverConf.Host + ":" + serverConf.Port, mux)

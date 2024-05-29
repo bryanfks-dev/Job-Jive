@@ -21,31 +21,23 @@ func getSecretKey() []byte {
 
 var secret_key = getSecretKey()
 
-func CreateToken(username string) string {
+func CreateToken(credential string) (string, error) {
 	// Init token
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"username": username,
+		"credential": credential,
 		"exp": time.Now().Add(time.Hour * (24 * 7)).Unix(),
 	})
 
 	// Hash token
 	token_string, err := token.SignedString(secret_key)
 
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return token_string
+	return token_string, err
 }
 
-func VerifyToken(token_string string) bool {
+func VerifyToken(token_string string) (bool, error) {
 	token, err := jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
 		return secret_key, nil
 	})
 
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return token.Valid
+	return token.Valid, err
 }
