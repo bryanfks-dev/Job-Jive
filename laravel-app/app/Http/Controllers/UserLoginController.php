@@ -19,18 +19,26 @@ class UserLoginController extends Controller
             'password' => ['required'],
         ]);
 
+        $remember = $request->input('remember') === "on";
+
         // Send request to be server
         $response =
             Http::post('http://127.0.0.1:5000/auth/user/login', array_merge(
-                $credentials, [
-                'remember' => ($request->input('remember') === "on"),
-            ]));
+                $credentials, ['remember' => $remember,]));
 
         switch ($response['status']) {
             case 401:
                 return redirect()->back();
 
             case 200:
+                // Create session token
+                session(['token' => $response['token']]);
+
+                // Create cookie
+                if ($remember) {
+                    cookie('token', $response['token'], 60 * 24 * 7); // 7 days expire time
+                }
+
                 return redirect()->intended(route('user.dashboard'));
         }
     }
