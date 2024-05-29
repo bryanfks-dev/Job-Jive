@@ -2,8 +2,36 @@
 
 @section('content')
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div class="flex justify-between bg-white w-full h-full rounded-lg col-span-full p-4 md:p-6 shadow dark:shadow-lg dark:border-gray-600">
+                <div class="flex items-center justify-center gap-4">
+                    {{-- If not yet attendance --}}
+                    <a href="#" class=" gap-1 inline-flex items-center px-6 py-3 text-sm font-medium text-center text-white bg-red-700 rounded-full sm:rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check In
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 512 512"><path fill="currentColor" d="M392 80H232a56.06 56.06 0 0 0-56 56v104h153.37l-52.68-52.69a16 16 0 0 1 22.62-22.62l80 80a16 16 0 0 1 0 22.62l-80 80a16 16 0 0 1-22.62-22.62L329.37 272H176v104c0 32.05 33.79 56 64 56h152a56.06 56.06 0 0 0 56-56V136a56.06 56.06 0 0 0-56-56M80 240a16 16 0 0 0 0 32h96v-32Z"/></svg>
+                    </a>
+    
+                    {{-- If the attendance is successful (Remove the hidden class) --}}
+                    <a href="#awda" class="hidden gap-2 inline-flex items-center px-6 py-3 text-sm font-medium text-center text-white bg-green-500 rounded-full sm:rounded-lg cursor-default pointer-events-none"><span class="hidden sm:block">Success</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </a>
+                </div>
+                
+                <div flex class="flex justify-center items-center gap-2">
+                    {{-- If not yet attendance --}}
+                    <div class="flex items-center justify-center bg-red-700 h-full px-4 rounded-full sm:rounded-lg font-semibold text-white">
+                        <p class="hidden sm:block">Not Present</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="sm:hidden" width="2em" height="2em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 1.25C6.063 1.25 1.25 6.063 1.25 12S6.063 22.75 12 22.75S22.75 17.937 22.75 12S17.937 1.25 12 1.25M9.702 8.641a.75.75 0 0 0-1.061 1.06L10.939 12l-2.298 2.298a.75.75 0 0 0 1.06 1.06L12 13.062l2.298 2.298a.75.75 0 0 0 1.06-1.06L13.06 12l2.298-2.298a.75.75 0 1 0-1.06-1.06L12 10.938z" clip-rule="evenodd"/></svg>
+                    </div>
+                    
+                    {{-- If attendance successful (Remove the hidden class)--}}
+                    <div class="hidden flex flex-col gap-1">
+                        <p class="text-sm sm:text-base"><span class="bg-green-500 rounded-full py-[2px] px-3 text-white text-sm">Date</span> : Tuesday, 29 Mei 2024</p>
+                        <p class="text-sm sm:text-base"><span class="bg-green-500 rounded-full py-[2px] px-3 text-white text-sm">Time</span> : 13:00:24</p>
+                    </div>
+                </div>
+        </div>
+
         <div class="rounded-lg dark:border-gray-600 h-full md:h-full">
-            <div class="w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+            <div class="w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6"> 
                 <div class="flex justify-between items-start w-full">
                     <div class="flex-col items-center">
                         <div class="flex items-center mb-1">
