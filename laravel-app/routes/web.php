@@ -65,6 +65,6 @@ Route::get('/sandbox', function () {
 
 Route::get('/profile', function() {
     return view('profile');
-})->name('profile');
+})->name('user.profile');
 
 
