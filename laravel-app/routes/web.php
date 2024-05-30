@@ -5,9 +5,9 @@ use App\Http\Controllers\user;
 use Illuminate\Support\Facades\Route;
 
 // User routes
-Route::group(['prefix'=> '/'], function () {
+Route::group(['prefix' => '/'], function () {
     // Login route
-    Route::group(['prefix'=> '/login'], function () {
+    Route::group(['prefix' => '/login'], function () {
         Route::get('/', [user\LoginController::class, 'index'])
             ->name('user.login');
 
@@ -22,12 +22,17 @@ Route::group(['prefix'=> '/'], function () {
     // Profile route
     Route::get('/profile', [user\ProfileController::class, 'index'])
         ->name('user.profile');
+
+    // Attendances route
+    Route::get('/attendance', function () {
+        return view('user.attendance');
+    })->name('user.attendance');
 });
 
 // Admin routes
-Route::group(['prefix'=> '/admin'], function () {
+Route::group(['prefix' => '/admin'], function () {
     // Login route
-    Route::group(['prefix'=> '/login'], function () {
+    Route::group(['prefix' => '/login'], function () {
         Route::get('/', [admin\LoginController::class, 'index'])
             ->name('admin.login');
 
@@ -35,13 +40,13 @@ Route::group(['prefix'=> '/admin'], function () {
     });
 
     // Employees route
-    Route::group(['prefix' => '/employees'], function() {
+    Route::group(['prefix' => '/employees'], function () {
         Route::get('/', [admin\EmployeesController::class, 'index'])
             ->name('admin.employees');
     });
 
     // Departments route
-    Route::group(['prefix'=> '/departments'], function () {
+    Route::group(['prefix' => '/departments'], function () {
         Route::get('/', [admin\DepartmentsController::class, 'index'])
             ->name('admin.departments');
     });
@@ -50,10 +55,6 @@ Route::group(['prefix'=> '/admin'], function () {
         return view('admin.config');
     })->name('admin.config');
 });
-
-Route::get('/attendance', function () {
-    return view('user.attendance');
-})->name('attendance');
 
 Route::get('/employees', function () {
     return view('user.employees');
