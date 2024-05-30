@@ -79,7 +79,8 @@
                         </td>
                         <td class="flex px-6 py-4 justify-end items-center gap-2">
                             {{-- Edit button --}}
-                            <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" data-modal-target="update-modal" data-modal-toggle="update-modal">
+                            <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                data-modal-target="update-modal" data-modal-toggle="update-modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-700 hover:fill-blue-800"
                                     width="2em" height="2em" viewBox="0 0 24 24">
                                     <g fill-rule="evenodd" clip-rule="evenodd">
@@ -238,7 +239,7 @@
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="date_of_birth"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birthdate</label>
-                                    <input type="date" name="date_of_birth" id="date_of_birth" 
+                                    <input type="date" name="date_of_birth" id="date_of_birth"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required="">
                                 </div>
@@ -267,7 +268,8 @@
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="job_title"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Title</label>
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job
+                                        Title</label>
                                     <select name="job_title" id="job_title"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                         <option value="Manager">Manager</option>
@@ -300,11 +302,11 @@
                     </div>
                 </div>
             </div>
-            
+
             {{-- Modal Update --}}
             <!-- Main modal -->
             <div id="update-modal" tabindex="-1" aria-hidden="true"
-                class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-60 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div class="relative p-4 w-full max-w-4xl max-h-full">
                     <!-- Modal content -->
                     <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -332,18 +334,20 @@
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Full
                                         Name</label>
                                     <input type="text" name="full_name" id="full_name"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required="">
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required="">
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="email"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                                     <input type="email" name="email" id="email"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required="">
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required="">
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="date_of_birth"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birthdate</label>
-                                    <input type="date" name="date_of_birth" id="date_of_birth" 
+                                    <input type="date" name="date_of_birth" id="date_of_birth"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required="">
                                 </div>
@@ -351,13 +355,15 @@
                                     <label for="address"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
                                     <input type="text" name="address" id="address"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required="">
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required="">
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="NIK"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
                                     <input type="text" name="NIK" id="NIK"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required="">
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required="">
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="gender"
@@ -370,7 +376,8 @@
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
                                     <label for="job_title"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Title</label>
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job
+                                        Title</label>
                                     <select name="job_title" id="job_title"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                         <option value="Manager">Manager</option>
