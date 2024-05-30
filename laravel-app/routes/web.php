@@ -34,14 +34,17 @@ Route::group(['prefix'=> '/admin'], function () {
         Route::post('/', [admin\LoginController::class, 'login']);
     });
 
-    // After login
-    Route::get('/departements', function () {
-        return view('admin.department');
-    })->name('admin.department');
+    // Employees route
+    Route::group(['prefix' => '/employees'], function() {
+        Route::get('/', [admin\EmployeesController::class, 'index'])
+            ->name('admin.employees');
+    });
 
-    Route::get('/employees', function () {
-        return view('admin.employee');
-    })->name('admin.employee');
+    // Departments route
+    Route::group(['prefix'=> '/departments'], function () {
+        Route::get('/', [admin\DepartmentsController::class, 'index'])
+            ->name('admin.departments');
+    });
 
     Route::get('/config', function () {
         return view('admin.config');
