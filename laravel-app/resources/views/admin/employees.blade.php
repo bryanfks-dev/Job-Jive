@@ -59,15 +59,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @include('partials.admin.employee.record')
-                    @include('partials.admin.employee.record')
-                    @include('partials.admin.employee.record')
+                    @include('partials.admin.employees.record')
+                    @include('partials.admin.employees.record')
+                    @include('partials.admin.employees.record')
                 </tbody>
             </table>
 
-            @include('partials.admin.employee.create-modal')
-            @include('partials.admin.employee.update-modal')
-            @include('partials.admin.employee.delete-modal')
+            @include('partials.admin.employees.create-modal')
+            @include('partials.admin.employees.update-modal')
+            @include('partials.admin.employees.delete-modal')
         </div>
     </div>
 @endsection
