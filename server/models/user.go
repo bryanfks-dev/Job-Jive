@@ -6,12 +6,6 @@ import (
 	"db"
 )
 
-type UserCred struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Remember bool   `json:"remember"`
-}
-
 type User struct {
 	Id           uint    `json:"id"`
 	FullName     string  `json:"full_name"`

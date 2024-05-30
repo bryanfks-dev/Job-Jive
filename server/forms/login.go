@@ -13,10 +13,16 @@ import (
 	"models"
 )
 
-type (
-	UserCred  models.UserCred
-	AdminCred models.AdminCred
-)
+type UserCred struct {
+	Email    string
+	Password string
+	Remember bool
+}
+
+type AdminCred struct {
+	Username string
+	Password string
+}
 
 var (
 	postMu                  sync.Mutex
