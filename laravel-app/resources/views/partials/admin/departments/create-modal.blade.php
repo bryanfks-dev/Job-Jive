@@ -23,61 +23,15 @@
             <form class="p-4 md:p-5">
                 <div class="grid gap-4 mb-4 grid-cols-2">
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Full
-                            Name</label>
+                        <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Department Name</label>
                         <input type="text" name="full_name" id="full_name"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. Budiono Santoso" required="">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="email"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                        <input type="text" name="email" id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. hello@example.com" required="">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="date_of_birth"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birthdate</label>
-                        <input type="date" name="date_of_birth" id="date_of_birth"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            required="">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="address"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                        <input type="text" name="address" id="address"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. Jl. Merpati No. 17" required="">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="NIK"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
-                        <input type="text" name="NIK" id="NIK"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. 35-76-01-44-03-91-0003" required="">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="gender"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
-                        <select name="gender" id="gender"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="job_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job
-                            Title</label>
-                        <select name="job_title" id="job_title"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option value="Manager">Manager</option>
-                            <option value="Staff">Staff</option>
-                        </select>
+                            placeholder="ex. Sales" required="">
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <label for="department"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Department</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Manager Name</label>
                         <select name="department" id="department"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                             <option value="IT">IT</option>
@@ -95,7 +49,7 @@
                             d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Add new employee
+                    Add new department
                 </button>
             </form>
         </div>
