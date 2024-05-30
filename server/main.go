@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apis"
 	"fmt"
 	"net/http"
 
@@ -28,8 +29,12 @@ func loadConfig() (configs.Server, configs.Database) {
 }
 
 func initEndPoints() {
+	// Forms endpoints
 	mux.HandleFunc("/auth/user/login", forms.UserLoginHandler)
 	mux.HandleFunc("/auth/admin/login", forms.AdminLoginHandler)
+
+	// API endpoints
+	mux.HandleFunc("/api/user/profile", apis.GetUserProfileHandler)
 }
 
 func main() {

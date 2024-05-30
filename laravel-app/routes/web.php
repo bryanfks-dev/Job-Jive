@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UserLoginController;
@@ -19,6 +20,10 @@ Route::group(['prefix'=> '/'], function () {
     Route::get('/', function () {
         return view('dashboard');
     })->name('user.dashboard');
+
+    // Profile route
+    Route::get('/profile', [UserProfileController::class, 'index'])
+        ->name('user.profile');
 });
 
 // Admin routes
