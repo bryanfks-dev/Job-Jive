@@ -10,25 +10,29 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $response =
-            Http::withHeaders([
-                'Authorization' => 'Bearer ' . ''
-            ])->get(BackendServer::url() . '/api/user/profile');
+        try {
+            $response =
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . ''
+                ])->get(BackendServer::url() . '/api/user/profile');
 
-        if ($response->successful()) {
-            switch ($response['status']) {
-                case 401: // Unauthorized
-                    return redirect()->intended(route('user-login'));
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 401: // Unauthorized
+                        return redirect()->intended(route('user-login'));
 
-                case 500: // Internal server error
-                    abort(500);
-                    return;
+                    case 500: // Internal server error
+                        abort(500);
+                        return;
 
-                case 200:
-                    return view('user.profile', []);
+                    case 200:
+                        return view('user.profile', []);
+                }
             }
-        }
 
-        return abort(500);
+            return abort(500);
+        } catch (\Exception $e) {
+            return abort(500);
+        }
     }
 }

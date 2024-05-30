@@ -22,11 +22,11 @@ func getSecretKey() []byte {
 
 var secret_key = getSecretKey()
 
-func CreateToken(user_id int) (string, error) {
+func CreateToken(record_id uint) (string, error) {
 	// Init token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user_id,
-		"exp":     time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
+		"id":  record_id,
+		"exp": time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
 	})
 
 	// Hash token
@@ -35,9 +35,10 @@ func CreateToken(user_id int) (string, error) {
 	return token_string, err
 }
 
-func VerifyToken(token_string string) (bool, error) {
+func ClaimsToken(token_string string) (jwt.MapClaims, error) {
 	token, err :=
 		jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
+			// Parse token
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method")
 			}
@@ -45,9 +46,15 @@ func VerifyToken(token_string string) (bool, error) {
 			return secret_key, nil
 		})
 
+	// Ensure there is no error in parsing token
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return token.Valid, err
+	// Try claims token
+	if jwt_map, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return jwt_map, nil
+	}
+
+	return nil, err
 }

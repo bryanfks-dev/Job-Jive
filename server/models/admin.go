@@ -11,9 +11,8 @@ type AdminCred struct {
 	Password string
 }
 
-
 type Admin struct {
-	Id uint `json:"id"`
+	Id       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
@@ -27,7 +26,7 @@ func (admin Admin) AddToDB() {
 			panic(err.Error())
 		}
 
-		admin.Password = string(hash);
+		admin.Password = string(hash)
 
 		// Insert user into admin table
 		stmt := "INSERT INTO `admins` VALUES('', ?, ?)"
@@ -40,28 +39,26 @@ func (admin Admin) AddToDB() {
 	}
 }
 
-func (admin Admin) GetHashedPassword(username string) string {
-	stmt := "SELECT Password FROM `admins` WHERE Username= ?"
+func (admin Admin) GetUsingUsername(username string) (Admin, error) {
+	stmt := "SELECT * FROM `admins` WHERE Username= ?"
 
 	row, err := db.Conn.Query(stmt, username)
 
 	if err != nil {
-		panic(err.Error())
+		return admin, err
 	}
 
 	defer row.Close()
 
-	var user_pwd string
-
 	// Query result from user table with given username should
 	// be returning 1 row, since the username value is unique
 	if row.Next() {
-		err := row.Scan(&user_pwd)
+		err := row.Scan(admin.Id, admin.Username, admin.Password)
 
 		if err != nil {
-			panic(err.Error())
+			return admin, err
 		}
 	}
 
-	return user_pwd
+	return admin, nil
 }

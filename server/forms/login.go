@@ -24,10 +24,10 @@ var (
 	errDBConnNotEstablished = errors.New("cannot established connection with database")
 )
 
-func verifyPassword(hashed_pwd string, cred_pwd string) (bool, error) {
+func verifyPassword(hashed_pwd string, cred_pwd string) (error) {
 	// Database failed to find user
 	if hashed_pwd == "" {
-		return false, errUserNotFound
+		return errUserNotFound
 	}
 
 	// Comparing hashed password from database and login credential
@@ -36,28 +36,51 @@ func verifyPassword(hashed_pwd string, cred_pwd string) (bool, error) {
 	// Not nil value in err possibly cause of hash and password
 	// values are not match, otherwise, means hash and password
 	// values are match
-	return err == nil, err
+	return err
 }
 
-func userVerified[T UserCred | AdminCred](cred T) (bool, error) {
+func verifyUser(cred UserCred) (models.User, error) {
 	if db.ConnectionEstablished() {
-		switch any(cred).(type) {
-		case UserCred:
-			{
-				hashed_pwd := models.User.GetHashedPassword(models.User{}, any(cred).(UserCred).Email)
+		user, err := 
+			models.User.GetUsingEmail(models.User{}, cred.Email)
 
-				return verifyPassword(hashed_pwd, any(cred).(UserCred).Password)
-			}
-		case AdminCred:
-			{
-				hashed_pwd := models.Admin.GetHashedPassword(models.Admin{}, any(cred).(AdminCred).Username)
-
-				return verifyPassword(hashed_pwd, any(cred).(AdminCred).Password)
-			}
+		if err != nil {
+			return models.User{}, err
 		}
+
+		// Verify user password
+		err = verifyPassword(user.Password, cred.Password)
+
+		if err != nil {
+			return models.User{}, err
+		}
+
+		return user, nil
 	}
 
-	return false, errDBConnNotEstablished
+	return models.User{}, errDBConnNotEstablished
+}
+
+func verifyAdmin(cred AdminCred) (models.Admin, error) {
+	if db.ConnectionEstablished() {
+		admin, err := 
+			models.Admin.GetUsingUsername(models.Admin{}, cred.Username)
+
+		if err != nil {
+			return models.Admin{}, err
+		}
+
+		// Verify user password
+		err = verifyPassword(admin.Password, cred.Password)
+
+		if err != nil {
+			return models.Admin{}, err
+		}
+
+		return admin, nil
+	}
+
+	return models.Admin{}, errDBConnNotEstablished
 }
 
 func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,52 +95,57 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := req_json.Decode(&login_cred)
 
-		if err != nil {
-			panic(err.Error())
-		}
-
-		verified, err := userVerified(login_cred)
-
-		var response map[string]interface{}
-
-		// Errors other than user not found and invalid password
-		if err != nil && (err != errUserNotFound && err != bcrypt.ErrMismatchedHashAndPassword) {
-			response = map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			}
-		} else {
-			// User is veified
-			if verified {
-				token, err := models.CreateToken(login_cred.Password)
-
-				// Failed generate token
-				if err != nil {
-					response = map[string]interface{}{
-						"status":  http.StatusInternalServerError,
-						"message": "Server error",
-					}
-				} else {
-					log.Println(login_cred.Email, " logged in")
-
-					response = map[string]interface{}{
-						"status":  http.StatusOK,
-						"message": "Login success",
-						"token":   token,
-					}
-				}
-			} else { // User not found or invalid password
-				response = map[string]interface{}{
-					"status":  http.StatusUnauthorized,
-					"message": "Invalid credentials",
-				}
-			}
-		}
-
-		// Send response
+		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		json.NewEncoder(w).Encode(response)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusUnauthorized,
+				"message": "Invalid credential",
+			})
+
+			return
+		}
+
+		user, err := verifyUser(login_cred)
+
+		if err != nil {
+			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusUnauthorized,
+					"message": "Invalid credential",
+				})
+	
+				return
+			}
+
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		// Generate JWT token
+		token, err := models.CreateToken(user.Id)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Println(login_cred.Email, " logged in")
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Login success",
+			"token":   token,
+		})
 	}
 }
 
@@ -133,51 +161,56 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := req_json.Decode(&login_cred)
 
-		if err != nil {
-			panic(err.Error())
-		}
-
-		verified, err := userVerified(login_cred)
-
-		var response map[string]interface{}
-
-		// Errors other than user not found and invalid password
-		if err != nil && (err != errUserNotFound && err != bcrypt.ErrMismatchedHashAndPassword) {
-			response = map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			}
-		} else {
-			// User is veified
-			if verified {
-				token, err := models.CreateToken()
-
-				// Failed generate token
-				if err != nil {
-					response = map[string]interface{}{
-						"status":  http.StatusInternalServerError,
-						"message": "Server error",
-					}
-				} else {
-					log.Println("Admin ", login_cred.Username, " logged in")
-
-					response = map[string]interface{}{
-						"status":  http.StatusOK,
-						"message": "Login success",
-						"token":   token,
-					}
-				}
-			} else { // User not found or invalid password
-				response = map[string]interface{}{
-					"status":  http.StatusUnauthorized,
-					"message": "Invalid credentials",
-				}
-			}
-		}
-
-		// Send response
+		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		json.NewEncoder(w).Encode(response)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusUnauthorized,
+				"message": "Invalid credential",
+			})
+
+			return
+		}
+
+		admin, err := verifyAdmin(login_cred)
+
+		if err != nil {
+			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusUnauthorized,
+					"message": "Invalid credential",
+				})
+	
+				return
+			}
+
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		// Generate JWT token
+		token, err := models.CreateToken(uint(admin.Id))
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Println("Admin ", login_cred.Username, " logged in")
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Login success",
+			"token":   token,
+		})
 	}
 }

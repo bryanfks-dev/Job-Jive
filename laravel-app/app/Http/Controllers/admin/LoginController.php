@@ -29,24 +29,20 @@ class LoginController extends Controller
             ])->post(BackendServer::url() . '/auth/admin/login', $credentials);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 401:
-                        return redirect()->back();
+                if ($response['status'] == 200) { // Ok
+                    // Create session token
+                    session(['token' => $response['token']]);
 
-                    case 500:
-                        return redirect()->back();
-
-                    case 200:
-                        // Create session token
-                        session(['token' => $response['token']]);
-
-                        return redirect()->intended(route('admin.dashboard'));
+                    return redirect()->intended(route('admin.dashboard'));
                 }
+
+                return redirect()->back()
+                    ->withErrors(['error' => $response['message']]);
             }
 
-            return redirect()->back();
+            return redirect()->back()->withErrors(['error' => 'Client error']);
         } catch (\Exception $e) {
-            return redirect()->back();
+            return redirect()->back()->withErrors(['error' => 'Server error']);
         }
     }
 }

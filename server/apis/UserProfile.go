@@ -2,11 +2,14 @@ package apis
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
 
 	"models"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type (
@@ -22,7 +25,11 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
+		// Get authorization header
 		auth_header := r.Header.Get("Authorization")
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
 
 		// Ensure user has authorization in header
 		if auth_header == "" {
@@ -56,20 +63,28 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tokenVerified, _ := models.VerifyToken(token)
+		// Claims user id from token
+		token_map, err := models.ClaimsToken(token)
 
-		if !tokenVerified {
+		// Ensure no error when claimming token
+		if err != nil {
+			if err == jwt.ErrTokenExpired {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status": http.StatusUnauthorized,
+					"message": "Token expired",
+				})
+
+				return
+			}
+
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusUnauthorized,
-				"message": "Invalid token",
+				"status": http.StatusInternalServerError,
+				"message": "Unable to claim token",
 			})
 
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": http.StatusOK,
-			
-		})
+		log.Println(token_map)
 	}
 }
