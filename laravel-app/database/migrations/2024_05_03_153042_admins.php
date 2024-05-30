@@ -16,8 +16,6 @@ return new class extends Migration
             $table->tinyIncrements('Admin_ID')->primary();
             $table->string('Username')->unique();
             $table->string('Password');
-
-            $table->timestamps();
         });
     }
 

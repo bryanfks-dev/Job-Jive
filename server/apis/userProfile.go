@@ -70,7 +70,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if err == jwt.ErrTokenExpired {
 				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status": http.StatusUnauthorized,
+					"status":  http.StatusUnauthorized,
 					"message": "Token expired",
 				})
 
@@ -78,7 +78,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusInternalServerError,
+				"status":  http.StatusInternalServerError,
 				"message": "Unable to claim token",
 			})
 
