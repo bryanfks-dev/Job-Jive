@@ -26,7 +26,7 @@ var (
 
 func verifyPassword(hashed_pwd string, cred_pwd string) (bool, error) {
 	// Database failed to find user
-	if len(hashed_pwd) == 0 {
+	if hashed_pwd == "" {
 		return false, errUserNotFound
 	}
 
@@ -150,7 +150,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// User is veified
 			if verified {
-				token, err := models.CreateToken(login_cred.Password)
+				token, err := models.CreateToken()
 
 				// Failed generate token
 				if err != nil {

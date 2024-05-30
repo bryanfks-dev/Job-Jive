@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -21,11 +22,11 @@ func getSecretKey() []byte {
 
 var secret_key = getSecretKey()
 
-func CreateToken(credential string) (string, error) {
+func CreateToken(user_id int) (string, error) {
 	// Init token
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"credential": credential,
-		"exp": time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user_id,
+		"exp":     time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
 	})
 
 	// Hash token
@@ -35,9 +36,18 @@ func CreateToken(credential string) (string, error) {
 }
 
 func VerifyToken(token_string string) (bool, error) {
-	token, err := jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
-		return secret_key, nil
-	})
+	token, err :=
+		jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method")
+			}
+
+			return secret_key, nil
+		})
+
+	if err != nil {
+		return false, err
+	}
 
 	return token.Valid, err
 }

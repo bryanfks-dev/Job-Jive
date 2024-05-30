@@ -32,29 +32,25 @@ class UserLoginController extends Controller
                 ])->post(BackendServer::url() . '/auth/user/login', $credentials);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 401:
-                        return redirect()->back();
+                if ($response['status'] === 200) {
+                    // Create session token
+                    session(['token' => $response['token']]);
 
-                    case 500:
-                        return redirect()->back();
+                    // Create cookie
+                    if ($remember) {
+                        cookie('token', $response['token'], 60 * 24 * 7); // 7 days expire time
+                    }
 
-                    case 200:
-                        // Create session token
-                        session(['token' => $response['token']]);
-
-                        // Create cookie
-                        if ($remember) {
-                            cookie('token', $response['token'], 60 * 24 * 7); // 7 days expire time
-                        }
-
-                        return redirect()->intended(route('user.dashboard'));
+                    return redirect()->intended(route('user.dashboard'));
                 }
+
+                return redirect()->intended(route('user.login'))
+                    ->withErrors(['error' => $response['message']]);
             }
 
-            return redirect()->back();
+            return redirect()->back()->withErrors(['error' => 'Server error']);
         } catch (\Exception $e) {
-            return redirect()->back();
+            return redirect()->back()->withErrors(['error' => 'Cannot resolve host']);
         }
     }
 }
