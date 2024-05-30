@@ -32,9 +32,19 @@ Route::group(['prefix'=> '/admin'], function () {
     Route::group(['prefix'=> '/login'], function () {
         Route::get('/', [AdminLoginController::class, 'index'])
             ->name('admin.login');
-
         Route::post('/', [AdminLoginController::class, 'login']);
     });
+
+    // After login
+    Route::get('/departements', function () {
+        return view('admin.department');
+    })->name('admin.department');
+    Route::get('/employees', function () {
+        return view('admin.employee');
+    })->name('admin.employee');
+    Route::get('/config', function () {
+        return view('admin.config');
+    })->name('admin.config');
 });
 
 Route::get('/attendance', function () {
@@ -52,3 +62,9 @@ Route::get('/employees/view', function () {
 Route::get('/sandbox', function () {
     return view('sandbox');
 })->name('sandbox');
+
+Route::get('/profile', function() {
+    return view('profile');
+})->name('profile');
+
+
