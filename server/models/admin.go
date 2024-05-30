@@ -17,25 +17,23 @@ type Admin struct {
 	Password string `json:"password"`
 }
 
-func (admin Admin) AddToDB() {
-	if db.ConnectionEstablished() {
-		// Hashing password
-		hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
+func (admin Admin) Insert() {
+	// Hashing password
+	hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
 
-		if err != nil {
-			panic(err.Error())
-		}
+	if err != nil {
+		panic(err.Error())
+	}
 
-		admin.Password = string(hash)
+	admin.Password = string(hash)
 
-		// Insert user into admin table
-		stmt := "INSERT INTO `admins` VALUES('', ?, ?)"
+	// Insert user into admin table
+	stmt := "INSERT INTO `admins` (Username, Password) VALUES(?, ?)"
 
-		_, err = db.Conn.Exec(stmt, admin.Username, admin.Password)
+	_, err = db.Conn.Exec(stmt, admin.Username, admin.Password)
 
-		if err != nil {
-			panic(err.Error())
-		}
+	if err != nil {
+		panic(err.Error())
 	}
 }
 
