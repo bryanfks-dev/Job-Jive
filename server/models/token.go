@@ -11,7 +11,7 @@ import (
 
 func getSecretKey() []byte {
 	// Load .env
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 
 	if err != nil {
 		panic(err.Error())
