@@ -35,7 +35,6 @@
         <h4 class="text-2xl text-gray-900 dark:text-white">Employees</h4>
     </div>
 
-
     <form class="max-w-md mx-auto mb-3 w-full">
         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
         <div class="relative">
@@ -53,7 +52,6 @@
                 class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
         </div>
     </form>
-
 
     {{-- Employee Content --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 mt-4 w-full">
