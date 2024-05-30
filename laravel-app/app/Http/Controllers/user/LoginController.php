@@ -49,9 +49,9 @@ class LoginController extends Controller
                     ->withErrors(['error' => $response['message']]);
             }
 
-            return redirect()->back()->withErrors(['error' => 'Server error']);
+            return redirect()->back()->withErrors(['error' => 'Client Error']);
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Cannot resolve host']);
+            return redirect()->back()->withErrors(['error' => 'Server Error']);
         }
     }
 }
