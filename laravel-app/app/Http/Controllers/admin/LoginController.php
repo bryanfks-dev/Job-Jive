@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
-use App\Models\BackendServer;
 use Illuminate\Http\Request;
+use App\Models\BackendServer;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 
-class AdminLoginController extends Controller
+class LoginController extends Controller
 {
     public function index()
     {

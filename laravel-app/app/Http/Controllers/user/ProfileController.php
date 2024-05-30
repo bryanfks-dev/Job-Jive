@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\user;
 
 use Http;
 use App\Models\BackendServer;
+use App\Http\Controllers\Controller;
 
-class UserProfileController extends Controller
+class ProfileController extends Controller
 {
     public function index()
     {
@@ -24,7 +25,7 @@ class UserProfileController extends Controller
                     return;
 
                 case 200:
-                    return view('profile', []);
+                    return view('user.profile', []);
             }
         }
 

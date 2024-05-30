@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\user;
 
-use App\Models\BackendServer;
 use Illuminate\Http\Request;
+use App\Models\BackendServer;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 
-class UserLoginController extends Controller
+class LoginController extends Controller
 {
     public function index()
     {
-        return view('login-user');
+        return view('user.login');
     }
 
     public function login(Request $request)

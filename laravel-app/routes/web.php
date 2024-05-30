@@ -1,28 +1,26 @@
 <?php
 
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\admin;
+use App\Http\Controllers\user;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\UserLoginController;
-use App\Http\Controllers\AdminLoginController;
 
 // User routes
 Route::group(['prefix'=> '/'], function () {
     // Login route
     Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [UserLoginController::class, 'index'])
+        Route::get('/', [user\LoginController::class, 'index'])
             ->name('user.login');
 
-        Route::post('/', [UserLoginController::class, 'login']);
+        Route::post('/', [user\LoginController::class, 'login']);
     });
 
     // Dashboard route
     Route::get('/', function () {
-        return view('dashboard');
+        return view('user.dashboard');
     })->name('user.dashboard');
 
     // Profile route
-    Route::get('/profile', [UserProfileController::class, 'index'])
+    Route::get('/profile', [user\ProfileController::class, 'index'])
         ->name('user.profile');
 });
 
@@ -30,41 +28,38 @@ Route::group(['prefix'=> '/'], function () {
 Route::group(['prefix'=> '/admin'], function () {
     // Login route
     Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [AdminLoginController::class, 'index'])
+        Route::get('/', [admin\LoginController::class, 'index'])
             ->name('admin.login');
-        Route::post('/', [AdminLoginController::class, 'login']);
+
+        Route::post('/', [admin\LoginController::class, 'login']);
     });
 
     // After login
     Route::get('/departements', function () {
         return view('admin.department');
     })->name('admin.department');
+
     Route::get('/employees', function () {
         return view('admin.employee');
     })->name('admin.employee');
+
     Route::get('/config', function () {
         return view('admin.config');
     })->name('admin.config');
 });
 
 Route::get('/attendance', function () {
-    return view('attendance');
+    return view('user.attendance');
 })->name('attendance');
 
 Route::get('/employees', function () {
-    return view('employees');
+    return view('user.employees');
 })->name('employees');
 
 Route::get('/employees/view', function () {
-    return view('view');
+    return view('user.view');
 })->name('view');
 
 Route::get('/sandbox', function () {
-    return view('sandbox');
+    return view('user.sandbox');
 })->name('sandbox');
-
-Route::get('/profile', function() {
-    return view('profile');
-})->name('user.profile');
-
-
