@@ -16,17 +16,24 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $credentials = \Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required']
         ]);
+
+        if ($credentials->fails()) {
+            return redirect()->back()->withErrors($credentials->errors());
+        }
 
         try {
             // Send request to be server
             $response =
             Http::withHeaders([
                 'Content-type' => 'application/json'
-            ])->post(BackendServer::url() . '/auth/admin/login', $credentials);
+            ])->post(BackendServer::url() . '/auth/admin/login', [
+                'username' => $request['username'],
+                'password' => $request['password'],
+            ]);
 
             if ($response->successful()) {
                 if ($response['status'] == 200) { // Ok
