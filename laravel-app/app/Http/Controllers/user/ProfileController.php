@@ -13,24 +13,25 @@ class ProfileController extends Controller
         try {
             $response =
                 Http::withHeaders([
-                    'Authorization' => 'Bearer ' . ''
+                    'Authorization' => 'Bearer ' . session('token')
                 ])->get(BackendServer::url() . '/api/user/profile');
 
-            if ($response->successful()) {
+            dd($response['message']);
+
+            if ($response->successful() && isset($response)) {
                 switch ($response['status']) {
                     case 401: // Unauthorized
                         return redirect()->intended(route('user-login'));
 
                     case 500: // Internal server error
-                        abort(500);
-                        return;
+                        return abort(500);
 
                     case 200:
                         return view('user.profile', []);
                 }
             }
 
-            return abort(500);
+            return abort(404);
         } catch (\Exception $e) {
             return abort(500);
         }

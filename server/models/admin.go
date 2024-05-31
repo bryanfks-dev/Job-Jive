@@ -46,7 +46,7 @@ func (admin Admin) GetUsingUsername(username string) (Admin, error) {
 	// Query result from user table with given username should
 	// be returning 1 row, since the username value is unique
 	if row.Next() {
-		err := row.Scan(admin.Id, admin.Username, admin.Password)
+		err := row.Scan(&admin.Id, &admin.Username, &admin.Password)
 
 		if err != nil {
 			return admin, err

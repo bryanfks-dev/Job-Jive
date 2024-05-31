@@ -7,7 +7,7 @@ import (
 
 	"configs"
 	"db"
-	"forms"
+	"auths"
 
 	"github.com/joho/godotenv"
 )
@@ -30,11 +30,14 @@ func loadConfig() (configs.Server, configs.Database) {
 
 func initEndPoints() {
 	// Forms endpoints
-	mux.HandleFunc("/auth/user/login", forms.UserLoginHandler)
-	mux.HandleFunc("/auth/admin/login", forms.AdminLoginHandler)
+	mux.HandleFunc("/auth/user/login", auths.UserLoginHandler)
+	mux.HandleFunc("/auth/admin/login", auths.AdminLoginHandler)
 
 	// API endpoints
 	mux.HandleFunc("/api/user/profile", apis.GetUserProfileHandler)
+
+	mux.HandleFunc("/api/departments", apis.GetDepartmentsHandler)
+	mux.HandleFunc("/api/department/create", apis.CreateDepartmentHandler)
 }
 
 func main() {

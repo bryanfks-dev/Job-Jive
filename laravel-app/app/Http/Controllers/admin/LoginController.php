@@ -16,24 +16,31 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $credentials = \Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required']
         ]);
+
+        if ($credentials->fails()) {
+            return redirect()->back()->withErrors($credentials->errors());
+        }
 
         try {
             // Send request to be server
             $response =
             Http::withHeaders([
                 'Content-type' => 'application/json'
-            ])->post(BackendServer::url() . '/auth/admin/login', $credentials);
+            ])->post(BackendServer::url() . '/auth/admin/login', [
+                'username' => $request['username'],
+                'password' => $request['password'],
+            ]);
 
             if ($response->successful()) {
                 if ($response['status'] == 200) { // Ok
                     // Create session token
                     session(['token' => $response['token']]);
 
-                    return redirect()->intended(route('admin.dashboard'));
+                    return redirect()->intended(route('admin.employees'));
                 }
 
                 return redirect()->back()
@@ -42,7 +49,7 @@ class LoginController extends Controller
 
             return redirect()->back()->withErrors(['error' => 'Client error']);
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Server error']);
+            return redirect()->back()->withErrors(['error' => 'Cannot establish connection with backend server']);
         }
     }
 }

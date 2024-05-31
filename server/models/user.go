@@ -7,12 +7,11 @@ import (
 )
 
 type User struct {
-	Id           uint    `json:"id"`
+	Id           int    `json:"id"`
 	FullName     string  `json:"full_name"`
 	Photo        string  `json:"photo"`
 	Email        string  `json:"email"`
 	Password     string  `json:"password"`
-	ManagerId    *int    `json:"manager_id"`
 	DateOfBirth  *string `json:"date_of_birth"`
 	Address      string  `json:"address"`
 	NIK          string  `json:"nik"`
@@ -27,9 +26,9 @@ func (user User) Insert() {
 
 	_, err := db.Conn.Exec(stmt, 
 		user.FullName, 
+		user.Photo, 
 		user.Email, 
 		user.Password, 
-		user.ManagerId,
 		user.DateOfBirth, 
 		user.Address, 
 		user.NIK, 
@@ -48,11 +47,11 @@ func (user User) GetUsingEmail(email string) (User, error) {
 
 	row, err := db.Conn.Query(stmt, email)
 
+	defer row.Close()
+
 	if err != nil {
 		return user, err
 	}
-
-	defer row.Close()
 
 	// Query result from user table with given email should
 	// be returning 1 row, since the email value is unique
@@ -60,9 +59,9 @@ func (user User) GetUsingEmail(email string) (User, error) {
 		err := row.Scan(
 			&user.Id, 
 			&user.FullName, 
+			&user.Photo, 
 			&user.Email, 
 			&user.Password, 
-			&user.ManagerId, 
 			&user.DateOfBirth, 
 			&user.Address, 
 			&user.NIK, 
@@ -96,15 +95,15 @@ func (user User) GetUsingId(id uint) (User, error) {
 		err := row.Scan(
 			&user.Id, 
 			&user.FullName, 
+			&user.Photo, 
 			&user.Email, 
 			&user.Password, 
-			&user.ManagerId, 
 			&user.DateOfBirth, 
 			&user.Address, 
 			&user.NIK, 
 			&user.Gender, 
 			&user.PhoneNumber, 
-			&user.DepartmentId, 
+			&user.DepartmentId,  
 			&user.FirstLogin)
 
 		if err != nil {

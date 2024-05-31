@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('salaries', function (Blueprint $table) {
-            $table->integerIncrements('User_ID')->unsigned();
+            $table->integer('User_ID')->unsigned();
             $table->integer('Initial_Salary');
             $table->integer('Final_Salary');
 
