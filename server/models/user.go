@@ -47,11 +47,11 @@ func (user User) GetUsingEmail(email string) (User, error) {
 
 	row, err := db.Conn.Query(stmt, email)
 
-	defer row.Close()
-
 	if err != nil {
-		return user, err
+		return User{}, err
 	}
+
+	defer row.Close()
 
 	// Query result from user table with given email should
 	// be returning 1 row, since the email value is unique
@@ -71,20 +71,20 @@ func (user User) GetUsingEmail(email string) (User, error) {
 			&user.FirstLogin)
 
 		if err != nil {
-			return user, err
+			return User{}, err
 		}
 	}
 
 	return user, nil
 }
 
-func (user User) GetUsingId(id uint) (User, error) {
+func (user User) GetUsingId(id int) (User, error) {
 	stmt := "SELECT * FROM `users` WHERE User_Id = ?"
 
 	row, err := db.Conn.Query(stmt, id)
 
 	if err != nil {
-		return user, err
+		return User{}, err
 	}
 
 	defer row.Close()
@@ -107,7 +107,7 @@ func (user User) GetUsingId(id uint) (User, error) {
 			&user.FirstLogin)
 
 		if err != nil {
-			return user, err
+			return User{}, err
 		}
 	}
 
