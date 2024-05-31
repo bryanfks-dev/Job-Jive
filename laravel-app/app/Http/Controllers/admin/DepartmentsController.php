@@ -21,22 +21,22 @@ class DepartmentsController extends Controller
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
-                        ;
                         return view("admin.departments", [
-                            'datas' => $response['data']->each
+                            'datas' => $response['data']
                         ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
                 }
 
-                // Possibly unauthorized
                 abort($response['status']);
             }
         } catch (\Exception $e) {
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
                 return abort($e->getStatusCode());
             }
+
+            return abort(500);
         }
     }
 
@@ -69,7 +69,6 @@ class DepartmentsController extends Controller
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
                 }
-
                 abort($response['status']);
             }
 
@@ -78,6 +77,8 @@ class DepartmentsController extends Controller
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
                 return abort($e->getStatusCode());
             }
+
+            return abort(500);
         }
     }
 }

@@ -16,12 +16,17 @@ type DepartmentFields struct {
 	ManagerId      int    `json:"manager-id"`
 }
 
+type ResponseData struct {
+	DepartmentName string `json:"department_name"`
+	ManagerName    string `json:"manager_name"`
+}
+
 func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-/* 		// Validate token
+		// Validate token
 		token_valid, res := auths.AuthorizedToken(r)
 
 		// Set HTTP header
@@ -43,11 +48,12 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			})
 
 			return
-		} */
+		}
 
 		departments, err :=
 			models.Department.Get(models.Department{})
 
+		// Ensure no error when fetching department datas
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
@@ -57,21 +63,50 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var departments_json []string
+		var response_data []ResponseData
 
-		for _, department := range departments {
-			json, err := json.Marshal(department)
+		for _, data := range departments {
+			department_head, err :=
+				models.DepartmentHead.GetUsingDepartmentId(
+					models.DepartmentHead{}, data.Id)
 
+			// Ensure no error fetching department
 			if err != nil {
-				panic(err.Error())
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": "Server error",
+				})
+
+				return
 			}
 
-			departments_json = append(departments_json, string(json))
+			var user models.User
+
+			// Ensure department_head not empty
+			if department_head != (models.DepartmentHead{}) {
+				user, err =
+					models.User.GetUsingId(models.User{}, *department_head.ManagerId)
+
+				// Ensure no error fetching user
+				if err != nil {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"status":  http.StatusInternalServerError,
+						"message": "Server error",
+					})
+
+					return
+				}
+			}
+
+			response_data = append(response_data, ResponseData{
+				DepartmentName: data.Name,
+				ManagerName:    user.FullName,
+			})
 		}
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status": http.StatusOK,
-			"data":   departments_json,
+			"data":   response_data,
 		})
 	}
 }
@@ -125,7 +160,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			Name: department_fields.DepartmentName,
 		})
 
-		// Ensure theres no inserting department error
+		// Ensure no error when inserting department
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,

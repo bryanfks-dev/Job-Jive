@@ -9,7 +9,6 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"db"
 	"models"
 )
 
@@ -25,9 +24,8 @@ type AdminCred struct {
 }
 
 var (
-	postMu                  sync.Mutex
-	errUserNotFound         = errors.New("user not found")
-	errDBConnNotEstablished = errors.New("cannot established connection with database")
+	postMu          sync.Mutex
+	errUserNotFound = errors.New("user not found")
 )
 
 func verifyPassword(hashed_pwd string, cred_pwd string) error {
@@ -46,47 +44,43 @@ func verifyPassword(hashed_pwd string, cred_pwd string) error {
 }
 
 func verifyUser(cred UserCred) (models.User, error) {
-	if db.ConnectionEstablished() {
-		user, err :=
-			models.User.GetUsingEmail(models.User{}, cred.Email)
+	user, err :=
+		models.User.GetUsingEmail(models.User{}, cred.Email)
 
-		if err != nil {
-			return models.User{}, err
-		}
-
-		// Verify user password
-		err = verifyPassword(user.Password, cred.Password)
-
-		if err != nil {
-			return models.User{}, err
-		}
-
-		return user, nil
+	// Ensure user is exist
+	if err != nil {
+		return models.User{}, err
 	}
 
-	return models.User{}, errDBConnNotEstablished
+	// Verify user password
+	err = verifyPassword(user.Password, cred.Password)
+
+	// Ensure password matched
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return user, nil
 }
 
 func verifyAdmin(cred AdminCred) (models.Admin, error) {
-	if db.ConnectionEstablished() {
-		admin, err :=
-			models.Admin.GetUsingUsername(models.Admin{}, cred.Username)
+	admin, err :=
+		models.Admin.GetUsingUsername(models.Admin{}, cred.Username)
 
-		if err != nil {
-			return models.Admin{}, err
-		}
-
-		// Verify user password
-		err = verifyPassword(admin.Password, cred.Password)
-
-		if err != nil {
-			return models.Admin{}, err
-		}
-
-		return admin, nil
+	// Ensure admin is exist
+	if err != nil {
+		return models.Admin{}, err
 	}
 
-	return models.Admin{}, errDBConnNotEstablished
+	// Verify user password
+	err = verifyPassword(admin.Password, cred.Password)
+
+	// Ensure password matched
+	if err != nil {
+		return models.Admin{}, err
+	}
+
+	return admin, nil
 }
 
 func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -116,6 +110,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		user, err := verifyUser(login_cred)
 
 		if err != nil {
+			// Incorrect password or user not found
 			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
 				json.NewEncoder(w).Encode(map[string]interface{}{
 					"status":  http.StatusUnauthorized,
@@ -125,6 +120,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// Other errors
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
@@ -133,9 +129,10 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Generate JWT token
+		// Generate jwt token
 		token, err := models.CreateToken(user.Id, "user")
 
+		// Ensure jwt token generated
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
@@ -145,7 +142,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println(login_cred.Email, " logged in")
+		log.Println(login_cred.Email, "logged in")
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
@@ -182,6 +179,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		admin, err := verifyAdmin(login_cred)
 
 		if err != nil {
+			// Incorrect password or user not found
 			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
 				json.NewEncoder(w).Encode(map[string]interface{}{
 					"status":  http.StatusUnauthorized,
@@ -191,6 +189,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// Other errors
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
@@ -199,9 +198,10 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Generate JWT token
+		// Generate jwt token
 		token, err := models.CreateToken(admin.Id, "admin")
 
+		// Ensure jwt token generated
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
