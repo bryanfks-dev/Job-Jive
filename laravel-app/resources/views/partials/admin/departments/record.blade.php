@@ -3,10 +3,10 @@
         {{ $index + 1 }}
     </th>
     <td class="px-6 py-4">
-        -
+        {{ $data['department_name'] }}
     </td>
     <td class="px-6 py-4">
-        @if(empty($myvar))
+        @if(empty($data['manager_name']))
             -
         @else
             {{ $data['manager_name'] }}
