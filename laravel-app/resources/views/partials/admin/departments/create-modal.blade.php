@@ -8,7 +8,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     Create New Department
                 </h3>
-                <button type="button"
+                <button type="button" id="close-modal"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-toggle="crud-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -24,18 +24,21 @@
                 @csrf
                 <div class="grid gap-4 mb-4">
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="department_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <label for="department-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Department Name</label>
-                        <input type="text" name="department_name" id="department_name"
+                        <input type="text" name="department-name" id="department-name"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             placeholder="ex. Sales" required="">
                     </div>
 
                     {{-- Catch create failed --}}
                     @error('error')
-                        <script>
-                            $(document).ready(function() {
-                                $('#crud-modal').modal('show');
+                        {{-- Show modal after redirect --}}
+                        <script type="module">
+                            window.addEventListener('load', function() {
+                                const modal = FlowbiteInstances.getInstance('Modal', 'crud-modal');
+
+                                modal.toggle();
                             });
                         </script>
 

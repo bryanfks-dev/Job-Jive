@@ -17,7 +17,7 @@ class DepartmentsController extends Controller
     public function create(Request $request)
     {
         $fields = \Validator::make($request->all(), [
-            'department_name' => ['required', 'unique:departments']
+            'department-name' => ['required', 'unique:departments,department_name']
         ]);
 
         if ($fields->fails()) {
@@ -31,12 +31,14 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json'
-                ])->post(BackendServer::url() . '/api/department/create', $fields);
+                ])->post(BackendServer::url() . '/api/department/create', [
+                    'department-name' => $request['department-name']
+                ]);
 
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
-                        return redirect()->intended()->back();
+                        return redirect()->intended(route('admin.departments'));
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
