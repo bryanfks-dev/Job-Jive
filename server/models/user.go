@@ -47,11 +47,11 @@ func (user User) GetUsingEmail(email string) (User, error) {
 
 	row, err := db.Conn.Query(stmt, email)
 
+	defer row.Close()
+
 	if err != nil {
 		return user, err
 	}
-
-	defer row.Close()
 
 	// Query result from user table with given email should
 	// be returning 1 row, since the email value is unique

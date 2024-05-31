@@ -11,7 +11,29 @@ class DepartmentsController extends Controller
 {
     public function index()
     {
-        return view("admin.departments");
+        try {
+            $response =
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . session('token')
+                ])->get(BackendServer::url() . '/api/departments');
+
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 200: // Ok
+                        return view("admin.departments");
+
+                    case 401: // Unauthorized
+                        return redirect()->intended(route('admin.login'));
+                }
+
+                // Possibly unauthorized
+                abort($response['status']);
+            }
+        } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                return abort($e->getStatusCode());
+            }
+        }
     }
 
     public function create(Request $request)
@@ -50,7 +72,7 @@ class DepartmentsController extends Controller
             abort(400); // Bad request
         } catch (\Exception $e) {
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
-                $e->getStatusCode();
+                return abort($e->getStatusCode());
             }
         }
     }

@@ -36,6 +36,7 @@ func initEndPoints() {
 	// API endpoints
 	mux.HandleFunc("/api/user/profile", apis.GetUserProfileHandler)
 
+	mux.HandleFunc("/api/departments", apis.GetDepartmentsHandler)
 	mux.HandleFunc("/api/department/create", apis.CreateDepartmentHandler)
 }
 

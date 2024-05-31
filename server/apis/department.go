@@ -7,11 +7,46 @@ import (
 
 	"auths"
 	"models"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type DepartmentFields struct {
 	DepartmentName string `json:"department-name"`
 	ManagerId      int    `json:"manager-id"`
+}
+
+func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Validate token
+		token_valid, res := auths.AuthorizedToken(r)
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		if !token_valid {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		jwt_claims := res["token"].(jwt.MapClaims)
+
+		// Check user role
+		if jwt_claims["role"].(string) != "admin" {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
+		
+	}
 }
 
 func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +62,18 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		if !token_valid {
 			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		jwt_claims := res["token"].(jwt.MapClaims)
+
+		// Check user role
+		if jwt_claims["role"].(string) != "admin" {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
 
 			return
 		}
