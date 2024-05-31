@@ -5,6 +5,6 @@ use (
 	./apis
 	./configs
 	./db
-	./forms
+	./auths
 	./models
 )

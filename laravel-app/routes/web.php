@@ -49,8 +49,12 @@ Route::group(['prefix' => '/admin'], function () {
     Route::group(['prefix' => '/departments'], function () {
         Route::get('/', [admin\DepartmentsController::class, 'index'])
             ->name('admin.departments');
+
+        Route::post('/create', [admin\DepartmentsController::class, 'create'])
+            ->name('admin.departments.create');
     });
 
+    // Config route
     Route::get('/config', function () {
         return view('admin.config');
     })->name('admin.config');

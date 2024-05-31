@@ -33,7 +33,7 @@ class LoginController extends Controller
                     // Create session token
                     session(['token' => $response['token']]);
 
-                    return redirect()->intended(route('admin.dashboard'));
+                    return redirect()->intended(route('admin.employees'));
                 }
 
                 return redirect()->back()
@@ -42,7 +42,7 @@ class LoginController extends Controller
 
             return redirect()->back()->withErrors(['error' => 'Client error']);
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Server error']);
+            return redirect()->back()->withErrors(['error' => 'Cannot establish connection with backend server']);
         }
     }
 }

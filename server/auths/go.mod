@@ -1,4 +1,4 @@
-module forms
+module auths
 
 go 1.22.1
 

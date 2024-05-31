@@ -1,4 +1,4 @@
-package forms
+package auths
 
 import (
 	"encoding/json"
@@ -14,14 +14,14 @@ import (
 )
 
 type UserCred struct {
-	Email    string
-	Password string
-	Remember bool
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Remember bool   `json:"remember"`
 }
 
 type AdminCred struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 var (
@@ -30,7 +30,7 @@ var (
 	errDBConnNotEstablished = errors.New("cannot established connection with database")
 )
 
-func verifyPassword(hashed_pwd string, cred_pwd string) (error) {
+func verifyPassword(hashed_pwd string, cred_pwd string) error {
 	// Database failed to find user
 	if hashed_pwd == "" {
 		return errUserNotFound
@@ -47,7 +47,7 @@ func verifyPassword(hashed_pwd string, cred_pwd string) (error) {
 
 func verifyUser(cred UserCred) (models.User, error) {
 	if db.ConnectionEstablished() {
-		user, err := 
+		user, err :=
 			models.User.GetUsingEmail(models.User{}, cred.Email)
 
 		if err != nil {
@@ -69,7 +69,7 @@ func verifyUser(cred UserCred) (models.User, error) {
 
 func verifyAdmin(cred AdminCred) (models.Admin, error) {
 	if db.ConnectionEstablished() {
-		admin, err := 
+		admin, err :=
 			models.Admin.GetUsingUsername(models.Admin{}, cred.Username)
 
 		if err != nil {
@@ -106,8 +106,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusUnauthorized,
-				"message": "Invalid credential",
+				"status":  http.StatusBadRequest,
+				"message": "Bad request",
 			})
 
 			return
@@ -121,7 +121,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 					"status":  http.StatusUnauthorized,
 					"message": "Invalid credential",
 				})
-	
+
 				return
 			}
 
@@ -134,7 +134,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Generate JWT token
-		token, err := models.CreateToken(user.Id)
+		token, err := models.CreateToken(user.Id, "user")
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -187,7 +187,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 					"status":  http.StatusUnauthorized,
 					"message": "Invalid credential",
 				})
-	
+
 				return
 			}
 
@@ -200,18 +200,18 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Generate JWT token
-		token, err := models.CreateToken(uint(admin.Id))
+		token, err := models.CreateToken(admin.Id, "admin")
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+				"message": "Could not generate token",
 			})
 
 			return
 		}
 
-		log.Println("Admin ", login_cred.Username, " logged in")
+		log.Println("Admin", login_cred.Username, "logged in")
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
