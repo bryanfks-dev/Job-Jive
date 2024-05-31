@@ -6,11 +6,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AdminCred struct {
-	Username string
-	Password string
-}
-
 type Admin struct {
 	Id       int    `json:"id"`
 	Username string `json:"username"`

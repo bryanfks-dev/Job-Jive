@@ -30,8 +30,6 @@ return new class extends Migration
                 ->on('users')->onDelete('set null');
             $table->foreign('Department_ID')->references('Department_ID')
                 ->on('departments')->onDelete('set null');
-
-            $table->timestamps();
         });
     }
 

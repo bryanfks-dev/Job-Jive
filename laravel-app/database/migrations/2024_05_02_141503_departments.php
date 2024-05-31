@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->tinyIncrements('Department_ID')->primary();
             $table->string('Department_Name');
-
-            $table->timestamps();
         });
     }
 
