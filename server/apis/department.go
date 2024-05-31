@@ -21,7 +21,7 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
+/* 		// Validate token
 		token_valid, res := auths.AuthorizedToken(r)
 
 		// Set HTTP header
@@ -38,14 +38,41 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 		// Check user role
 		if jwt_claims["role"].(string) != "admin" {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
+			})
+
+			return
+		} */
+
+		departments, err :=
+			models.Department.Get(models.Department{})
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
 			})
 
 			return
 		}
 
-		
+		var departments_json []string
+
+		for _, department := range departments {
+			json, err := json.Marshal(department)
+
+			if err != nil {
+				panic(err.Error())
+			}
+
+			departments_json = append(departments_json, string(json))
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusOK,
+			"data":   departments_json,
+		})
 	}
 }
 
@@ -71,7 +98,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		// Check user role
 		if jwt_claims["role"].(string) != "admin" {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
 			})
 

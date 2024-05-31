@@ -50,9 +50,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @include('partials.admin.departments.record')
-                    @include('partials.admin.departments.record')
-                    @include('partials.admin.departments.record')
+                    @forelse ($datas as $index => $data)
+                        @include('partials.admin.departments.record')
+                    @empty
+
+                    @endforelse
                 </tbody>
             </table>
 
