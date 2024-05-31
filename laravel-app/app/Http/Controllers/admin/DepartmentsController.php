@@ -14,13 +14,17 @@ class DepartmentsController extends Controller
         try {
             $response =
                 Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token')
+                    'Authorization' => 'Bearer ' . session('token'),
+                    'Accept' => 'applications/json'
                 ])->get(BackendServer::url() . '/api/departments');
 
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
-                        return view("admin.departments");
+                        ;
+                        return view("admin.departments", [
+                            'datas' => $response['data']->each
+                        ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));

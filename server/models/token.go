@@ -25,9 +25,9 @@ var secret_key = getSecretKey()
 func CreateToken(record_id int, role string) (string, error) {
 	// Init token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  record_id,
+		"id":   record_id,
 		"role": role,
-		"exp": time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
+		"exp":  time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
 	})
 
 	// Hash token

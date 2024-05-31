@@ -29,7 +29,8 @@ class LoginController extends Controller
             // Send request to be server
             $response =
             Http::withHeaders([
-                'Content-type' => 'application/json'
+                'Content-type' => 'application/json',
+                'Accept' => 'applications/json'
             ])->post(BackendServer::url() . '/auth/admin/login', [
                 'username' => $request['username'],
                 'password' => $request['password'],
