@@ -1,4 +1,4 @@
-<div id="update-modal-{{ $data['department_id'] }}" tabindex="-1" aria-hidden="true"
+<div id="update-modal-{{ $department['id'] }}" tabindex="-1" aria-hidden="true"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-4xl max-h-full">
         <!-- Modal content -->
@@ -10,7 +10,7 @@
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                    data-modal-toggle="update-modal-{{ $data['department_id'] }}">
+                    data-modal-toggle="update-modal-{{ $department['id'] }}">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -20,23 +20,23 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <form class="p-4 md:p-5" action="{{ route('admin.departments.update', ['id' => $data['department_id']]) }}"
+            <form class="p-4 md:p-5" action="{{ route('admin.departments.update', ['id' => $department['id']]) }}"
                 method="post">
                 @csrf
                 @method('put')
                 <div class="grid gap-4 mb-4">
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="department-name"
+                        <label for="department_name"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Department Name</label>
-                        <input type="text" name="department-name" id="department-name"
+                        <input type="text" name="department_name" id="department_name"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. Sales" value="{{ $data['department_name'] }}" required="">
+                            placeholder="ex. Sales" value="{{ $department['name'] }}" required="">
                     </div>
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="manager-id"
+                        <label for="manager_id"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Manager Name</label>
-                        <select name="manager-id" id="manager-id"
+                        <select name="manager_id" id="manager_id"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                             <option value="" selected hidden disabled>Select Manager</option>
                             <option value="IT">IT</option>

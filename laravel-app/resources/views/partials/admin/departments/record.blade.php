@@ -3,20 +3,20 @@
         {{ $index + 1 }}
     </th>
     <td class="px-6 py-4">
-        {{ $data['department_name'] }}
+        {{ $department['name'] }}
     </td>
     <td class="px-6 py-4">
-        @if (empty($data['manager_name']))
+        @if (empty($department['manager_name']))
             -
         @else
-            {{ $data['manager_name'] }}
+            {{ $department['manager_name'] }}
         @endif
     </td>
     <td class="flex px-6 py-4 justify-end items-center gap-2">
         {{-- Edit button --}}
         <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
-            data-modal-target="update-modal-{{ $data['department_id'] }}"
-            data-modal-toggle="update-modal-{{ $data['department_id'] }}">
+            data-modal-target="update-modal-{{ $department['id'] }}"
+            data-modal-toggle="update-modal-{{ $department['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-700 hover:fill-blue-800" width="2em"
                 height="2em" viewBox="0 0 24 24">
                 <g fill-rule="evenodd" clip-rule="evenodd">
@@ -30,8 +30,8 @@
 
         {{-- Delete button --}}
         <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
-            data-modal-target="popup-modal-{{ $data['department_id'] }}"
-            data-modal-toggle="popup-modal-{{ $data['department_id'] }}">
+            data-modal-target="popup-modal-{{ $department['id'] }}"
+            data-modal-toggle="popup-modal-{{ $department['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-red-700 hover:fill-red-800" width="1.5em"
                 height="1.5em" viewBox="0 0 15 15">
                 <path fill-rule="evenodd"

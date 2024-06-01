@@ -16,15 +16,15 @@ import (
 )
 
 type DepartmentFields struct {
-	DepartmentName string `json:"department-name"`
-	ManagerId      int    `json:"manager-id"`
+	DepartmentName string `json:"department_name"`
+	ManagerId      int    `json:"manager_id"`
 }
 
 type ResponseData struct {
-	DepartmentId   int    `json:"department_id"`
-	DepartmentName string `json:"department_name"`
-	ManagerId      *int   `json:"manager_id"`
-	ManagerName    string `json:"manager_name"`
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	ManagerId   *int   `json:"manager_id"`
+	ManagerName string `json:"manager_name"`
 }
 
 func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,10 +71,10 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 
 		var response_data []ResponseData
 
-		for _, data := range departments {
+		for _, department := range departments {
 			department_head, err :=
 				models.DepartmentHead.GetUsingDepartmentId(
-					models.DepartmentHead{}, data.Id)
+					models.DepartmentHead{}, department.Id)
 
 			var user models.User
 
@@ -104,10 +104,10 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			response_data = append(response_data, ResponseData{
-				DepartmentId:   data.Id,
-				ManagerId:      &user.Id,
-				DepartmentName: data.Name,
-				ManagerName:    user.FullName,
+				Id:          department.Id,
+				Name:        department.Name,
+				ManagerId:   &user.Id,
+				ManagerName: user.FullName,
 			})
 		}
 

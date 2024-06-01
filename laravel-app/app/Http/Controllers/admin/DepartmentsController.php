@@ -6,9 +6,19 @@ use Http;
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DepartmentsController extends Controller
 {
+    private function paginate(array $items, int $perPage = 10, ?int $page = null, $options = []): LengthAwarePaginator
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+        $items = collect($items);
+
+        return new LengthAwarePaginator($items->forPage($page, $perPage),
+            $items->count(), $perPage, $page, $options);
+    }
+
     public function index()
     {
         try {
@@ -21,8 +31,10 @@ class DepartmentsController extends Controller
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
+                        $paginatedDepartments = $this->paginate($response['data']);
+
                         return view("admin.departments", [
-                            'datas' => $response['data']
+                            'departments' => $paginatedDepartments
                         ]);
 
                     case 401: // Unauthorized
@@ -57,10 +69,11 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept', 'application/json'
+                    'Accept',
+                    'application/json'
                 ])->post(BackendServer::url() . '/api/department/create', [
-                    'department-name' => $request['department-name']
-                ]);
+                            'department-name' => $request['department-name']
+                        ]);
 
             if ($response->successful()) {
                 switch ($response['status']) {
@@ -92,7 +105,8 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept', 'application/json'
+                    'Accept',
+                    'application/json'
                 ])->delete(BackendServer::url() . '/api/department/update/' . $id);
 
             if ($response->successful()) {
@@ -125,7 +139,8 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept', 'application/json'
+                    'Accept',
+                    'application/json'
                 ])->delete(BackendServer::url() . '/api/department/delete/' . $id);
 
             if ($response->successful()) {

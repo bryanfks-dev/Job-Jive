@@ -9,7 +9,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 256 256"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.13 104.13 0 0 0 128 24m40 112h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 0 16"/></svg>
                 <span class="hidden sm:block">Add Department</span>
             </button>
-
             {{-- Search bar --}}
             <form class="flex items-center max-w-sm">
                 <label for="simple-search" class="sr-only">Search</label>
@@ -28,9 +27,7 @@
                     <span class="sr-only">Search</span>
                 </button>
             </form>
-
         </div>
-
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -50,7 +47,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($datas as $index => $data)
+                    @forelse ($departments as $index => $department)
                         @include('partials.admin.departments.record')
                     @empty
 
@@ -60,10 +57,14 @@
 
             @include('partials.admin.departments.create-modal')
 
-            @foreach ($datas as $data)
+            @foreach ($departments as $department)
                 @include('partials.admin.departments.update-modal')
                 @include('partials.admin.departments.delete-modal')
             @endforeach
+
+            <div class="p-4 mt-4">
+                {{ $departments->withPath(url()->current())->links() }}
+            </div>
         </div>
     </div>
 @endsection
