@@ -14,10 +14,6 @@
                     class="mb-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Manager</span>
                 <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">Aldo Arista</h5>
                 <span class="text-sm text-gray-500 dark:text-gray-400 text-wrap">aristaaldo2@gmail.com</span>
-                <div class="flex mt-4 md:mt-6">
-                    <a href="#"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Contact</a>
-                </div>
             </div>
         </div>
         <a href="#"
@@ -54,7 +50,7 @@
     </form>
 
     {{-- Employee Content --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 mt-4 w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4 mt-4 w-full">
         @include('partials.user.employees.employee-card')
         @include('partials.user.employees.employee-card')
         @include('partials.user.employees.employee-card')
