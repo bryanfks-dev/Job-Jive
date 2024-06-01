@@ -56,10 +56,44 @@ class DepartmentsController extends Controller
             $response =
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
-                    'Content-type' => 'application/json'
+                    'Content-type' => 'application/json',
+                    'Accept', 'application/json'
                 ])->post(BackendServer::url() . '/api/department/create', [
                     'department-name' => $request['department-name']
                 ]);
+
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 200: // Ok
+                        return redirect()->intended(route('admin.departments'));
+
+                    case 401: // Unauthorized
+                        return redirect()->intended(route('admin.login'));
+                }
+                abort($response['status']);
+            }
+
+            abort(400); // Bad request
+        } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                return abort($e->getStatusCode());
+            }
+
+            return abort(500);
+        }
+    }
+
+    public function delete(int $id)
+    {
+        $id = intval($id);
+
+        try {
+            $response =
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . session('token'),
+                    'Content-type' => 'application/json',
+                    'Accept', 'application/json'
+                ])->delete(BackendServer::url() . '/api/department/delete/' . $id);
 
             if ($response->successful()) {
                 switch ($response['status']) {

@@ -38,6 +38,7 @@ func initEndPoints() {
 
 	mux.HandleFunc("/api/departments", apis.GetDepartmentsHandler)
 	mux.HandleFunc("/api/department/create", apis.CreateDepartmentHandler)
+	mux.HandleFunc("/api/department/delete/{id}", apis.DeleteDepartmentHandler)
 }
 
 func main() {

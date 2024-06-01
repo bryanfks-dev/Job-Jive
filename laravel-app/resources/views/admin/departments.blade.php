@@ -42,7 +42,7 @@
                             Department Name
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Manager
+                            Manager Name
                         </th>
                         <th scope="col" class="text-right px-6 py-3">
                             Action
@@ -52,6 +52,8 @@
                 <tbody>
                     @forelse ($datas as $index => $data)
                         @include('partials.admin.departments.record')
+                        @include('partials.admin.departments.update-modal')
+                        @include('partials.admin.departments.delete-modal')
                     @empty
 
                     @endforelse
@@ -59,8 +61,6 @@
             </table>
 
             @include('partials.admin.departments.create-modal')
-            @include('partials.admin.departments.update-modal')
-            @include('partials.admin.departments.delete-modal')
         </div>
     </div>
 @endsection

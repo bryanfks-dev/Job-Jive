@@ -52,6 +52,9 @@ Route::group(['prefix' => '/admin'], function () {
 
         Route::post('/create', [admin\DepartmentsController::class, 'create'])
             ->name('admin.departments.create');
+
+        Route::delete('/delete/{id}', [admin\DepartmentsController::class, 'delete'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.departments.delete');
     });
 
     // Config route

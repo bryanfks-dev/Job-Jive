@@ -75,3 +75,11 @@ func (department Department) Insert() error {
 
 	return err
 }
+
+func (department Department) Delete() error {
+	stmt := "DELETE FROM `departments` WHERE Department_ID = ?"
+
+	_, err := db.Conn.Exec(stmt, department.Id)
+
+	return err
+}

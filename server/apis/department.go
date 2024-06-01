@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"auths"
 	"models"
@@ -17,6 +18,7 @@ type DepartmentFields struct {
 }
 
 type ResponseData struct {
+	DepartmentId   int    `json:"department_id"`
 	DepartmentName string `json:"department_name"`
 	ManagerName    string `json:"manager_name"`
 }
@@ -99,6 +101,7 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			response_data = append(response_data, ResponseData{
+				DepartmentId:   data.Id,
 				DepartmentName: data.Name,
 				ManagerName:    user.FullName,
 			})
@@ -190,6 +193,83 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
 			"message": "Created",
+		})
+	}
+}
+
+func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Validate token
+		token_valid, res := auths.AuthorizedToken(r)
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		if !token_valid {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		jwt_claims := res["token"].(jwt.MapClaims)
+
+		// Check user role
+		if jwt_claims["role"].(string) != "admin" {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
+		// Retrieve value from url
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		// Ensure user provide a valid record id
+		if err != nil || id <= 0 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Bad request",
+			})
+
+			return
+		}
+
+		department, err := 
+			models.Department.GetUsingId(models.Department{}, id)
+
+		// Ensure no error when fetching data
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		err =
+			models.Department.Delete(department)
+
+		// Ensure no error when deleting data
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Println("Department", department.Name, "deleted")
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Deleted",
 		})
 	}
 }
