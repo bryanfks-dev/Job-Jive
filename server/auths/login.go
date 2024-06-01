@@ -91,9 +91,9 @@ func VerifyLoginToken(w http.ResponseWriter, r *http.Request) {
 
 		if valid_user {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
-				"role": "user",
+				"role":    "user",
 			})
 
 			return
@@ -103,16 +103,16 @@ func VerifyLoginToken(w http.ResponseWriter, r *http.Request) {
 
 		if valid_admin {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
-				"role": "admin",
+				"role":    "admin",
 			})
 
 			return
 		}
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": http.StatusOK,
+			"status":  http.StatusOK,
 			"message": "Ok",
 		})
 	}
@@ -130,7 +130,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if valid_user {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
 			})
 
@@ -141,7 +141,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if valid_admin {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
 			})
 
@@ -221,7 +221,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if valid_admin {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
 			})
 
@@ -232,7 +232,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if valid_user {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": http.StatusForbidden,
+				"status":  http.StatusForbidden,
 				"message": "Forbidden",
 			})
 
