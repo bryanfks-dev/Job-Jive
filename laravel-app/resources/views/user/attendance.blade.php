@@ -76,6 +76,15 @@
                     </form>
                 </div>
                 <div>
+                    {{-- @if (count($attendanceHistory) == 0) --}}
+                    <div class="flex items-center justify-center h-60 col-span-3">
+                        <div class="text-center">
+                            <h2 class="text-2xl text-gray-600 dark:text-gray-400">No attendance found</h2>
+                            <p class="text-gray-500 dark:text-gray-400">Please add an attendance</p>
+                        </div>
+                    </div>
+                    {{-- @endif --}}
+
                     @include('partials.user.attendance.today-record')
                     @include('partials.user.attendance.regular-record')
                     @include('partials.user.attendance.regular-record')
@@ -83,6 +92,8 @@
                     @include('partials.user.attendance.regular-record')
                     @include('partials.user.attendance.regular-record')
                     @include('partials.user.attendance.regular-record')
+
+                    
                 </div>
 
                 <!-- Pagination -->

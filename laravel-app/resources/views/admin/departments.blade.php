@@ -6,7 +6,10 @@
             {{-- Create button --}}
             <button type="button" data-modal-target="crud-modal" data-modal-toggle="crud-modal"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full sm:rounded-lg text-sm px-4 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 256 256"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.13 104.13 0 0 0 128 24m40 112h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 0 16"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 256 256">
+                    <path fill="currentColor"
+                        d="M128 24a104 104 0 1 0 104 104A104.13 104.13 0 0 0 128 24m40 112h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 0 16" />
+                </svg>
                 <span class="hidden sm:block">Add Department</span>
             </button>
             {{-- Search bar --}}
@@ -34,7 +37,7 @@
                         <th scope="col" class="px-6 py-3" width="1">
                             #
                         </th>
-                        <th scope="col" class="px-6 py-3" width="40%" >
+                        <th scope="col" class="px-6 py-3" width="40%">
                             Department Name
                         </th>
                         <th scope="col" class="px-6 py-3">
@@ -49,7 +52,10 @@
                     @forelse ($departments as $index => $department)
                         @include('partials.admin.departments.record')
                     @empty
-                        
+                        <tr class="h-10"></tr>
+                        <tr class="bg-gray-50 dark:bg-gray-800 dark:border-none">
+                            <td class="text-center" colspan="4">No department is found</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

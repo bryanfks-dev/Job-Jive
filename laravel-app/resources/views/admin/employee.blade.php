@@ -59,6 +59,12 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- EMPTY STATE: taruh di dalam tbody --}}
+                    {{-- <tr class="h-10"></tr>
+                    <tr class="bg-gray-50 dark:bg-gray-800 dark:border-none">
+                        <td class="text-center" colspan="4">No department is found</td>
+                    </tr> --}}
+                    
                     {{-- Employee 1 --}}
                     <tr
                         class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">

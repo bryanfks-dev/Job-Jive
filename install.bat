@@ -1,4 +1,3 @@
-@echo off
 
 :: Frontend
 start cd laravel-app && composer install && copy .env.example .env 

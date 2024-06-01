@@ -51,6 +51,15 @@
 
     {{-- Employee Content --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4 mt-4 w-full">
+        {{-- @if (!$employees->count()) --}}
+        <div class="flex items-center justify-center h-60 col-span-3">
+            <div class="text-center">
+                <h2 class="text-2xl text-gray-600 dark:text-gray-400">No employees found</h2>
+                <p class="text-gray-500 dark:text-gray-400">Please add an employee</p>
+            </div>
+        </div>
+        {{-- @endif --}}
+
         @include('partials.user.employees.employee-card')
         @include('partials.user.employees.employee-card')
         @include('partials.user.employees.employee-card')
