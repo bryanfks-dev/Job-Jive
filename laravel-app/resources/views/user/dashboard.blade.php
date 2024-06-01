@@ -169,7 +169,14 @@
                     </thead>
                     <tr class="h-4"></tr>
                     <tbody>
-                        {{-- Employee 1 --}}
+                        {{-- Empty State --}}
+                        <tr class="h-5"></tr>
+                        <tr class= "dark:bg-gray-800 dark:border-none">
+                            <td class="text-center" colspan="4">No employee yet</td>
+                        </tr>
+                        <tr class="h-5"></tr>
+
+                        {{-- Employees --}}
                         <tr>
                             <th class="font-medium py-1">
                                 1
@@ -249,7 +256,14 @@
                     </thead>
                     <tr class="h-4"></tr>
                     <tbody>
-                        {{-- Employee 1 --}}
+                        {{-- Empty State --}}
+                        <tr class="h-5"></tr>
+                        <tr class= "dark:bg-gray-800 dark:border-none">
+                            <td class="text-center" colspan="4">No employee yet</td>
+                        </tr>
+                        <tr class="h-5"></tr>
+                        
+                        {{-- Employees --}}
                         <tr>
                             <th class="font-medium py-1">
                                 1
