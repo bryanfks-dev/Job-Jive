@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\admin;
 use App\Http\Controllers\user;
+use App\Http\Controllers\admin;
 use Illuminate\Support\Facades\Route;
 
 // User routes
@@ -61,9 +61,13 @@ Route::group(['prefix' => '/admin'], function () {
     });
 
     // Config route
-    Route::get('/config', function () {
-        return view('admin.config');
-    })->name('admin.config');
+    Route::group(['prefix' => '/configs'], function () {
+        Route::get('/', [admin\ConfigController::class, 'index'])
+            ->name('admin.configs');
+
+        Route::put('/', [admin\ConfigController::class, 'save'])
+            ->name('admin.configs.save');
+    });
 });
 
 Route::get('/employees', function () {

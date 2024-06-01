@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"auths"
 	"configs"
 	"db"
-	"auths"
 
 	"github.com/joho/godotenv"
 )
@@ -41,6 +41,10 @@ func initEndPoints() {
 	mux.HandleFunc("/api/department/create", apis.CreateDepartmentHandler)
 	mux.HandleFunc("/api/department/update/{id}", apis.UpdateDepartmentHandler)
 	mux.HandleFunc("/api/department/delete/{id}", apis.DeleteDepartmentHandler)
+
+	// Config endpoints
+	mux.HandleFunc("/api/configs", apis.GetConfigsHandler)
+	mux.HandleFunc("/api/configs/save", apis.SaveConfigsHandler)
 }
 
 func main() {

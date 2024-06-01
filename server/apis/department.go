@@ -179,7 +179,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = models.DepartmentHead.Insert(models.DepartmentHead{
 			DepartmentId: int(id),
-			ManagerId: nil,
+			ManagerId:    nil,
 		})
 
 		// Ensure no error when inserting department_head
