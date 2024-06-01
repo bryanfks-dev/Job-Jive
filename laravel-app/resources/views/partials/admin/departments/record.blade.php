@@ -40,7 +40,4 @@
             </svg>
         </a>
     </td>
-
-    @include('partials.admin.departments.update-modal')
-    @include('partials.admin.departments.delete-modal')
 </tr>

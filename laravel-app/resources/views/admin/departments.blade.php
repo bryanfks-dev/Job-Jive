@@ -59,6 +59,11 @@
             </table>
 
             @include('partials.admin.departments.create-modal')
+
+            @foreach ($datas as $data)
+                @include('partials.admin.departments.update-modal')
+                @include('partials.admin.departments.delete-modal')
+            @endforeach
         </div>
     </div>
 @endsection
