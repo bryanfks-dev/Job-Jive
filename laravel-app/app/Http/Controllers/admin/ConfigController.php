@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\admin;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
@@ -27,12 +26,13 @@ class ConfigController extends Controller
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
                 }
-                abort($response['status']);
+
+                return abort($response['status']);
             }
 
-            abort(400); // Bad request
+            return abort(400); // Bad request
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
                 return abort($e->getStatusCode());
             }
 
@@ -82,6 +82,10 @@ class ConfigController extends Controller
 
             return abort(400); // Bad request
         } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return abort($e->getStatusCode());
+            }
+
             return abort(500);
         }
     }

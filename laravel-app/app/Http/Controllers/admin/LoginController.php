@@ -29,6 +29,7 @@ class LoginController extends Controller
             // Send request to be server
             $response =
             Http::withHeaders([
+                'Authorization' => 'Bearer ' . session('token'),
                 'Content-type' => 'application/json',
                 'Accept' => 'applications/json'
             ])->post(BackendServer::url() . '/auth/admin/login', [
@@ -50,7 +51,11 @@ class LoginController extends Controller
 
             return redirect()->back()->withErrors(['error' => 'Client error']);
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Cannot establish connection with backend server']);
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return abort($e->getStatusCode());
+            }
+
+            return redirect()->back()->withErrors(['error' => 'Server error']);
         }
     }
 }
