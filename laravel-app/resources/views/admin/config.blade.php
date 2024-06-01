@@ -11,6 +11,9 @@
                 <input type="time" name="check_in_time" id="check_in_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales" value="{{ $check_in_time }}" required="">
+                @error('check_in_time')
+                    <p class="text-red-500 text-xs mt-1">{{ $errors->first('check_in_time') }}</p>
+                @enderror
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="check_out_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -18,6 +21,9 @@
                 <input type="time" name="check_out_time" id="check_out_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales" value="{{ $check_out_time }}" required="">
+                @error('check_out_time')
+                    <p class="text-red-500 text-xs mt-1">{{ $errors->first('check_out_time') }}</p>
+                @enderror
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="absence_quota" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -25,33 +31,30 @@
                 <input type="number" name="absence_quota" id="absence_quota"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     value="{{ $absence_quota }}" required="" min="1">
+                @error('absence_quota')
+                    <p class="text-red-500 text-xs mt-1">{{ $errors->first('absence_quota') }}</p>
+                @enderror
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="daily_work_hours" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Daily Work Hours</label>
                 <input type="number" name="daily_work_hours" id="daily_work_hours"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ $daily_work_hours }}" required="" min="1">
+                    value="{{ $daily_work_hours }}" required="" min="1" max="24">
+                @error('daily_work_hours')
+                    <p class="text-red-500 text-xs mt-1">{{ $errors->first('daily_work_hours') }}</p>
+                @enderror
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="weekly_work_hours" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Weekly Work Hours</label>
                 <input type="number" name="weekly_work_hours" id="weekly_work_hours"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ $weekly_work_hours }}" required="" min="1">
+                    value="{{ $weekly_work_hours }}" required="" min="1" max="168">
+                @error('weekly_work_hours')
+                    <p class="text-red-500 text-xs mt-1">{{ $errors->first('weekly_work_hours') }}</p>
+                @enderror
             </div>
-
-            {{-- Catch save failed --}}
-            @error('error')
-                <div class="flex gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="fill-red-500" width="1em" height="1em"
-                        viewBox="0 0 56 56">
-                        <path
-                            d="M28 51.906c13.055 0 23.906-10.828 23.906-23.906c0-13.055-10.875-23.906-23.93-23.906C14.899 4.094 4.095 14.945 4.095 28c0 13.078 10.828 23.906 23.906 23.906m-.023-20.39c-1.243 0-1.922-.727-1.97-1.97L25.68 17.97c-.047-1.29.937-2.203 2.273-2.203c1.313 0 2.32.937 2.274 2.226l-.329 11.555c-.047 1.265-.75 1.969-1.921 1.969m0 8.625c-1.36 0-2.626-1.078-2.626-2.532c0-1.453 1.243-2.53 2.626-2.53c1.359 0 2.624 1.054 2.624 2.53c0 1.477-1.289 2.532-2.624 2.532" />
-                    </svg>
-                    <p class="text-red-500 text-xs">{{ $errors->first('create-error') }}</p>
-                </div>
-            @enderror
         </div>
 
         <div class="mb-4">

@@ -104,6 +104,18 @@ func SaveConfigsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Validating values
+		if config.AbsenceQuota <= 0 || config.DailyWorkHours <= 0 || 
+			config.WeekyWorkHours <= 0 || config.CheckInTime >= config.CheckOutTime || 
+			config.WeekyWorkHours > config.DailyWorkHours {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Bad request",
+			})
+
+			return
+		}
+
 		err = models.ConfigJson.WriteFile(config)
 
 		// Ensure no error writting config file

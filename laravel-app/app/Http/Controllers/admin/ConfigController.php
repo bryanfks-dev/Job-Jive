@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
@@ -42,15 +43,15 @@ class ConfigController extends Controller
     public function save(Request $request)
     {
         $fields = \Validator::make(request()->all(), [
-            'check_in_time' => ['required'],
-            'check_out_time' => ['required'],
-            'absence_quota' => ['required'],
-            'daily_work_hours' => ['required'],
-            'weekly_work_hours' => ['required']
+            'check_in_time' => ['required', 'date_format:H:i', 'before:' . $request['check_out_time']],
+            'check_out_time' => ['required', 'date_format:H:i', 'after:' . $request['check_in_time']],
+            'absence_quota' => ['required', 'integer'],
+            'daily_work_hours' => ['required', 'integer', 'lte:weekly_work_hours', 'min:1', 'max:24'],
+            'weekly_work_hours' => ['required', 'integer', 'gte:daily_work_hours', 'min:1', 'max:168']
         ]);
 
         if ($fields->fails()) {
-            return redirect()->back()->withErrors(['error' => 'Do not leave input fields empty']);
+            return redirect()->back()->withErrors($fields->errors());
         }
 
         try {
@@ -62,9 +63,9 @@ class ConfigController extends Controller
                 ])->put(BackendServer::url() . '/api/configs/save', [
                     'check_in_time' => $request['check_in_time'],
                     'check_out_time' => $request['check_out_time'],
-                    'absence_quota' => $request['absence_quota'],
-                    'daily_work_hours' => $request['daily_work_hours'],
-                    'weekly_work_hours' => $request['weekly_work_hours']
+                    'absence_quota' => intval($request['absence_quota']),
+                    'daily_work_hours' => intval($request['daily_work_hours']),
+                    'weekly_work_hours' => intval($request['weekly_work_hours'])
                 ]);
 
             if ($response->successful()) {
