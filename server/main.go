@@ -30,6 +30,7 @@ func loadConfig() (configs.Server, configs.Database) {
 
 func initEndPoints() {
 	// Forms endpoints
+	mux.HandleFunc("/auth/verify-token", auths.VerifyLoginToken)
 	mux.HandleFunc("/auth/user/login", auths.UserLoginHandler)
 	mux.HandleFunc("/auth/admin/login", auths.AdminLoginHandler)
 

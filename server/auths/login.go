@@ -79,10 +79,74 @@ func verifyAdmin(cred AdminCred) (models.Admin, error) {
 	return admin, nil
 }
 
+func VerifyLoginToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_user, _ := UserMiddleware(r)
+
+		if valid_user {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+				"role": "user",
+			})
+
+			return
+		}
+
+		valid_admin, _ := AdminMiddleware(r)
+
+		if valid_admin {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+				"role": "admin",
+			})
+
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusOK,
+			"message": "Ok",
+		})
+	}
+}
+
 func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		postMu.Lock()
 		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_user, _ := UserMiddleware(r)
+
+		if valid_user {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
+		valid_admin, _ := AdminMiddleware(r)
+
+		if valid_admin {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
 
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
@@ -90,9 +154,6 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		var login_cred UserCred
 
 		err := req_json.Decode(&login_cred)
-
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -153,15 +214,37 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_admin, _ := AdminMiddleware(r)
+
+		if valid_admin {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
+		valid_user, _ := UserMiddleware(r)
+
+		if valid_user {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status": http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
 
 		var login_cred AdminCred
 
 		err := req_json.Decode(&login_cred)
-
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{

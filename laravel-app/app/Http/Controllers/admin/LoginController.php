@@ -11,7 +11,36 @@ class LoginController extends Controller
 {
     public function index()
     {
-        return view('admin.login');
+        try {
+            // Send request to be server
+            $response =
+            Http::withHeaders([
+                'Authorization' => 'Bearer ' . session('token'),
+                'Accept' => 'applications/json'
+            ])->get(BackendServer::url() . '/auth/verify-token');
+
+            if ($response->successful()) {
+                if ($response['status'] == 200) { // Ok
+                    return view('admin.login');
+                } else if ($response['status'] == 403) { // Forbidden
+                    if ($response['role'] == 'user') {
+                        return redirect()->intended(route('user.dashboard'));
+                    }
+
+                    return redirect()->intended(route('admin.employees'));
+                }
+
+                return abort($response['status']);
+            }
+
+            return view('admin.login')->withErrors(['error' => 'Client error']);
+        } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return abort($e->getStatusCode());
+            }
+
+            return view('admin.login')->withErrors(['error' => 'Server error']);
+        }
     }
 
     public function login(Request $request)
@@ -45,8 +74,7 @@ class LoginController extends Controller
                     return redirect()->intended(route('admin.employees'));
                 }
 
-                return redirect()->back()
-                    ->withErrors(['error' => $response['message']]);
+                return abort($response['status']);
             }
 
             return redirect()->back()->withErrors(['error' => 'Client error']);

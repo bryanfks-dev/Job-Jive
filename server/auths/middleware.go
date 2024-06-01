@@ -26,7 +26,7 @@ func UserMiddleware(r *http.Request) (bool, map[string]interface{}) {
 	}
 
 	// Check if user is exist in database
-	_, err := models.User.GetUsingId(models.User{}, jwt_claims["id"].(int))
+	_, err := models.User.GetUsingId(models.User{}, int(jwt_claims["id"].(float64)))
 
 	// Ensure no error when getting user data
 	if err != nil {
@@ -61,7 +61,7 @@ func AdminMiddleware(r *http.Request) (bool, map[string]interface{}) {
 	}
 
 	// Check if admin is exist in database
-	_, err := models.Admin.GetUsingId(models.Admin{}, jwt_claims["id"].(int))
+	_, err := models.Admin.GetUsingId(models.Admin{}, int(jwt_claims["id"].(float64)))
 
 	// Ensure no error when getting user data
 	if err != nil {

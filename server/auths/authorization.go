@@ -59,7 +59,6 @@ func AuthorizedToken(r *http.Request) (bool, map[string]interface{}) {
 
 	return true, map[string]interface{}{
 		"status":  http.StatusOK,
-		"message": "Token valid",
 		"token":   token_map,
 	}
 }
