@@ -15,11 +15,16 @@ class DepartmentsController extends Controller
         $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
         $items = collect($items);
 
-        return new LengthAwarePaginator($items->forPage($page, $perPage),
-            $items->count(), $perPage, $page, $options);
+        return new LengthAwarePaginator(
+            $items->forPage($page, $perPage),
+            $items->count(),
+            $perPage,
+            $page,
+            $options
+        );
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             $response =
@@ -31,6 +36,24 @@ class DepartmentsController extends Controller
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
+                        if ($request->has('query')) {
+                            $query = $request->get('query');
+
+                            $results = [];
+
+                            foreach ($response['data'] as $department) {
+                                if (in_array(strtolower($query), array_map('strtolower', $department))) {
+                                    $results[] = $department;
+                                }
+                            }
+
+                            $paginatedDepartments = $this->paginate($results);
+
+                            return view("admin.departments", [
+                                'departments' => $paginatedDepartments
+                            ]);
+                        }
+
                         $paginatedDepartments = $this->paginate($response['data']);
 
                         return view("admin.departments", [
@@ -47,6 +70,8 @@ class DepartmentsController extends Controller
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
                 return abort($e->getStatusCode());
             }
+
+            dd($e);
 
             return abort(500);
         }
@@ -107,7 +132,7 @@ class DepartmentsController extends Controller
                     'Content-type' => 'application/json',
                     'Accept',
                     'application/json'
-                ])->delete(BackendServer::url() . '/api/department/update/' . $id);
+                ])->put(BackendServer::url() . '/api/department/update/' . $id);
 
             if ($response->successful()) {
                 switch ($response['status']) {

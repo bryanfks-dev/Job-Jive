@@ -408,3 +408,91 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
+
+func SearchDepartmentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		// Validate token
+		token_valid, res := auths.AuthorizedToken(r)
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		if !token_valid {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		jwt_claims := res["token"].(jwt.MapClaims)
+
+		// Check user role
+		if jwt_claims["role"].(string) != "admin" {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusForbidden,
+				"message": "Forbidden",
+			})
+
+			return
+		}
+
+		departments, err :=
+			models.Department.Get(models.Department{})
+
+		// Ensure no error when fetching department datas
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		var response_data []ResponseData
+
+		for _, department := range departments {
+			department_head, err :=
+				models.DepartmentHead.GetUsingDepartmentId(
+					models.DepartmentHead{}, department.Id)
+
+			var user models.User
+
+			// Ensure no error fetching department
+			if err != nil && err != sql.ErrNoRows {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": "Server error",
+				})
+
+				return
+			}
+
+			if department_head.ManagerId != nil {
+				user, err =
+					models.User.GetUsingId(models.User{}, *department_head.ManagerId)
+
+				// Ensure no error fetching user
+				if err != nil {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"status":  http.StatusInternalServerError,
+						"message": "Server error",
+					})
+
+					return
+				}
+			}
+
+			response_data = append(response_data, ResponseData{
+				Id:          department.Id,
+				Name:        department.Name,
+				ManagerId:   &user.Id,
+				ManagerName: user.FullName,
+			})
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusOK,
+			"data":   response_data,
+		})
+	}
+}
