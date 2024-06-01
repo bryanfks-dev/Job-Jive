@@ -15,7 +15,8 @@
     <td class="flex px-6 py-4 justify-end items-center gap-2">
         {{-- Edit button --}}
         <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
-            data-modal-target="update-modal" data-modal-toggle="update-modal">
+            data-modal-target="update-modal-{{ $data['department_id'] }}"
+            data-modal-toggle="update-modal-{{ $data['department_id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-700 hover:fill-blue-800" width="2em"
                 height="2em" viewBox="0 0 24 24">
                 <g fill-rule="evenodd" clip-rule="evenodd">
@@ -39,4 +40,7 @@
             </svg>
         </a>
     </td>
+
+    @include('partials.admin.departments.update-modal')
+    @include('partials.admin.departments.delete-modal')
 </tr>

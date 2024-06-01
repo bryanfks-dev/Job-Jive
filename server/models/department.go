@@ -43,35 +43,27 @@ func (department Department) Get() ([]Department, error) {
 func (department Department) GetUsingId(id int) (Department, error) {
 	stmt := "SELECT * FROM `departments` WHERE Department_ID = ?"
 
-	row, err := db.Conn.Query(stmt, id)
-
-	// Ensure no error when fetching records
-	if err != nil {
-		return Department{}, err
-	}
-
-	defer row.Close()
-
 	// Query result from department table with given id should
 	// be returning 1 row, since the id value is unique
-	if row.Next() {
-		err := row.Scan(
-			&department.Id, 
+	err := db.Conn.QueryRow(stmt, id).
+		Scan(&department.Id,
 			&department.Name)
 
-		// Ensure no error when parsing row
-		if err != nil {
-			return Department{}, err
-		}
-	}
-
-	return department, nil
+	return department, err
 }
 
 func (department Department) Insert() error {
 	stmt := "INSERT INTO `departments` (Department_Name) VALUES(?)"
 
 	_, err := db.Conn.Exec(stmt, department.Name)
+
+	return err
+}
+
+func (department Department) Update() error {
+	stmt := "UPDATE `departments` SET Department_Name = ? WHERE Department_ID = ?"
+
+	_, err := db.Conn.Exec(stmt, department.Name, department.Id)
 
 	return err
 }

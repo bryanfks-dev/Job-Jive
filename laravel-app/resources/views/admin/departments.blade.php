@@ -52,8 +52,6 @@
                 <tbody>
                     @forelse ($datas as $index => $data)
                         @include('partials.admin.departments.record')
-                        @include('partials.admin.departments.update-modal')
-                        @include('partials.admin.departments.delete-modal')
                     @empty
 
                     @endforelse

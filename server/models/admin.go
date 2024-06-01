@@ -35,23 +35,12 @@ func (admin Admin) Insert() {
 func (admin Admin) GetUsingUsername(username string) (Admin, error) {
 	stmt := "SELECT * FROM `admins` WHERE Username= ?"
 
-	row, err := db.Conn.Query(stmt, username)
-
-	if err != nil {
-		return admin, err
-	}
-
-	defer row.Close()
-
-	// Query result from user table with given username should
+	// Query result from admin table with given id should
 	// be returning 1 row, since the username value is unique
-	if row.Next() {
-		err := row.Scan(&admin.Id, &admin.Username, &admin.Password)
+	err := db.Conn.QueryRow(stmt, username).
+		Scan(&admin.Id, 
+			&admin.Username, 
+			&admin.Password)
 
-		if err != nil {
-			return admin, err
-		}
-	}
-
-	return admin, nil
+	return admin, err
 }

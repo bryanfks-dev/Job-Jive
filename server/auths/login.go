@@ -1,6 +1,7 @@
 package auths
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -29,11 +30,6 @@ var (
 )
 
 func verifyPassword(hashed_pwd string, cred_pwd string) error {
-	// Database failed to find user
-	if hashed_pwd == "" {
-		return errUserNotFound
-	}
-
 	// Comparing hashed password from database and login credential
 	err := bcrypt.CompareHashAndPassword([]byte(hashed_pwd), []byte(cred_pwd))
 
@@ -111,7 +107,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			// Incorrect password or user not found
-			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
+			if err == bcrypt.ErrMismatchedHashAndPassword || err == sql.ErrNoRows {
 				json.NewEncoder(w).Encode(map[string]interface{}{
 					"status":  http.StatusUnauthorized,
 					"message": "Invalid credential",

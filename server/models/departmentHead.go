@@ -25,7 +25,7 @@ func (department_head DepartmentHead) Get() ([]DepartmentHead, error) {
 
 	for row.Next() {
 		err := row.Scan(
-			&department_head.DepartmentId, 
+			&department_head.DepartmentId,
 			&department_head.ManagerId)
 
 		// Ensure no error when parsing row to struct
@@ -42,29 +42,13 @@ func (department_head DepartmentHead) Get() ([]DepartmentHead, error) {
 func (department_head DepartmentHead) GetUsingDepartmentId(department_id int) (DepartmentHead, error) {
 	stmt := "SELECT * FROM `department_heads` WHERE Department_ID = ?"
 
-	row, err := db.Conn.Query(stmt, department_id)
-
-	// Ensure no error when fetching row
-	if err != nil {
-		return DepartmentHead{}, err
-	}
-
-	defer row.Close()
-
 	// Query result from department_head table with given department_id should
 	// be returning 1 row, since the department_id value is unique
-	if row.Next() {
-		err := row.Scan(
-			&department_head.DepartmentId, 
+	err := db.Conn.QueryRow(stmt, department_id).
+		Scan(&department_head.DepartmentId,
 			&department_head.ManagerId)
-		
-		// Ensure no error when parsing row to struct
-		if err != nil {
-			return DepartmentHead{}, err
-		}
-	}
 
-	return department_head, nil
+	return department_head, err
 }
 
 func (department_head DepartmentHead) Insert() error {
@@ -72,6 +56,15 @@ func (department_head DepartmentHead) Insert() error {
 
 	_, err := db.Conn.Exec(stmt,
 		department_head.DepartmentId, department_head.ManagerId)
+
+	return err
+}
+
+func (department_head DepartmentHead) Update() error {
+	stmt := "UPDATE `department_heads` SET Manager_ID = ? WHERE Department_ID = ?"
+
+	_, err := db.Conn.Exec(stmt,
+		department_head.ManagerId, department_head.DepartmentId)
 
 	return err
 }
