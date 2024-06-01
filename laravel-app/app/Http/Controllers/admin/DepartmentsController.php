@@ -128,7 +128,7 @@ class DepartmentsController extends Controller
 
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
-                'update-error'=> 'Invalid input values',
+                'update-error-' . $id => 'Invalid input values',
             ]);
         }
 

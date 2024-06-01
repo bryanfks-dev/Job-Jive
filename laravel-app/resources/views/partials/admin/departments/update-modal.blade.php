@@ -21,9 +21,9 @@
             </div>
             <!-- Modal body -->
             <form class="p-4 md:p-5" action="{{ route('admin.departments.update', ['id' => $department['id']]) }}"
-                method="post">
+                method="POST">
                 @csrf
-                @method('put')
+                @method('PUT')
                 <div class="grid gap-4 mb-4">
                     <div class="col-span-2 sm:col-span-1">
                         <label for="department_name"
@@ -47,11 +47,13 @@
                     </div>
 
                     {{-- Catch update failed --}}
-                    @error('update-error')
+                    @error('update-error-{{ $department["id"] }}')
                         {{-- Show modal after redirect --}}
                         <script type="module">
                             window.addEventListener('load', function() {
-                                const modal = FlowbiteInstances.getInstance('Modal', `update-modal-{{ $department['id'] }}`);
+                                const id = {{ $department['id'] }};
+
+                                const modal = FlowbiteInstances.getInstance('Modal', `update-modal-${id}`);
 
                                 modal.toggle();
                             });
