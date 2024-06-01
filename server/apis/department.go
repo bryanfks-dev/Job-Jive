@@ -163,11 +163,26 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = models.Department.Insert(models.Department{
+		id, err := models.Department.Insert(models.Department{
 			Name: department_fields.DepartmentName,
 		})
 
 		// Ensure no error when inserting department
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		err = models.DepartmentHead.Insert(models.DepartmentHead{
+			DepartmentId: int(id),
+			ManagerId: nil,
+		})
+
+		// Ensure no error when inserting department_head
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,

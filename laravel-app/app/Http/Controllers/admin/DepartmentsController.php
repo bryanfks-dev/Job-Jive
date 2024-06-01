@@ -47,14 +47,14 @@ class DepartmentsController extends Controller
                                 }
                             }
 
-                            $paginatedDepartments = $this->paginate($results);
+                            $paginatedDepartments = $this->paginate($results ?? []);
 
                             return view("admin.departments", [
                                 'departments' => $paginatedDepartments
                             ]);
                         }
 
-                        $paginatedDepartments = $this->paginate($response['data']);
+                        $paginatedDepartments = $this->paginate($response['data'] ?? []);
 
                         return view("admin.departments", [
                             'departments' => $paginatedDepartments
@@ -71,8 +71,6 @@ class DepartmentsController extends Controller
                 return abort($e->getStatusCode());
             }
 
-            dd($e);
-
             return abort(500);
         }
     }
@@ -80,7 +78,7 @@ class DepartmentsController extends Controller
     public function create(Request $request)
     {
         $fields = \Validator::make($request->all(), [
-            'department-name' => ['required', 'unique:departments,department_name']
+            'department_name' => ['required', 'unique:departments,department_name']
         ]);
 
         if ($fields->fails()) {
@@ -94,10 +92,9 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept',
-                    'application/json'
+                    'Accept' => 'application/json'
                 ])->post(BackendServer::url() . '/api/department/create', [
-                            'department-name' => $request['department-name']
+                            'department_name' => $request['department_name']
                         ]);
 
             if ($response->successful()) {
@@ -121,18 +118,29 @@ class DepartmentsController extends Controller
         }
     }
 
-    public function update(int $id)
+    public function update(Request $request, int $id)
     {
         $id = intval($id);
+
+        $fields = \Validator::make($request->all(), [
+            'manager_id' => ['required', 'unique:department_heads,manager_id,' . $id]
+        ]);
+
+        if ($fields->fails()) {
+            return redirect()->back()->withErrors([
+                'update-error'=> 'Invalid input values',
+            ]);
+        }
 
         try {
             $response =
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept',
-                    'application/json'
-                ])->put(BackendServer::url() . '/api/department/update/' . $id);
+                    'Accept' => 'application/json'
+                ])->put(BackendServer::url() . '/api/department/update/' . $id, [
+                    'manager_id' => $request['manager_id']
+                ]);
 
             if ($response->successful()) {
                 switch ($response['status']) {
@@ -164,8 +172,7 @@ class DepartmentsController extends Controller
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
-                    'Accept',
-                    'application/json'
+                    'Accept' => 'application/json'
                 ])->delete(BackendServer::url() . '/api/department/delete/' . $id);
 
             if ($response->successful()) {

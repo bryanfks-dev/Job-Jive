@@ -49,7 +49,7 @@
                     @forelse ($departments as $index => $department)
                         @include('partials.admin.departments.record')
                     @empty
-
+                        
                     @endforelse
                 </tbody>
             </table>
