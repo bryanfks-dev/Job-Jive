@@ -3,7 +3,6 @@ package apis
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,8 +10,6 @@ import (
 	"auths"
 	"db"
 	"models"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type DepartmentFields struct {
@@ -32,26 +29,13 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
@@ -123,26 +107,13 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
@@ -206,26 +177,13 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
@@ -259,6 +217,7 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Database transaction
 		tx, err := db.Conn.Begin()
 
 		if err != nil {
@@ -306,11 +265,6 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when updating depatrment
 		if err != nil {
-			// Ensure no error when rollback
-			if rbErr := tx.Rollback(); rbErr != nil {
-				fmt.Println("Rollback error:", rbErr)
-			}
-
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
@@ -323,11 +277,6 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when updating department
 		if err != nil {
-			// Ensure no error when rollback
-			if rbErr := tx.Rollback(); rbErr != nil {
-				fmt.Println("Rollback error:", rbErr)
-			}
-
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
@@ -336,7 +285,14 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tx.Commit()
+		if err := tx.Commit(); err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
 
 		log.Println("Department record", department.Name, "updated")
 
@@ -352,26 +308,13 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
@@ -402,8 +345,7 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err =
-			models.Department.Delete(department)
+		err = models.Department.Delete(department)
 
 		// Ensure no error when deleting data
 		if err != nil {
@@ -420,94 +362,6 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
 			"message": "Deleted",
-		})
-	}
-}
-
-func SearchDepartmentHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
-
-		if !token_valid {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
-
-		departments, err :=
-			models.Department.Get(models.Department{})
-
-		// Ensure no error when fetching department datas
-		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			})
-
-			return
-		}
-
-		var response_data []ResponseData
-
-		for _, department := range departments {
-			department_head, err :=
-				models.DepartmentHead.GetUsingDepartmentId(
-					models.DepartmentHead{}, department.Id)
-
-			var user models.User
-
-			// Ensure no error fetching department
-			if err != nil && err != sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusInternalServerError,
-					"message": "Server error",
-				})
-
-				return
-			}
-
-			if department_head.ManagerId != nil {
-				user, err =
-					models.User.GetUsingId(models.User{}, *department_head.ManagerId)
-
-				// Ensure no error fetching user
-				if err != nil {
-					json.NewEncoder(w).Encode(map[string]interface{}{
-						"status":  http.StatusInternalServerError,
-						"message": "Server error",
-					})
-
-					return
-				}
-			}
-
-			response_data = append(response_data, ResponseData{
-				Id:          department.Id,
-				Name:        department.Name,
-				ManagerId:   &user.Id,
-				ManagerName: user.FullName,
-			})
-		}
-
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": http.StatusOK,
-			"data":   response_data,
 		})
 	}
 }

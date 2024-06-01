@@ -12,6 +12,32 @@ type Admin struct {
 	Password string `json:"password"`
 }
 
+func (admin Admin) GetUsingUsername(username string) (Admin, error) {
+	stmt := "SELECT * FROM `admins` WHERE Username = ?"
+
+	// Query result from admin table with given id should
+	// be returning 1 row, since the username value is unique
+	err := db.Conn.QueryRow(stmt, username).
+		Scan(&admin.Id, 
+			&admin.Username, 
+			&admin.Password)
+
+	return admin, err
+}
+
+func (admin Admin) GetUsingId(id int) (Admin, error) {
+	stmt := "SELECT * FROM `admins` WHERE Admin_ID = ?"
+
+	// Query result from admin table with given id should
+	// be returning 1 row, since the username value is unique
+	err := db.Conn.QueryRow(stmt, id).
+		Scan(&admin.Id, 
+			&admin.Username, 
+			&admin.Password)
+
+	return admin, err
+}
+
 func (admin Admin) Insert() {
 	// Hashing password
 	hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
@@ -30,17 +56,4 @@ func (admin Admin) Insert() {
 	if err != nil {
 		panic(err.Error())
 	}
-}
-
-func (admin Admin) GetUsingUsername(username string) (Admin, error) {
-	stmt := "SELECT * FROM `admins` WHERE Username= ?"
-
-	// Query result from admin table with given id should
-	// be returning 1 row, since the username value is unique
-	err := db.Conn.QueryRow(stmt, username).
-		Scan(&admin.Id, 
-			&admin.Username, 
-			&admin.Password)
-
-	return admin, err
 }

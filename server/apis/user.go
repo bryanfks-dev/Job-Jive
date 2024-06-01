@@ -8,8 +8,6 @@ import (
 	"sync"
 
 	"auths"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -21,32 +19,19 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_user, res := auths.UserMiddleware(r)
+
+		if !valid_user {
 			json.NewEncoder(w).Encode(res)
 
 			return
 		}
 
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "user" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
-
 		user, err :=
-			models.User.GetUsingId(models.User{}, jwt_claims["id"].(int))
+			models.User.GetUsingId(models.User{}, res["id"].(int))
 
 		// Ensure no error when getting user information
 		if err != nil {

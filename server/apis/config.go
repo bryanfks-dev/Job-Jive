@@ -6,8 +6,6 @@ import (
 
 	"auths"
 	"models"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func GetConfigsHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,26 +13,13 @@ func GetConfigsHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
@@ -64,26 +49,13 @@ func SaveConfigsHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		// Validate token
-		token_valid, res := auths.AuthorizedToken(r)
-
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		if !token_valid {
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
 			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		jwt_claims := res["token"].(jwt.MapClaims)
-
-		// Check user role
-		if jwt_claims["role"].(string) != "admin" {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
 
 			return
 		}
