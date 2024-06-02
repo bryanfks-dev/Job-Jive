@@ -16,10 +16,11 @@
             <ul class="py-2" aria-labelledby="dropdownButton1">
                 <li>
                     <a href="#"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Feedback</a>
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        data-modal-target="feedback-modal" data-modal-toggle="feedback-modal">Feedback</a>
                 </li>
                 <li>
-                    <a href="#"
+                    <a href="{{ route("user.attendance") }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
                         Log</a>
                 </li>
