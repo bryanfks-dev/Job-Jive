@@ -73,5 +73,5 @@
         @include('partials.user.employees.employee-card') --}}
     </div>
 
-    @include('partials.user.employees.feedback-modal')
+    {{-- @include('partials.user.employees.feedback-modal') --}}
 @endsection
