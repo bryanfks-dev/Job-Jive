@@ -1,24 +1,16 @@
 package models
 
 import (
-	// "cloud.google.com/go/civil"
-
 	"db"
 )
 
-type UserCred struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Remember bool   `json:"remember"`
-}
-
 type User struct {
-	Id           uint    `json:"id"`
+	Id           int     `json:"id"`
 	FullName     string  `json:"full_name"`
-	PhotoPath    string  `json:"photo_path"`
+	Photo        string  `json:"photo"`
 	Email        string  `json:"email"`
 	Password     string  `json:"password"`
-	ManagerId    *int    `json:"manager_id"`
+	DateOfBirth  string  `json:"date_of_birth"`
 	Address      string  `json:"address"`
 	NIK          string  `json:"nik"`
 	Gender       string  `json:"gender"`
@@ -30,36 +22,64 @@ type User struct {
 func (user User) Insert() {
 	stmt := "INSERT INTO `users` (User_ID, Full_Name, Email, Password, Manager_ID, Address, NIK, Gander, Phone_Number, Department_ID, First_Login) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	_, err := db.Conn.Exec(stmt, user.FullName, user.Email, user.Password, user.ManagerId,
-		user.Address, user.NIK, user.Gender, user.PhoneNumber, user.DepartmentId, user.FirstLogin)
+	_, err := db.Conn.Exec(stmt,
+		user.FullName,
+		user.Photo,
+		user.Email,
+		user.Password,
+		user.DateOfBirth,
+		user.Address,
+		user.NIK,
+		user.Gender,
+		user.PhoneNumber,
+		user.DepartmentId,
+		user.FirstLogin)
 
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func (user User) GetHashedPassword(email string) string {
-	stmt := "SELECT Password FROM `users` WHERE Email = ?"
-
-	row, err := db.Conn.Query(stmt, email)
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer row.Close()
-
-	var user_pwd string
+func (user User) GetUsingEmail(email string) (User, error) {
+	stmt := "SELECT * FROM `users` WHERE Email = ?"
 
 	// Query result from user table with given email should
 	// be returning 1 row, since the email value is unique
-	if row.Next() {
-		err := row.Scan(&user_pwd)
+	err := db.Conn.QueryRow(stmt, email).
+		Scan(&user.Id,
+			&user.FullName,
+			&user.Photo,
+			&user.Email,
+			&user.Password,
+			&user.DateOfBirth,
+			&user.Address,
+			&user.NIK,
+			&user.Gender,
+			&user.PhoneNumber,
+			&user.DepartmentId,
+			&user.FirstLogin)
 
-		if err != nil {
-			panic(err.Error())
-		}
-	}
+	return user, err
+}
 
-	return user_pwd
+func (user User) GetUsingId(id int) (User, error) {
+	stmt := "SELECT * FROM `users` WHERE User_Id = ?"
+
+	// Query result from user table with given id should
+	// be returning 1 row, since the id value is unique
+	err := db.Conn.QueryRow(stmt, id).
+		Scan(&user.Id,
+			&user.FullName,
+			&user.Email,
+			&user.Password,
+			&user.DateOfBirth,
+			&user.Address,
+			&user.NIK,
+			&user.Photo,
+			&user.Gender,
+			&user.PhoneNumber,
+			&user.DepartmentId,
+			&user.FirstLogin)
+
+	return user, err
 }

@@ -6,62 +6,54 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AdminCred struct {
-	Username string
-	Password string
-}
-
-
 type Admin struct {
-	Id uint `json:"id"`
+	Id       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-func (admin Admin) AddToDB() {
-	if db.ConnectionEstablished() {
-		// Hashing password
-		hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
+func (admin Admin) GetUsingUsername(username string) (Admin, error) {
+	stmt := "SELECT * FROM `admins` WHERE Username = ?"
 
-		if err != nil {
-			panic(err.Error())
-		}
+	// Query result from admin table with given id should
+	// be returning 1 row, since the username value is unique
+	err := db.Conn.QueryRow(stmt, username).
+		Scan(&admin.Id, 
+			&admin.Username, 
+			&admin.Password)
 
-		admin.Password = string(hash);
-
-		// Insert user into admin table
-		stmt := "INSERT INTO `admins` VALUES('', ?, ?)"
-
-		_, err = db.Conn.Exec(stmt, admin.Username, admin.Password)
-
-		if err != nil {
-			panic(err.Error())
-		}
-	}
+	return admin, err
 }
 
-func (admin Admin) GetHashedPassword(username string) string {
-	stmt := "SELECT Password FROM `admins` WHERE Username= ?"
+func (admin Admin) GetUsingId(id int) (Admin, error) {
+	stmt := "SELECT * FROM `admins` WHERE Admin_ID = ?"
 
-	row, err := db.Conn.Query(stmt, username)
+	// Query result from admin table with given id should
+	// be returning 1 row, since the username value is unique
+	err := db.Conn.QueryRow(stmt, id).
+		Scan(&admin.Id, 
+			&admin.Username, 
+			&admin.Password)
+
+	return admin, err
+}
+
+func (admin Admin) Insert() {
+	// Hashing password
+	hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	defer row.Close()
+	admin.Password = string(hash)
 
-	var user_pwd string
+	// Insert user into admin table
+	stmt := "INSERT INTO `admins` (Username, Password) VALUES(?, ?)"
 
-	// Query result from user table with given username should
-	// be returning 1 row, since the username value is unique
-	if row.Next() {
-		err := row.Scan(&user_pwd)
+	_, err = db.Conn.Exec(stmt, admin.Username, admin.Password)
 
-		if err != nil {
-			panic(err.Error())
-		}
+	if err != nil {
+		panic(err.Error())
 	}
-
-	return user_pwd
 }

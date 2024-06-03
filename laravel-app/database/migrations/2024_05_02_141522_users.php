@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('Full_Name');
             $table->string('Email')->unique();
             $table->string('Password');
-            $table->integer('Manager_ID')->unsigned()->nullable();
             $table->date('Date_of_Birth');
             $table->string('Address');
             $table->string('NIK', 16);
@@ -26,12 +25,8 @@ return new class extends Migration
             $table->tinyInteger('Department_ID')->unsigned()->nullable();
             $table->date('First_Login')->nullable();
 
-            $table->foreign('Manager_ID')->references('User_ID')
-                ->on('users')->onDelete('set null');
             $table->foreign('Department_ID')->references('Department_ID')
                 ->on('departments')->onDelete('set null');
-
-            $table->timestamps();
         });
     }
 

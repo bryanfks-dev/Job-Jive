@@ -1,54 +1,83 @@
 <?php
 
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\user;
+use App\Http\Controllers\admin;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\UserLoginController;
-use App\Http\Controllers\AdminLoginController;
-
 // User routes
-Route::group(['prefix'=> '/'], function () {
+Route::group(['prefix' => '/'], function () {
     // Login route
-    Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [UserLoginController::class, 'index'])
+    Route::group(['prefix' => '/login'], function () {
+        Route::get('/', [user\LoginController::class, 'index'])
             ->name('user.login');
 
-        Route::post('/', [UserLoginController::class, 'login']);
+        Route::post('/', [user\LoginController::class, 'login']);
     });
 
     // Dashboard route
     Route::get('/', function () {
-        return view('dashboard');
+        return view('user.dashboard');
     })->name('user.dashboard');
 
     // Profile route
-    Route::get('/profile', [UserProfileController::class, 'index'])
+    Route::get('/profile', [user\ProfileController::class, 'index'])
         ->name('user.profile');
+
+    // Attendances route
+    Route::get('/attendance', function () {
+        return view('user.attendance');
+    })->name('user.attendance');
 });
 
 // Admin routes
-Route::group(['prefix'=> '/admin'], function () {
+Route::group(['prefix' => '/admin'], function () {
     // Login route
-    Route::group(['prefix'=> '/login'], function () {
-        Route::get('/', [AdminLoginController::class, 'index'])
+    Route::group(['prefix' => '/login'], function () {
+        Route::get('/', [admin\LoginController::class, 'index'])
             ->name('admin.login');
 
-        Route::post('/', [AdminLoginController::class, 'login']);
+        Route::post('/', [admin\LoginController::class, 'login']);
+    });
+
+    // Employees route
+    Route::group(['prefix' => '/employees'], function () {
+        Route::get('/', [admin\EmployeesController::class, 'index'])
+            ->name('admin.employees');
+    });
+
+    // Departments route
+    Route::group(['prefix' => '/departments'], function () {
+        Route::get('/', [admin\DepartmentsController::class, 'index'])
+            ->name('admin.departments');
+
+        Route::post('/create', [admin\DepartmentsController::class, 'create'])
+            ->name('admin.departments.create');
+
+        Route::put('/update/{id}', [admin\DepartmentsController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.departments.update');
+
+        Route::delete('/delete/{id}', [admin\DepartmentsController::class, 'delete'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.departments.delete');
+    });
+
+    // Config route
+    Route::group(['prefix' => '/configs'], function () {
+        Route::get('/', [admin\ConfigController::class, 'index'])
+            ->name('admin.configs');
+
+        Route::put('/', [admin\ConfigController::class, 'save'])
+            ->name('admin.configs.save');
     });
 });
 
-Route::get('/attendance', function () {
-    return view('attendance');
-})->name('attendance');
-
 Route::get('/employees', function () {
-    return view('employees');
+    return view('user.employees');
 })->name('employees');
 
 Route::get('/employees/view', function () {
-    return view('view');
+    return view('user.view');
 })->name('view');
 
 Route::get('/sandbox', function () {
-    return view('sandbox');
+    return view('user.sandbox');
 })->name('sandbox');

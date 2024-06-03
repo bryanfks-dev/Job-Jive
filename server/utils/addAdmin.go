@@ -5,15 +5,15 @@ import (
 	"os"
 
 	"configs" // ignore: import error
-	"models" // ignore: import error
-	"db" // ignore: import error
+	"db"      // ignore: import error
+	"models"  // ignore: import error
 
 	"github.com/joho/godotenv" // ignore: import error
 )
 
 func loadConfig() configs.Database {
 	// Load .env
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 
 	if err != nil {
 		panic(err.Error())
@@ -41,7 +41,12 @@ func main() {
 		Password: os.Args[2],
 	}
 
-	models.Admin.AddToDB(admin)
+	if db.ConnectionEstablished() {
+		models.Admin.Insert(admin)
+		fmt.Println("Admin `", admin.Username, "` has been created")
 
-	fmt.Println("New Admin has been created")
+		return
+	}
+
+	fmt.Println("Error establish connection to database")
 }
