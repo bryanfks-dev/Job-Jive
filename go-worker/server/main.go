@@ -16,16 +16,16 @@ var (
 	mux = http.NewServeMux()
 )
 
-func loadConfig() (configs.Server, configs.Database) {
+func loadConfig() (configs.Server, configs.Database, error) {
 	// Load .env
 	err := godotenv.Load()
 
 	if err != nil {
-		panic(err.Error())
+		return configs.Server{}, configs.Database{}, err
 	}
 
 	return configs.Server.Get(configs.Server{}),
-		configs.Database.Get(configs.Database{})
+		configs.Database.Get(configs.Database{}), nil
 }
 
 func initEndPoints() {
@@ -49,10 +49,22 @@ func initEndPoints() {
 }
 
 func main() {
-	serverConf, dbConf := loadConfig()
+	serverConf, dbConf, err := loadConfig()
+
+	// Ensure no error fetching config
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// Connect to database
-	db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+	err = db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+
+	// Ensure no error connecting to database
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Printf("Connected to database %s:%s (%s)\n", dbConf.Host, dbConf.Port, dbConf.Database)
 
 	initEndPoints()
 
@@ -60,7 +72,7 @@ func main() {
 	fmt.Println("Logs:")
 
 	// Open server connection
-	err := http.ListenAndServe(serverConf.Host+":"+serverConf.Port, mux)
+	err = http.ListenAndServe(serverConf.Host+":"+serverConf.Port, mux)
 
 	if err != nil {
 		panic(err.Error())

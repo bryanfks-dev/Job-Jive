@@ -11,28 +11,38 @@ import (
 	"github.com/joho/godotenv" // ignore: import error
 )
 
-func loadConfig() configs.Database {
+func loadConfig() (configs.Database, error) {
 	// Load .env
 	err := godotenv.Load()
 
 	if err != nil {
-		panic(err.Error())
+		return configs.Database{}, err
 	}
 
-	return configs.Database.Get(configs.Database{})
+	return configs.Database.Get(configs.Database{}), nil
 }
 
 func main() {
 	// Check input arg length
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: ./addAdmin <username> <password>")
+		fmt.Println("Usage: utils/addAdmin/main <username> <password>")
 		os.Exit(1)
 	}
 
-	dbConf := loadConfig()
+	dbConf, err := loadConfig()
+
+	// Ensure no error fetching config
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// Connect to database
-	db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+	err = db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+
+	// Ensure no error connecting to database
+	if err != nil {
+		panic(err.Error())
+	}
 
 	defer db.Conn.Close()
 

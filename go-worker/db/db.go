@@ -12,16 +12,12 @@ var (
 	err error
 )
 
-func Connect(user string, password string, host string, port string, db_name string) {
+func Connect(user string, password string, host string, port string, db_name string) error {
 	// Open connection to database
 	Conn, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		user, password, host, port, db_name))
 
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fmt.Printf("Connected to database %s:%s (%s)\n", host, port, db_name)
+	return err
 }
 
 func ConnectionEstablished() bool {

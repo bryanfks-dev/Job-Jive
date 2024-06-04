@@ -9,7 +9,7 @@ type Salary struct {
 }
 
 func ResetCurrentSalary() error {
-	stmt := "UPDATE `salaries` SET CurrentSalary = Initial_Salary"
+	stmt := "UPDATE `salaries` SET Current_Salary = Initial_Salary"
 
 	_, err := db.Conn.Exec(stmt)
 
