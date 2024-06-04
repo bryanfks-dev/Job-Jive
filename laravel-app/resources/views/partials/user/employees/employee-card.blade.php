@@ -14,12 +14,13 @@
         <div id="dropdown1"
             class="z-10 hidden text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
             <ul class="py-2" aria-labelledby="dropdownButton1">
-                <li>
+                {{-- <li>
                     <a href="#"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Feedback</a>
-                </li>
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        data-modal-target="feedback-modal" data-modal-toggle="feedback-modal">Feedback</a>
+                </li> --}}
                 <li>
-                    <a href="#"
+                    <a href="{{ route("user.attendance") }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
                         Log</a>
                 </li>
