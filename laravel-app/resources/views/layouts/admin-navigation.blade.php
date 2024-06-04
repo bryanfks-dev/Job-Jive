@@ -36,14 +36,14 @@
         <div class="flex flex-col overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800 justify-between">
             <ul class="space-y-2">
                 <li>
-                    <a href="{{ route('admin.employees') }}"
+                    <a href="{{ route('admin.users') }}"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
                             <path
                                 d="M16.52 4.19205C16.3751 4.06811 16.1907 4 16 4C15.8093 4 15.6249 4.06811 15.48 4.19205L4 14.032V25.6C4 26.2365 4.25286 26.847 4.70294 27.2971C5.15303 27.7471 5.76348 28 6.39999 28H12.8C13.0122 28 13.2156 27.9157 13.3657 27.7657C13.5157 27.6157 13.6 27.4122 13.6 27.2V22.4C13.6 21.7635 13.8528 21.153 14.3029 20.703C14.753 20.2529 15.3635 20 16 20C16.6365 20 17.2469 20.2529 17.697 20.703C18.1471 21.153 18.4 21.7635 18.4 22.4V27.2C18.4 27.4122 18.4843 27.6157 18.6343 27.7657C18.7843 27.9157 18.9878 28 19.2 28H25.6C26.2365 28 26.8469 27.7471 27.297 27.2971C27.7471 26.847 27.9999 26.2365 27.9999 25.6V14.032L16.52 4.19205Z" />
                         </svg>
-                        <span class="ml-3">Employee</span>
+                        <span class="ml-3">Users</span>
                     </a>
                 </li>
                 <li>
@@ -55,7 +55,7 @@
                             <path
                                 d="M21.5385 6.76923H26.1539V28H5.84619V6.76923H10.4616V8.61538H21.5385V6.76923ZM9.5385 16H22.4616V14.1538H9.5385V16ZM9.5385 23.3846H22.4616V21.5385H9.5385V23.3846ZM12.3077 6.76923V4H19.6923V6.76923H12.3077Z" />
                         </svg>
-                        <span class="ml-3">Department</span>
+                        <span class="ml-3">Departments</span>
                     </a>
                 </li>
                 <li>

@@ -6,7 +6,7 @@
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Create New Employee
+                    Create New User
                 </h3>
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <label for="date_of_birth"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birthdate</label>
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birth Date</label>
                         <input type="date" name="date_of_birth" id="date_of_birth"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             required="">
@@ -51,9 +51,9 @@
                             placeholder="ex. Jl. Merpati No. 17" required="">
                     </div>
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="NIK"
+                        <label for="nik"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
-                        <input type="text" name="NIK" id="NIK"
+                        <input type="text" name="nik" id="nik"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             placeholder="ex. 35-76-01-44-03-91-0003" required="">
                     </div>
@@ -62,17 +62,9 @@
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
                         <select name="gender" id="gender"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            <option value="" selected hidden disabled>Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
-                        </select>
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label for="job_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job
-                            Title</label>
-                        <select name="job_title" id="job_title"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option value="Manager">Manager</option>
-                            <option value="Staff">Staff</option>
                         </select>
                     </div>
                     <div class="col-span-2 sm:col-span-1">

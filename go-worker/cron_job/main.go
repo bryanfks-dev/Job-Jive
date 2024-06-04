@@ -39,7 +39,7 @@ func main() {
 	}
 
 	cron := cron.New()
-	err = cron.AddFunc( /* "0 0 0 1 * *" */ "1 * * * * *", func() {
+	err = cron.AddFunc("0 0 0 1 * *", func() {
 		tx, err := db.Conn.Begin()
 
 		if err != nil {

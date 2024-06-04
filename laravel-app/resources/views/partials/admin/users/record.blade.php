@@ -3,21 +3,27 @@
         1
     </th>
     <td class="px-6 py-4">
-        Aldo Arista
+        {{ $user['full_name'] }}
     </td>
     <td class="px-6 py-4">
-        aldoarista@gmail.com
+        {{ $user['email'] }}
     </td>
     <td class="px-6 py-4">
-        081338556780
+        {{ $user['phone_number'] }}
     </td>
     <td class="px-6 py-4">
-        Male
+        {{ $user['birth_date'] }}
+    </td>
+    <td class="px-6 py-4">
+        {{ $user['gender'] }}
+    </td>
+    <td class="px-6 py-4">
+        {{ $user['department'] }}
     </td>
     <td class="flex px-6 py-4 justify-end items-center gap-2">
         {{-- Edit button --}}
-        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-            data-modal-target="update-modal" data-modal-toggle="update-modal">
+        <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            data-modal-target="update-modal-{{ $user['id'] }}" data-modal-toggle="update-modal-{{ $user['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-700 hover:fill-blue-800" width="2em"
                 height="2em" viewBox="0 0 24 24">
                 <g fill-rule="evenodd" clip-rule="evenodd">
@@ -28,10 +34,9 @@
                 </g>
             </svg>
         </a>
-
         {{-- Delete button --}}
         <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-            data-modal-target="popup-modal" data-modal-toggle="popup-modal">
+            data-modal-target="popup-modal-{{ $user['id'] }}" data-modal-toggle="popup-modal-{{ $user['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-red-700 hover:fill-red-800" width="1.5em"
                 height="1.5em" viewBox="0 0 15 15">
                 <path fill-rule="evenodd"

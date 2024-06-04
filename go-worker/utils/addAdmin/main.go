@@ -53,7 +53,7 @@ func main() {
 
 	if db.ConnectionEstablished() {
 		models.Admin.Insert(admin)
-		fmt.Println("Admin `", admin.Username, "` has been created")
+		fmt.Printf("Admin `%s` has been created", admin.Username)
 
 		return
 	}

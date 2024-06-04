@@ -39,10 +39,10 @@ Route::group(['prefix' => '/admin'], function () {
         Route::post('/', [admin\LoginController::class, 'login']);
     });
 
-    // Employees route
-    Route::group(['prefix' => '/employees'], function () {
-        Route::get('/', [admin\EmployeesController::class, 'index'])
-            ->name('admin.employees');
+    // Users route
+    Route::group(['prefix' => '/users'], function () {
+        Route::get('/', [admin\UsersController::class, 'index'])
+            ->name('admin.users');
     });
 
     // Departments route
