@@ -11,7 +11,6 @@ type ConfigJson struct {
 	AbsenceQuota   int    `json:"absence_quota"`
 	DailyWorkHours int    `json:"daily_work_hours"`
 	WeekyWorkHours int    `json:"weekly_work_hours"`
-	Working        bool   `json:"working"`
 }
 
 var (
