@@ -39,6 +39,7 @@ func initEndPoints() {
 
 	// Employees endpoints
 	mux.HandleFunc("/api/users", apis.GetUsersHandler)
+	mux.HandleFunc("/api/user/create", apis.CreateUserHandler)
 
 	// Department endpoints
 	mux.HandleFunc("/api/departments", apis.GetDepartmentsHandler)

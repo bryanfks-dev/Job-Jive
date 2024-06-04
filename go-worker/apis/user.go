@@ -124,6 +124,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
+
+		
 	}
 }
 

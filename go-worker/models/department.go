@@ -52,7 +52,7 @@ func (department Department) GetUsingId(id int) (Department, error) {
 	return department, err
 }
 
-func (department Department) Insert() (int64, error) {
+func (department Department) Insert() (int, error) {
 	stmt := "INSERT INTO `departments` (Department_Name) VALUES(?)"
 
 	row, err := db.Conn.Exec(stmt, department.Name)
@@ -69,7 +69,7 @@ func (department Department) Insert() (int64, error) {
 		return 0, err
 	}
 
-	return id, nil
+	return int(id), nil
 }
 
 func (department Department) Update() error {

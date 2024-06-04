@@ -137,10 +137,10 @@ func (user User) GetEmployees(manager_id int, department_id int) ([]User, error)
 	return users, nil
 }
 
-func (user User) Insert() {
-	stmt := "INSERT INTO `users` (User_ID, Full_Name, Email, Password, Manager_ID, Address, NIK, Gander, Phone_Number, Department_ID, First_Login) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+func (user User) Insert() (int, error) {
+	stmt := "INSERT INTO `users` (Full_Name, Email, Password, Manager_ID, Address, NIK, Gander, Phone_Number, Department_ID, First_Login) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	_, err := db.Conn.Exec(stmt,
+	row, err := db.Conn.Exec(stmt,
 		user.FullName,
 		user.Photo,
 		user.Email,
@@ -153,7 +153,17 @@ func (user User) Insert() {
 		user.DepartmentId,
 		user.FirstLogin)
 
+	// Ensure no error inserting data
 	if err != nil {
-		panic(err.Error())
+		return 0, err
 	}
+
+	id, err := row.LastInsertId()
+
+	// Ensure getting last inserted id
+	if err != nil {
+		return 0, nil
+	}
+
+	return int(id), nil
 }
