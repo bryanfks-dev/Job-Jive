@@ -4,9 +4,12 @@ namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Image;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Intervention\Image\ImageManager;
 
 class UsersController extends Controller
 {
@@ -70,6 +73,10 @@ class UsersController extends Controller
                     return redirect()->intended(route('admin.login'));
                 }
 
+                if ($userResponse['status'] == 200) {
+                    return abort($departmentResponse['status']);
+                }
+
                 return abort($userResponse['status']);
             }
 
@@ -88,16 +95,101 @@ class UsersController extends Controller
         $fields = \Validator::make($request->all(), [
             'full_name' => ['required'],
             'email' => ['required', 'email'],
-            'date_of_birth' => ['required', 'date_format:m-d-Y'],
+            'phone_number' => ['required', 'digits_between:11,13'],
+            'date_of_birth' => ['required', 'date'],
             'address' => ['required'],
             'nik' => ['required'],
-            'gender' => ['required', 'in:male,female'],
+            'gender' => ['required', 'in:Male,Female'],
+            'department_id' => ['required', 'integer'],
+            'photo' => ['required'],
+            'photo.*' => ['required', 'mimes:png,jpg,jpeg']
+        ]);
+
+        if ($fields->fails()) {
+            return redirect()->back()->withErrors([
+                'create-error' => $fields->errors()->first()
+            ]);
+        }
+
+        try {
+            $photo = $request->file('photo');
+            $fileName = time() . '_user_' .
+                $request['full_name'] . '.png';
+
+            $response =
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . session('token'),
+                    'Content-type' => 'application/json',
+                    'Accept' => 'application/json'
+                ])->post(BackendServer::url() . '/api/user/create', [
+                            'full_name' => $request['full_name'],
+                            'email' => $request['email'],
+                            'date_of_birth' => $request['date_of_birth'],
+                            'phone_number' => $request['phone_number'],
+                            'address' => $request['address'],
+                            'nik' => $request['nik'],
+                            'gender' => $request['gender'],
+                            'department_id' => intval($request['department_id']),
+                            'photo' => $fileName
+                        ]);
+
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 200: // Ok
+                        // Save user photo to storage
+                        $imgManager = new ImageManager(new Driver());
+                        $img =
+                            $imgManager->read($photo->getRealPath());
+
+                        $img->resize(500, 500)->toPng();
+
+                        \Storage::put('/public/img/user_profile/' . $fileName,
+                            (string) $img->encode());
+
+                        return redirect()->intended(route('admin.users'));
+
+                    case 400: // Bad request
+                        return redirect()->back()->withErrors([
+                            'create-error' => $response['message']
+                        ]);
+
+                    case 401: // Unauthorized
+                        return redirect()->intended(route('admin.login'));
+                }
+
+                return abort($response['status']);
+            }
+
+            return abort(400); // Bad request
+        } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return abort($e->getStatusCode());
+            }
+
+            dd($e);
+
+            return abort(500);
+        }
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $id = intval($id);
+
+        $fields = \Validator::make($request->all(), [
+            'full_name' => ['required'],
+            'email' => ['required', 'email'],
+            'phone_number' => ['required', 'digits_between:11,13'],
+            'date_of_birth' => ['required', 'date'],
+            'address' => ['required'],
+            'nik' => ['required'],
+            'gender' => ['required', 'in:Male,Female'],
             'department_id' => ['required', 'integer']
         ]);
 
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
-                'error' => 'Invalid field value'
+                'update-error-' . $id => $fields->errors()->first(),
             ]);
         }
 
@@ -107,15 +199,56 @@ class UsersController extends Controller
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json'
-                ])->post(BackendServer::url() . '/api/users/create', [
+                ])->put(BackendServer::url() . '/api/user/update/' . $id, [
                             'full_name' => $request['full_name'],
                             'email' => $request['email'],
                             'date_of_birth' => $request['date_of_birth'],
+                            'phone_number' => $request['phone_number'],
                             'address' => $request['address'],
                             'nik' => $request['nik'],
                             'gender' => $request['gender'],
-                            'department_id' => intval($request['department_id'])
+                            'department_id' => intval($request['department_id']),
+                            'new_password' => $request['new_password']
                         ]);
+
+            if ($response->successful()) {
+                switch ($response['status']) {
+                    case 200: // Ok
+                        return redirect()->intended(route('admin.users'));
+
+                    case 400: // Bad request
+                        return redirect(route('admin.users'))->withErrors([
+                            'update-error-' . $id => $response['message'],
+                        ]);
+
+                    case 401: // Unauthorized
+                        return redirect()->intended(route('admin.login'));
+                }
+
+                return abort($response['status']);
+            }
+
+            return abort(400); // Bad request
+        } catch (\Exception $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return abort($e->getStatusCode());
+            }
+
+            return abort(500);
+        }
+    }
+
+    public function delete(Request $request, int $id)
+    {
+        $id = intval($id);
+
+        try {
+            $response =
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . session('token'),
+                    'Content-type' => 'application/json',
+                    'Accept' => 'application/json'
+                ])->delete(BackendServer::url() . '/api/user/delete/' . $id);
 
             if ($response->successful()) {
                 switch ($response['status']) {

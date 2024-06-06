@@ -27,7 +27,7 @@ class LoginController extends Controller
                         return redirect()->intended(route('user.dashboard'));
                     }
 
-                    return redirect()->intended(route('admin.employees'));
+                    return redirect()->intended(route('admin.users'));
                 }
 
                 return abort($response['status']);

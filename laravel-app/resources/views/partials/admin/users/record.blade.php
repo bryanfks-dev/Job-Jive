@@ -1,6 +1,6 @@
 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-        1
+        {{ $index + 1 }}
     </th>
     <td class="px-6 py-4">
         {{ $user['full_name'] }}
@@ -22,7 +22,7 @@
     </td>
     <td class="flex px-6 py-4 justify-end items-center gap-2">
         {{-- Edit button --}}
-        <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+        <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
             data-modal-target="update-modal-{{ $user['id'] }}" data-modal-toggle="update-modal-{{ $user['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-700 hover:fill-blue-800" width="2em"
                 height="2em" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
             </svg>
         </a>
         {{-- Delete button --}}
-        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+        <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
             data-modal-target="popup-modal-{{ $user['id'] }}" data-modal-toggle="popup-modal-{{ $user['id'] }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-red-700 hover:fill-red-800" width="1.5em"
                 height="1.5em" viewBox="0 0 15 15">

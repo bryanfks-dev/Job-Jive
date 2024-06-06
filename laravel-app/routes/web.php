@@ -43,6 +43,15 @@ Route::group(['prefix' => '/admin'], function () {
     Route::group(['prefix' => '/users'], function () {
         Route::get('/', [admin\UsersController::class, 'index'])
             ->name('admin.users');
+
+        Route::post('/', [admin\UsersController::class, 'create'])
+            ->name('admin.users.create');
+
+        Route::put('/update/{id}', [admin\UsersController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.users.update');
+
+        Route::delete('/delete/{id}', [admin\UsersController::class, 'delete'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.users.delete');
     });
 
     // Departments route

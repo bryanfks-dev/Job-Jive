@@ -47,10 +47,10 @@
                             Email
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Birth Date
+                            Phone Number
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Phone Number
+                            Birth Date
                         </th>
                         <th scope="col" class="px-6 py-3">
                             Gender
@@ -64,7 +64,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($users as $user)
+                    @forelse ($users as $index => $user)
                         @include('partials.admin.users.record')
                     @empty
                         <tr class="h-10"></tr>

@@ -20,7 +20,7 @@
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to
                     delete this user?</h3>
-                <form action="{{ route('admin.users') }}" method="POST">
+                <form action="{{ route('admin.users.delete', ['id' => $user['id']]) }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <button data-modal-hide="popup-modal-{{ $user['id'] }}" type="submit"

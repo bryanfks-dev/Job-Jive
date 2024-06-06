@@ -35,7 +35,7 @@
                     @error('create-error')
                         {{-- Show modal after redirect --}}
                         <script type="module">
-                            window.addEventListener('load', function() {
+                            addEventListener('load', function() {
                                 const modal = FlowbiteInstances.getInstance('Modal', 'crud-modal');
 
                                 modal.toggle();
