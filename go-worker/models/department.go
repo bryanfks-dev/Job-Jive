@@ -10,7 +10,7 @@ type Department struct {
 }
 
 func (department Department) Get() ([]Department, error) {
-	stmt := "SELECT * FROM `departments`"
+	stmt := "SELECT * FROM `departments` ORDER BY Department_ID DESC"
 
 	row, err := db.Conn.Query(stmt)
 
@@ -49,6 +49,20 @@ func (department Department) GetUsingId(id int) (Department, error) {
 		Scan(&department.Id,
 			&department.Name)
 
+	return department, err
+}
+
+func (department Department) GetUsingDepartmentName(department_name string) (Department, error) {
+	stmt := "SELECT * FROM `departments` WHERE Department_Name = ?"
+
+	// Query result from department table with given name should
+	// be returning 1 row, since the name value is unique
+	err := db.Conn.QueryRow(stmt, department_name).
+		Scan(&department.Id,
+			&department.Name)
+
+	// Query result from user table with given name should
+	// be returning 1 row, since the name value is unique
 	return department, err
 }
 

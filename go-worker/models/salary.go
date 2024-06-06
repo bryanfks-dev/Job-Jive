@@ -4,8 +4,17 @@ import "db"
 
 type Salary struct {
 	UserId        int     `json:"user_id"`
-	IntialSalary  float64 `json:"initial_salary"`
+	InitialSalary  float64 `json:"initial_salary"`
 	CurrentSalary float64 `json:"current_salary"`
+}
+
+func (salary Salary) Insert() error {
+	stmt := "INSERT INTO `salaries` (User_ID, Initial_Salary, Current_Salary) VALUES(?, ?, ?)"
+
+	_, err := 
+		db.Conn.Exec(stmt, salary.UserId, salary.InitialSalary, salary.CurrentSalary)
+
+	return err
 }
 
 func ResetCurrentSalary() error {

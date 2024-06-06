@@ -52,7 +52,13 @@ func main() {
 	}
 
 	if db.ConnectionEstablished() {
-		models.Admin.Insert(admin)
+		err := models.Admin.Insert(admin)
+
+		// Ensure no error insertting admin data
+		if err != nil {
+			panic(err.Error())
+		}
+
 		fmt.Printf("Admin `%s` has been created", admin.Username)
 
 		return

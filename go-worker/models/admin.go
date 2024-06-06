@@ -38,12 +38,12 @@ func (admin Admin) GetUsingId(id int) (Admin, error) {
 	return admin, err
 }
 
-func (admin Admin) Insert() {
+func (admin Admin) Insert() error {
 	// Hashing password
 	hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 11)
 
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 
 	admin.Password = string(hash)
@@ -53,7 +53,5 @@ func (admin Admin) Insert() {
 
 	_, err = db.Conn.Exec(stmt, admin.Username, admin.Password)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	return err
 }

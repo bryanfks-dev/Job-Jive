@@ -15,7 +15,7 @@ import (
 type DepartmentResponseData struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
-	ManagerId   *int   `json:"manager_id"`
+	ManagerId   int    `json:"manager_id"`
 	ManagerName string `json:"manager_name"`
 }
 
@@ -90,7 +90,7 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			response_data = append(response_data, DepartmentResponseData{
 				Id:          department.Id,
 				Name:        department.Name,
-				ManagerId:   &user.Id,
+				ManagerId:   user.DepartmentId,
 				ManagerName: user.FullName,
 			})
 		}
@@ -128,7 +128,21 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// Ensure the department name is unique
+		_, err =
+			models.Department.GetUsingDepartmentName(
+				models.Department{}, department_fields.DepartmentName)
+
+		if err == nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Department name already use, please use other department name",
 			})
 
 			return
@@ -195,7 +209,7 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil || id <= 0 {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+				"message": "There is an invalid input field",
 			})
 
 			return
@@ -211,7 +225,42 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		current_department, err :=
+			models.Department.GetUsingId(models.Department{}, id)
+
+		// Ensure no error fetching current department data
+		if err != nil {
+			if err == sql.ErrNoRows {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusBadRequest,
+					"message": "Invalid departmnet id",
+				})
+
+				return
+			}
+
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		// Ensure department name is unique
+		result, err :=
+			models.User.GetUsingEmail(models.User{}, department_fields.DepartmentName)
+
+		if err == nil || result.Id != current_department.Id {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Department name already in use, please use other department name",
 			})
 
 			return
@@ -245,7 +294,8 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		department_head, err :=
-			models.DepartmentHead.GetUsingDepartmentId(models.DepartmentHead{}, department.Id)
+			models.DepartmentHead.GetUsingDepartmentId(
+				models.DepartmentHead{}, department.Id)
 
 		// Ensure no error when fetching data
 		if err != nil {
@@ -256,6 +306,8 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
+
+		old_name := department.Name
 
 		// Update records
 		department.Name = department_fields.DepartmentName
@@ -294,7 +346,7 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("Department record", department.Name, "updated")
+		log.Printf("Department %s record has been updated\n", old_name)
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,

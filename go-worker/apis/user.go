@@ -3,10 +3,13 @@ package apis
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"auths"
+	"db"
 	"models"
 )
 
@@ -17,20 +20,26 @@ var (
 type UserResponseData struct {
 	Id          int    `json:"id"`
 	FullName    string `json:"full_name"`
-	BirthDate   string `json:"date_of_birth"`
+	Email       string `json:"email"`
+	Address     string `json:"address"`
+	BirthDate   string `json:"birth_date"`
 	PhoneNumber string `json:"phone_number"`
 	Gender      string `json:"gender"`
+	NIK         string `json:"nik"`
 	Department  string `json:"department"`
 }
 
 type UserFields struct {
 	FullName     string `json:"full_name"`
 	Email        string `json:"email"`
+	PhoneNumber  string `json:"phone_number"`
 	BirthDate    string `json:"date_of_birth"`
 	Address      string `json:"address"`
 	NIK          string `json:"nik"`
 	Gender       string `json:"gender"`
 	DepartmentId int    `json:"department_id"`
+	Photo        string `json:"photo"`
+	NewPassword  string `json:"new_password"`
 }
 
 func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,9 +88,12 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 			response_data = append(response_data, UserResponseData{
 				Id:          user.Id,
 				FullName:    user.FullName,
+				Email:       user.Email,
+				Address:     user.Email,
 				BirthDate:   user.DateOfBirth,
 				PhoneNumber: user.PhoneNumber,
 				Gender:      user.Gender,
+				NIK:         user.NIK,
 				Department:  department.Name,
 			})
 		}
@@ -119,13 +131,287 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		user := models.User{
+			FullName:     user_fields.FullName,
+			Email:        user_fields.Email,
+			Password:     user_fields.PhoneNumber,
+			PhoneNumber:  user_fields.PhoneNumber,
+			DateOfBirth:  user_fields.BirthDate,
+			Address:      user_fields.Address,
+			NIK:          user_fields.NIK,
+			Gender:       user_fields.Gender,
+			DepartmentId: user_fields.DepartmentId,
+			Photo:        user_fields.Photo,
+		}
+
+		// Check if email is unique
+		_, err = models.User.GetUsingEmail(models.User{}, user.Email)
+
+		// If err is nil, therefore there is an user that already have this email
+		if err == nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Email already in use, please use other email",
+			})
+
+			return
+		}
+
+		id, err := models.User.Insert(user)
+
+		// Ensure no error when inserting user
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		err = models.Salary.Insert(models.Salary{
+			UserId:        id,
+			InitialSalary: 0,
+			CurrentSalary: 0,
+		})
+
+		// Ensure no error when inserting salary
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Printf("New user `%s` has been created", user.FullName)
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Created",
+		})
+	}
+}
+
+func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPut {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		// Retrieve value from url
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		// Ensure user provide a valid record id
+		if err != nil || id <= 0 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Invalid user id",
+			})
+
+			return
+		}
+
+		// Decode json to struct
+		req_json := json.NewDecoder(r.Body)
+
+		var user_fields UserFields
+
+		err = req_json.Decode(&user_fields)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		current_user, err := 
+			models.User.GetUsingId(models.User{}, id)
+
+		// Ensure no error fetching user data
+		if err != nil {
+			if err == sql.ErrNoRows {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusBadRequest,
+					"message": "Invalid user id",
+				})
+
+				return
+			}
+
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		// Ensure user email is unique
+		result, err :=
+			models.User.GetUsingEmail(models.User{}, user_fields.Email)
+
+		if err == nil && result.Id != current_user.Id {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "Email already in use, please use other email",
+			})
+
+			return
+		}
+
+		// Database transaction
+		tx, err := db.Conn.Begin()
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		defer tx.Rollback()
+
+		user, err := 
+			models.User.GetUsingId(models.User{}, id)
+
+		// Ensure no error when fetching data
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		old_name := user.FullName
+
+		// Update records
+		user.FullName = user_fields.FullName
+		user.Email = user_fields.Email
+		user.DateOfBirth = user_fields.BirthDate
+		user.Address = user_fields.Address
+		user.NIK = user_fields.NIK
+		user.Gender = user_fields.Gender
+		user.PhoneNumber = user_fields.PhoneNumber
+		user.DepartmentId = user_fields.DepartmentId
+
+		if user_fields.NewPassword != "" {
+			user.Password = user_fields.NewPassword
+		}
+
+		err = models.User.Update(user)
+
+		// Ensure no error when updating user
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		if err := tx.Commit(); err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Printf("User `%s` record has been updated\n", old_name)
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Updated",
+		})
+	}
+}
+
+func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_admin, res := auths.AdminMiddleware(r)
+
+		if !valid_admin {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		// Retrieve value from url
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		// Ensure user provide a valid record id
+		if err != nil || id <= 0 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
 				"message": "Bad request",
 			})
 
 			return
 		}
 
-		
+		user, err :=
+			models.User.GetUsingId(models.User{}, id)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		err = models.User.Delete(user)
+
+		// Ensure no error when deleting data
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		log.Println("User", user.FullName, "deleted")
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "Deleted",
+		})
 	}
 }
 
