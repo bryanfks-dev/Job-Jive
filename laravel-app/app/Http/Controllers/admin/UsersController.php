@@ -98,7 +98,7 @@ class UsersController extends Controller
             'phone_number' => ['required', 'digits_between:11,13'],
             'date_of_birth' => ['required', 'date'],
             'address' => ['required'],
-            'nik' => ['required', 'digits_between:16,16'],
+            'nik' => ['required', 'digits:16'],
             'gender' => ['required', 'in:Male,Female'],
             'department_id' => ['required', 'integer'],
             'photo' => ['required'],
@@ -206,7 +206,7 @@ class UsersController extends Controller
             'phone_number' => ['required', 'digits_between:11,13'],
             'date_of_birth' => ['required', 'date'],
             'address' => ['required'],
-            'nik' => ['required', 'digits_between:16,16'],
+            'nik' => ['required', 'digits:16'],
             'gender' => ['required', 'in:Male,Female'],
             'department_id' => ['required', 'integer']
         ]);
