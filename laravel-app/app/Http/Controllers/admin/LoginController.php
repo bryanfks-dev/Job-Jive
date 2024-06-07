@@ -68,12 +68,10 @@ class LoginController extends Controller
 
             if ($response->successful()) {
                 if ($response['status'] == 200) { // Ok
-                    \Auth::loginUsingId($response['data']['id']);
-                    
                     // Create session token
                     session(['token' => $response['token']]);
 
-                    return redirect()->intended(route('admin.employees'));
+                    return redirect()->intended(route('admin.users'));
                 }
 
                 return abort($response['status']);
@@ -84,6 +82,8 @@ class LoginController extends Controller
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
                 return abort($e->getStatusCode());
             }
+
+            dd($e);
 
             return redirect()->back()->withErrors(['error' => 'Server error']);
         }
