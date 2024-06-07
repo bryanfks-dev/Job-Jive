@@ -47,20 +47,22 @@ class UsersController extends Controller
                     if ($request->has('query')) {
                         $query = $request->get('query');
 
-                        $results = [];
+                        if (!empty($query)) {
+                            $results = [];
 
-                        foreach ($userResponse['data'] as $user) {
-                            if (in_array(strtolower($query), array_map('strtolower', $user))) {
-                                $results[] = $user;
+                            foreach ($userResponse['data'] as $user) {
+                                if (in_array(strtolower($query), array_map('strtolower', $user))) {
+                                    $results[] = $user;
+                                }
                             }
+
+                            $paginatedUsers = $this->paginate($results ?? []);
+
+                            return view("admin.users", [
+                                'users' => $paginatedUsers,
+                                'departments' => $departmentResponse['data'] ?? []
+                            ]);
                         }
-
-                        $paginatedUsers = $this->paginate($results ?? []);
-
-                        return view("admin.users", [
-                            'users' => $paginatedUsers,
-                            'departments' => $departmentResponse['data'] ?? []
-                        ]);
                     }
 
                     $paginatedUsers = $this->paginate($userResponse['data'] ?? []);

@@ -44,20 +44,22 @@ class DepartmentsController extends Controller
                     if ($request->has('query')) {
                         $query = $request->get('query');
 
-                        $results = [];
+                        if (!empty($query)) {
+                            $results = [];
 
-                        foreach ($departmentsResponse['data'] as $department) {
-                            if (in_array(strtolower($query), array_map('strtolower', $department))) {
-                                $results[] = $department;
+                            foreach ($departmentsResponse['data'] as $department) {
+                                if (in_array(strtolower($query), array_map('strtolower', $department))) {
+                                    $results[] = $department;
+                                }
                             }
+
+                            $paginatedDepartments = $this->paginate($results ?? []);
+
+                            return view("admin.departments", [
+                                'departments' => $paginatedDepartments,
+                                'users' => $userResponse['data'] ?? []
+                            ]);
                         }
-
-                        $paginatedDepartments = $this->paginate($results ?? []);
-
-                        return view("admin.departments", [
-                            'departments' => $paginatedDepartments,
-                            'users' => $userResponse['data'] ?? []
-                        ]);
                     }
 
                     $paginatedDepartments = $this->paginate($departmentsResponse['data'] ?? []);
