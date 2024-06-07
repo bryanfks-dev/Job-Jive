@@ -45,7 +45,7 @@
                                 Number</label>
                             <input type="tel" name="phone_number" id="phone_number"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. 081234567890" value="{{ old('phone_number') }}" required="">
+                                placeholder="ex. 081234567890" value="{{ old('phone_number') }}" minlength="11" maxlength="13" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="date_of_birth"
@@ -66,7 +66,7 @@
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
                             <input type="text" name="nik" id="nik"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. 35-76-01-44-03-91-0003" value="{{ old('nik') }}" required="">
+                                placeholder="ex. 35-76-01-44-03-91-0003" value="{{ old('nik') }}" minlength="16" maxlength="16" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="gender"
@@ -98,7 +98,7 @@
                                     Select Department</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department['id'] }}"
-                                        {{ old('department_id') == $department['id'] ? 'selected' : '' }}>
+                                        {{ intval(old('department_id')) == $department['id'] ? 'selected' : '' }}>
                                         {{ $department['name'] }}</option>
                                 @endforeach
                             </select>

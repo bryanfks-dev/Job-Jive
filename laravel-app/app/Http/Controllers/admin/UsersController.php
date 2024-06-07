@@ -98,7 +98,7 @@ class UsersController extends Controller
             'phone_number' => ['required', 'digits_between:11,13'],
             'date_of_birth' => ['required', 'date'],
             'address' => ['required'],
-            'nik' => ['required'],
+            'nik' => ['required', 'digits_between:16,16'],
             'gender' => ['required', 'in:Male,Female'],
             'department_id' => ['required', 'integer'],
             'photo' => ['required'],
@@ -108,7 +108,18 @@ class UsersController extends Controller
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
                 'create-error' => $fields->errors()->first()
-            ]);
+            ])
+                ->withInput([
+                    'full_name' => $request['full_name'],
+                    'email' => $request['email'],
+                    'date_of_birth' => $request['date_of_birth'],
+                    'phone_number' => $request['phone_number'],
+                    'address' => $request['address'],
+                    'nik' => $request['nik'],
+                    'gender' => $request['gender'],
+                    'department_id' => $request['department_id'],
+                    'photo' => $request['photo']
+                ]);
         }
 
         try {
@@ -143,15 +154,28 @@ class UsersController extends Controller
 
                         $img->resize(500, 500)->toPng();
 
-                        \Storage::put('/public/img/user_profile/' . $fileName,
-                            (string) $img->encode());
+                        \Storage::put(
+                            '/public/img/user_profile/' . $fileName,
+                            (string) $img->encode()
+                        );
 
                         return redirect()->intended(route('admin.users'));
 
                     case 400: // Bad request
                         return redirect()->back()->withErrors([
                             'create-error' => $response['message']
-                        ]);
+                        ])
+                            ->withInput([
+                                'full_name' => $request['full_name'],
+                                'email' => $request['email'],
+                                'date_of_birth' => $request['date_of_birth'],
+                                'phone_number' => $request['phone_number'],
+                                'address' => $request['address'],
+                                'nik' => $request['nik'],
+                                'gender' => $request['gender'],
+                                'department_id' => $request['department_id'],
+                                'photo' => $request['photo']
+                            ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
@@ -182,7 +206,7 @@ class UsersController extends Controller
             'phone_number' => ['required', 'digits_between:11,13'],
             'date_of_birth' => ['required', 'date'],
             'address' => ['required'],
-            'nik' => ['required'],
+            'nik' => ['required', 'digits_between:16,16'],
             'gender' => ['required', 'in:Male,Female'],
             'department_id' => ['required', 'integer']
         ]);
@@ -190,7 +214,17 @@ class UsersController extends Controller
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
                 'update-error-' . $id => $fields->errors()->first(),
-            ]);
+            ])
+                ->withInput([
+                    'full_name' => $request['full_name'],
+                    'email' => $request['email'],
+                    'date_of_birth' => $request['date_of_birth'],
+                    'phone_number' => $request['phone_number'],
+                    'address' => $request['address'],
+                    'nik' => $request['nik'],
+                    'gender' => $request['gender'],
+                    'department_id' => $request['department_id']
+                ]);
         }
 
         try {
@@ -219,7 +253,17 @@ class UsersController extends Controller
                     case 400: // Bad request
                         return redirect(route('admin.users'))->withErrors([
                             'update-error-' . $id => $response['message'],
-                        ]);
+                        ])
+                            ->withInput([
+                                'full_name' => $request['full_name'],
+                                'email' => $request['email'],
+                                'date_of_birth' => $request['date_of_birth'],
+                                'phone_number' => $request['phone_number'],
+                                'address' => $request['address'],
+                                'nik' => $request['nik'],
+                                'gender' => $request['gender'],
+                                'department_id' => $request['department_id'],
+                            ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));

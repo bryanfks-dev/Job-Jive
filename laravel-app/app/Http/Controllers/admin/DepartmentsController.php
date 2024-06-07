@@ -96,7 +96,11 @@ class DepartmentsController extends Controller
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
                 'create-error' => $fields->errors()->first()
-            ]);
+            ])
+                ->withInput([
+                    'department_name' => $request['department_name'],
+                    'manager_id' => $request['manager_id']
+                ]);
         }
 
         try {
@@ -117,7 +121,10 @@ class DepartmentsController extends Controller
                     case 400: // Bad request
                         return redirect()->back()->withErrors([
                             'create-error' => $response['message']
-                        ]);
+                        ])
+                            ->withInput([
+                                'department_name' => $request['department_name']
+                            ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));
@@ -147,7 +154,11 @@ class DepartmentsController extends Controller
         if ($fields->fails()) {
             return redirect()->back()->withErrors([
                 'update-error-' . $id => $fields->errors()->first(),
-            ]);
+            ])
+                ->withInput([
+                    'department_name' => $request['department_name'],
+                    'manager_id' => $request['manager_id']
+                ]);
         }
 
         try {
@@ -168,7 +179,11 @@ class DepartmentsController extends Controller
                     case 400: // Bad request
                         return redirect()->intended(route('admin.departments'))->withErrors([
                             'update-error' . $id => $response['message']
-                    ]);
+                        ])
+                            ->withInput([
+                                'department_name' => $request['department_name'],
+                                'manager_id' => $request['manager_id']
+                            ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('admin.login'));

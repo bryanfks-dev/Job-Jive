@@ -31,14 +31,17 @@
                                 Name</label>
                             <input type="text" name="full_name" id="full_name"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. Budiono Santoso" value="{{ $user['full_name'] }}" required="">
+                                placeholder="ex. Budiono Santoso"
+                                value="{{ empty(old('full_name')) ? $user['full_name'] : old('full_name') }}"
+                                required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="email"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                             <input type="email" name="email" id="email"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. hello@example.com" value="{{ $user['email'] }}" required="">
+                                placeholder="ex. hello@example.com"
+                                value="{{ empty(old('email')) ? $user['email'] : old('email') }}" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="phone_number"
@@ -46,28 +49,34 @@
                                 Number</label>
                             <input type="tel" name="phone_number" id="phone_number"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. 081234567890" value="{{ $user['phone_number'] }}" required="">
+                                placeholder="ex. 081234567890"
+                                value="{{ empty(old('phone_number')) ? $user['phone_number'] : old('phone_number') }}"
+                                minlength="11" maxlength="13" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="date_of_birth"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birth Date</label>
                             <input type="date" name="date_of_birth" id="date_of_birth"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                value="{{ $user['birth_date'] }}" required="">
+                                value="{{ empty(old('date_of_birth')) ? $user['birth_date'] : old('date_of_birth') }}"
+                                required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="address"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
                             <input type="text" name="address" id="address"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. Jl. Merpati No. 17" value="{{ $user['address'] }}" required="">
+                                placeholder="ex. Jl. Merpati No. 17"
+                                value="{{ empty(old('address')) ? $user['address'] : old('address') }}" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="nik"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
                             <input type="text" name="nik" id="nik"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                placeholder="ex. 35-76-01-44-03-91-0003" value="{{ $user['nik'] }}" required="">
+                                placeholder="ex. 35-76-01-44-03-91-0003"
+                                value="{{ empty(old('nik')) ? $user['nik'] : old('nik') }}" minlength="16"
+                                maxlength="16" required="">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label for="gender"
@@ -80,7 +89,7 @@
                                 @endphp
                                 @foreach ($genders as $gender)
                                     <option value="{{ $gender }}"
-                                        {{ $gender == $user['gender'] ? 'selected' : '' }}>
+                                        {{ $gender == (empty(old('gender')) ? $user['gender'] : old('gender')) ? 'selected' : '' }}>
                                         {{ $gender }}</option>
                                 @endforeach
                             </select>
@@ -93,7 +102,7 @@
                                 required>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department['id'] }}"
-                                        {{ $user['department'] == $department['name'] ? 'selected' : '' }}>
+                                        {{ $department['name'] == (empty(old('department_id')) ? $user['department'] : old('department_id')) ? 'selected' : '' }}>
                                         {{ $department['name'] }}</option>
                                 @endforeach
                             </select>

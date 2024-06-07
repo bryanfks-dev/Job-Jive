@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/mail"
 	"strconv"
 	"sync"
 
@@ -137,6 +138,39 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Validate rules
+		// Email validator
+		_, err = mail.ParseAddress(user_fields.Email)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// Phone number validator
+		if len(user_fields.PhoneNumber) < 11 || len(user_fields.PhoneNumber) > 13 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// NIK validator
+		if len(user_fields.NIK) != 16 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
 		user := models.User{
 			FullName:     user_fields.FullName,
 			Email:        user_fields.Email,
@@ -237,6 +271,39 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		err = req_json.Decode(&user_fields)
 
 		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// Validate rules
+		// Email validator
+		_, err = mail.ParseAddress(user_fields.Email)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// Phone number validator
+		if len(user_fields.PhoneNumber) < 11 || len(user_fields.PhoneNumber) > 13 {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": "There is an invalid input field",
+			})
+
+			return
+		}
+
+		// NIK validator
+		if len(user_fields.NIK) != 16 {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
