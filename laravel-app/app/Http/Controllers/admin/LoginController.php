@@ -68,6 +68,8 @@ class LoginController extends Controller
 
             if ($response->successful()) {
                 if ($response['status'] == 200) { // Ok
+                    \Auth::loginUsingId($response['data']['id']);
+                    
                     // Create session token
                     session(['token' => $response['token']]);
 

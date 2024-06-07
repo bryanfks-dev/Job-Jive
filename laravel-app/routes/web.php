@@ -14,6 +14,9 @@ Route::group(['prefix' => '/'], function () {
         Route::post('/', [user\LoginController::class, 'login']);
     });
 
+    Route::post('/logout', [user\LogoutController::class, 'logout'])
+        ->name('user.logout');
+
     // Dashboard route
     Route::get('/', function () {
         return view('user.dashboard');
@@ -38,6 +41,9 @@ Route::group(['prefix' => '/admin'], function () {
 
         Route::post('/', [admin\LoginController::class, 'login']);
     });
+
+    Route::post('/logout', [admin\LogoutController::class, 'logout'])
+        ->name('admin.logout');
 
     // Users route
     Route::group(['prefix' => '/users'], function () {

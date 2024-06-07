@@ -1,8 +1,9 @@
 package main
 
 import (
+	//	"fmt"
 	"log"
-	
+
 	"configs"
 	"db"
 	"models"
@@ -22,24 +23,8 @@ func loadConfig() (configs.Database, error) {
 	return configs.Database.Get(configs.Database{}), err
 }
 
-func main() {
-	config, err := loadConfig()
-
-	// Ensure no error fetching config
-	if err != nil {
-		panic(err.Error())
-	}
-
-	err =
-		db.Connect(config.User, config.Password, config.Host, config.Port, config.Database)
-
-	// Ensure no error connecting to database
-	if err != nil {
-		panic(err.Error())
-	}
-
-	cron := cron.New()
-	err = cron.AddFunc("0 0 0 1 * *", func() {
+func initResetEmployeeSalary(cron *cron.Cron) {
+	err := cron.AddFunc("0 0 0 1 * *", func() {
 		tx, err := db.Conn.Begin()
 
 		if err != nil {
@@ -64,6 +49,47 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+/* func initCheckInHandler(cron *cron.Cron) {
+	config, err := 
+		models.ConfigJson.LoadConfig(models.ConfigJson{})
+	
+	//
+	if err != nil {
+		panic(err.Error())
+	}
+
+	spec := fmt.Sprintf("%s %s %s * *", )
+
+	err := cron.AddFunc(spec, func() {
+		
+	})
+
+	if err != nil {
+		panic(err.Error())
+	}
+} */
+
+func main() {
+	config, err := loadConfig()
+
+	// Ensure no error fetching config
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err =
+		db.Connect(config.User, config.Password, config.Host, config.Port, config.Database)
+
+	// Ensure no error connecting to database
+	if err != nil {
+		panic(err.Error())
+	}
+
+	cron := cron.New()
+
+	initResetEmployeeSalary(cron)
 
 	log.Println("Start cron job")
 	cron.Start()
