@@ -83,8 +83,6 @@ class LoginController extends Controller
                 return abort($e->getStatusCode());
             }
 
-            dd($e);
-
             return redirect()->back()->withErrors(['error' => 'Server error']);
         }
     }
