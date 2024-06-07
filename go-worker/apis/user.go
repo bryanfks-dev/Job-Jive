@@ -90,7 +90,7 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 				Id:          user.Id,
 				FullName:    user.FullName,
 				Email:       user.Email,
-				Address:     user.Email,
+				Address:     user.Address,
 				BirthDate:   user.DateOfBirth,
 				PhoneNumber: user.PhoneNumber,
 				Gender:      user.Gender,
