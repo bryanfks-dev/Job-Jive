@@ -25,7 +25,7 @@ func loadConfig() (configs.Database, error) {
 func main() {
 	// Check input arg length
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: utils/addAdmin/main <username> <password>")
+		fmt.Println("Usage: addAdmin <username> <password>")
 		os.Exit(1)
 	}
 
@@ -52,7 +52,17 @@ func main() {
 	}
 
 	if db.ConnectionEstablished() {
-		err := models.Admin.Insert(admin)
+		// Check if username already exist
+		_, err := 
+			models.Admin.GetUsingUsername(models.Admin{}, admin.Username)
+
+		if err == nil {
+			fmt.Errorf("Error: Admin username already exist")
+
+			return
+		}
+
+		err = models.Admin.Insert(admin)
 
 		// Ensure no error insertting admin data
 		if err != nil {
