@@ -1,8 +1,8 @@
 package main
 
 import (
-	//	"fmt"
 	"log"
+	"time"
 
 	"configs"
 	"db"
@@ -11,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron"
 )
+
+type Schedule struct {
+	At time.Time
+	Every time.Duration
+}
 
 func loadConfig() (configs.Database, error) {
 	// Load .env
@@ -24,7 +29,7 @@ func loadConfig() (configs.Database, error) {
 }
 
 func initResetEmployeeSalary(cron *cron.Cron) {
-	err := cron.AddFunc("0 0 0 1 * *", func() {
+	err := cron.AddFunc("@monthly", func() {
 		tx, err := db.Conn.Begin()
 
 		if err != nil {
@@ -51,25 +56,20 @@ func initResetEmployeeSalary(cron *cron.Cron) {
 	}
 }
 
-/* func initCheckInHandler(cron *cron.Cron) {
-	config, err := 
+func initCheckInHandler(cron *cron.Cron) {
+	// Change this later into real code
+	_, err := 
 		models.ConfigJson.LoadConfig(models.ConfigJson{})
 	
-	//
+	// Ensure no error fetching config
 	if err != nil {
 		panic(err.Error())
 	}
 
-	spec := fmt.Sprintf("%s %s %s * *", )
-
-	err := cron.AddFunc(spec, func() {
-		
+	cron.AddFunc("@midnight", func()  {
+		// code here
 	})
-
-	if err != nil {
-		panic(err.Error())
-	}
-} */
+}
 
 func main() {
 	config, err := loadConfig()
@@ -90,9 +90,12 @@ func main() {
 	cron := cron.New()
 
 	initResetEmployeeSalary(cron)
+	initCheckInHandler(cron)
 
 	log.Println("Start cron job")
 	cron.Start()
+
+	defer cron.Stop()
 
 	select {}
 }
