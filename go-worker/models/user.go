@@ -125,12 +125,12 @@ func (user User) GetUsingEmail(email string) (User, error) {
 	err := db.Conn.QueryRow(stmt, email).
 		Scan(&user.Id,
 			&user.FullName,
-			&user.Photo,
 			&user.Email,
 			&user.Password,
 			&user.DateOfBirth,
 			&user.Address,
 			&user.NIK,
+			&user.Photo,
 			&user.Gender,
 			&user.PhoneNumber,
 			&user.DepartmentId,
@@ -149,7 +149,7 @@ func (user User) Insert() (int, error) {
 
 	user.Password = string(hash)
 
-	stmt := "INSERT INTO `users` (Full_Name, Email, Password, Date_of_Birth, Address, NIK, Gender, Phone_Number, Department_ID, Photo, First_Login) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	stmt := "INSERT INTO `users` (Full_Name, Email, Password, Date_of_Birth, Address, NIK, Gender, Phone_Number, Department_ID, Photo) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	row, err := db.Conn.Exec(stmt,
 		user.FullName,
@@ -161,8 +161,7 @@ func (user User) Insert() (int, error) {
 		user.Gender,
 		user.PhoneNumber,
 		user.DepartmentId,
-		user.Photo,
-		user.FirstLogin)
+		user.Photo)
 
 	// Ensure no error inserting data
 	if err != nil {
@@ -173,7 +172,7 @@ func (user User) Insert() (int, error) {
 
 	// Ensure getting last inserted id
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return int(id), nil

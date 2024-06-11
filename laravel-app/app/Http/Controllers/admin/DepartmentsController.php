@@ -100,8 +100,7 @@ class DepartmentsController extends Controller
                 'create-error' => $fields->errors()->first()
             ])
                 ->withInput([
-                    'department_name' => $request['department_name'],
-                    'manager_id' => $request['manager_id']
+                    'department_name' => $request['department_name']
                 ]);
         }
 
@@ -112,7 +111,7 @@ class DepartmentsController extends Controller
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json'
                 ])->post(BackendServer::url() . '/api/department/create', [
-                            'department_name' => intval($request['department_name'])
+                            'department_name' => $request['department_name']
                         ]);
 
             if ($response->successful()) {

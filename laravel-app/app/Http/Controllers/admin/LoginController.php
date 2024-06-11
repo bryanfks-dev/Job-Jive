@@ -72,6 +72,10 @@ class LoginController extends Controller
                     session(['token' => $response['token']]);
 
                     return redirect()->intended(route('admin.users'));
+                } else if ($response['status'] == 401) {
+                    return redirect()->back()->withErrors([
+                        'error' => $response['message']
+                    ]);
                 }
 
                 return abort($response['status']);

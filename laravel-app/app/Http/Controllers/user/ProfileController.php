@@ -20,7 +20,9 @@ class ProfileController extends Controller
             if ($response->successful()) {
                 switch ($response['status']) {
                     case 200: // Ok
-                        return view('user.profile', $response['data']);
+                        return view('user.profile', [
+                            'data' => $response['data']
+                        ]);
 
                     case 401: // Unauthorized
                         return redirect()->intended(route('user.login'));

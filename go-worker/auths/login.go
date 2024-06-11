@@ -177,6 +177,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			log.Println(err.Error())
+
 			// Other errors
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
@@ -193,13 +195,13 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+				"message": "Could not generate token",
 			})
 
 			return
 		}
 
-		log.Println(login_cred.Email, "logged in")
+		log.Println("user", login_cred.Email, "logged in")
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
@@ -267,6 +269,8 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 				return
 			}
+
+			log.Println(err.Error())
 
 			// Other errors
 			json.NewEncoder(w).Encode(map[string]interface{}{

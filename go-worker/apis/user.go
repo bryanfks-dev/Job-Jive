@@ -12,6 +12,8 @@ import (
 	"auths"
 	"db"
 	"models"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -19,15 +21,19 @@ var (
 )
 
 type UserResponseData struct {
-	Id          int    `json:"id"`
-	FullName    string `json:"full_name"`
-	Email       string `json:"email"`
-	Address     string `json:"address"`
-	BirthDate   string `json:"birth_date"`
-	PhoneNumber string `json:"phone_number"`
-	Gender      string `json:"gender"`
-	NIK         string `json:"nik"`
-	Department  string `json:"department"`
+	Id          int     `json:"id"`
+	FullName    string  `json:"full_name"`
+	Status      string  `json:"status"`
+	Email       string  `json:"email"`
+	Address     string  `json:"address"`
+	BirthDate   string  `json:"birth_date"`
+	PhoneNumber string  `json:"phone_number"`
+	Gender      string  `json:"gender"`
+	NIK         string  `json:"nik"`
+	Department  string  `json:"department"`
+	Photo       string  `json:"photo"`
+	Salary      float64 `json:"salary"`
+	FirstLogin  *string  `json:"first_login"`
 }
 
 type UserFields struct {
@@ -312,7 +318,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		current_user, err := 
+		current_user, err :=
 			models.User.GetUsingId(models.User{}, id)
 
 		// Ensure no error fetching user data
@@ -361,7 +367,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		defer tx.Rollback()
 
-		user, err := 
+		user, err :=
 			models.User.GetUsingId(models.User{}, id)
 
 		// Ensure no error when fetching data
@@ -498,8 +504,10 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		token := res["jwt_claims"].(jwt.MapClaims)
+
 		user, err :=
-			models.User.GetUsingId(models.User{}, res["id"].(int))
+			models.User.GetUsingId(models.User{}, int(token["id"].(float64)))
 
 		// Ensure no error when getting user information
 		if err != nil {
@@ -520,9 +528,56 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		department_head, err :=
+			models.DepartmentHead.GetUsingDepartmentId(models.DepartmentHead{}, user.DepartmentId)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		// Get user status
+		user_status := "Employee"
+
+		if department_head.ManagerId == &user.Id {
+			user_status = "Manager"
+		}
+
+		// Get user department
+		department, err :=
+			models.Department.GetUsingId(models.Department{}, user.DepartmentId)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": "Server error",
+			})
+
+			return
+		}
+
+		response_data := UserResponseData{
+			FullName:    user.FullName,
+			Status:      user_status,
+			Email:       user.Email,
+			Address:     user.Address,
+			BirthDate:   user.DateOfBirth,
+			PhoneNumber: user.PhoneNumber,
+			Gender:      user.Gender,
+			NIK:         user.NIK,
+			Department:  department.Name,
+			Photo:       user.Photo,
+			Salary:      0,
+			FirstLogin:  user.FirstLogin,
+		}
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status": http.StatusOK,
-			"data":   user,
+			"data":   response_data,
 		})
 	}
 }
