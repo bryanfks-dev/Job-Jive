@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/mail"
 	"strconv"
+	"strings"
 	"sync"
 
 	"auths"
@@ -33,7 +34,7 @@ type UserResponseData struct {
 	Department  string  `json:"department"`
 	Photo       string  `json:"photo"`
 	Salary      float64 `json:"salary"`
-	FirstLogin  *string  `json:"first_login"`
+	FirstLogin  *string `json:"first_login"`
 }
 
 type UserFields struct {
@@ -384,7 +385,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Update records
 		user.FullName = user_fields.FullName
-		user.Email = user_fields.Email
 		user.DateOfBirth = user_fields.BirthDate
 		user.Address = user_fields.Address
 		user.NIK = user_fields.NIK
@@ -392,11 +392,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		user.PhoneNumber = user_fields.PhoneNumber
 		user.DepartmentId = user_fields.DepartmentId
 
-		if user_fields.NewPassword != "" {
-			user.Password = user_fields.NewPassword
-		}
-
-		err = models.User.Update(user)
+		err = models.User.UpdateInformation(user)
 
 		// Ensure no error when updating user
 		if err != nil {
@@ -408,6 +404,22 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Update login credentials
+		if user_fields.Email != user.Email || strings.TrimSpace(user_fields.NewPassword) != "" {
+			err := user.UpdateCredentials(user_fields.Email, user_fields.NewPassword)
+
+			// Ensure no error updating user credentials
+			if err != nil {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": "Server error",
+				})
+	
+				return
+			}
+		}
+
+		// Ensure no error commiting to database
 		if err := tx.Commit(); err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"status":  http.StatusInternalServerError,

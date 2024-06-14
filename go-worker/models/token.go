@@ -2,14 +2,15 @@ package models
 
 import (
 	"fmt"
-	"os"
 	"time"
+
+	"configs"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 )
 
-func getSecretKey() []byte {
+func getJWTSecret() []byte {
 	// Load .env
 	err := godotenv.Load()
 
@@ -17,10 +18,12 @@ func getSecretKey() []byte {
 		panic(err.Error())
 	}
 
-	return []byte(os.Getenv("JWT_SECRET_KEY"))
+	jwt := configs.JWT.Get(configs.JWT{})
+
+	return []byte(jwt.Secret)
 }
 
-var secret_key = getSecretKey()
+var secret = getJWTSecret()
 
 func CreateToken(record_id int, role string) (string, error) {
 	// Init token
@@ -31,7 +34,7 @@ func CreateToken(record_id int, role string) (string, error) {
 	})
 
 	// Hash token
-	token_string, err := token.SignedString(secret_key)
+	token_string, err := token.SignedString(secret)
 
 	return token_string, err
 }
@@ -44,7 +47,7 @@ func ClaimsToken(token_string string) (jwt.MapClaims, error) {
 				return nil, fmt.Errorf("unexpected signing method")
 			}
 
-			return secret_key, nil
+			return secret, nil
 		})
 
 	// Ensure there is no error in parsing token

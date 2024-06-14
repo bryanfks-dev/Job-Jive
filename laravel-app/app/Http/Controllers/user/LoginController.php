@@ -16,21 +16,21 @@ class LoginController extends Controller
             $response =
             Http::withHeaders([
                 'Authorization' => 'Bearer ' . session('token'),
-                'Accept' => 'applications/json'
+                'Accept' => 'applications/json',
             ])->get(BackendServer::url() . '/auth/verify-token');
 
             if ($response->successful()) {
-                if ($response['status'] == 200) { // Ok
-                    return view('user.login');
-                } else if ($response['status'] == 403) { // Forbidden
-                    if ($response['role'] == 'user') {
-                        return redirect()->intended(route('user.dashboard'));
-                    }
-
-                    return redirect()->intended(route('admin.employees'));
+                return view('user.login');
+            }
+            else if ($response->forbidden()) {
+                if ($response['role'] == 'user') {
+                    return redirect()->intended(route('admin.users'));
                 }
 
-                return abort($response['status']);
+                return redirect()->intended(route('admin.users'));
+            }
+            else if ($response->serverError()) {
+                return abort($response->status());
             }
 
             return view('user.login')->withErrors(['error' => 'Client error']);
@@ -86,7 +86,9 @@ class LoginController extends Controller
                     ]);
                 }
 
-                return abort($response['status']);
+                return redirect()->back()->withErrors([
+                    'error' => $response['message']
+                ]);
             }
 
             return redirect()->back()->withErrors(['error' => 'Client Error']);

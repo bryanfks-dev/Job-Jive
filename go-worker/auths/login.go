@@ -3,14 +3,16 @@ package auths
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
-	"golang.org/x/crypto/bcrypt"
-
+	"configs"
 	"models"
+
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserCred struct {
@@ -25,8 +27,7 @@ type AdminCred struct {
 }
 
 var (
-	postMu          sync.Mutex
-	errUserNotFound = errors.New("user not found")
+	postMu sync.Mutex
 )
 
 func verifyPassword(hashed_pwd string, cred_pwd string) error {
@@ -77,6 +78,19 @@ func verifyAdmin(cred AdminCred) (models.Admin, error) {
 	}
 
 	return admin, nil
+}
+
+func getTimezone() string {
+	// Load .env
+	err := godotenv.Load()
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	jwt := configs.Timezone.Get(configs.Timezone{})
+
+	return string(jwt.Zone)
 }
 
 func VerifyLoginToken(w http.ResponseWriter, r *http.Request) {
@@ -201,7 +215,44 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("user", login_cred.Email, "logged in")
+		// Update user first login if first login date haven't made
+		if user.FirstLogin == nil {
+			// BUG: user first login cannot be updated
+			zone := getTimezone()
+
+			tz, err := time.LoadLocation(zone)
+
+			// Ensure no error getting timezone
+			if err != nil {
+				log.Println("Could not get provided timezone")
+
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": "Server error",
+				})
+
+				return
+			}
+
+			// Get current time within current timezone
+			curr_date := time.Now().In(tz).String()
+
+			log.Println(curr_date)
+
+			err = user.UpdateFistLogin(curr_date)
+
+			// Ensure no error updating user
+			if err != nil {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": "Server error",
+				})
+
+				return
+			}
+		}
+
+		log.Println("user", user.FullName, "logged in")
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  http.StatusOK,
@@ -261,7 +312,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			// Incorrect password or user not found
-			if err == bcrypt.ErrMismatchedHashAndPassword || err == errUserNotFound {
+			if err == bcrypt.ErrMismatchedHashAndPassword || err == sql.ErrNoRows {
 				json.NewEncoder(w).Encode(map[string]interface{}{
 					"status":  http.StatusUnauthorized,
 					"message": "Invalid credential",

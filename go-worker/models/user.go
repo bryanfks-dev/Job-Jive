@@ -178,45 +178,45 @@ func (user User) Insert() (int, error) {
 	return int(id), nil
 }
 
-func (user User) Update() error {
-	if user.Password == "" {
-		stmt := "UPDATE `users` SET Full_Name = ?, Email = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
+func (user User) UpdateInformation() error {
+	stmt := "UPDATE `users` SET Full_Name = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
 
-		_, err := db.Conn.Exec(stmt,
-			user.FullName,
-			user.Email,
-			user.DateOfBirth,
-			user.Address,
-			user.NIK,
-			user.Gender,
-			user.PhoneNumber,
-			user.DepartmentId,
-			user.Id)
-
-		return err
-	}
-
-	// Hashing password
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 11)
-
-	if err != nil {
-		return err
-	}
-
-	user.Password = string(hash)
-
-	stmt := "UPDATE `users` SET Full_Name = ?, Email = ?, Password = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
-
-	_, err = db.Conn.Exec(stmt,
+	_, err := db.Conn.Exec(stmt,
 		user.FullName,
-		user.Email,
-		user.Password,
 		user.DateOfBirth,
 		user.Address,
 		user.NIK,
 		user.Gender,
 		user.PhoneNumber,
 		user.DepartmentId,
+		user.Id)
+
+	return err
+}
+
+func (user User) UpdateCredentials(email string, password string) error {
+	stmt := "UPDATE `users` SET Email = ?, Password = ? WHERE User_Id = ?"
+
+	// Hash password
+	hashed_pwd, err := bcrypt.GenerateFromPassword([]byte(password), 11)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Conn.Exec(stmt,
+		email,
+		string(hashed_pwd),
+		user.Id)
+
+	return err
+}
+
+func (user User) UpdateFistLogin(date string) error {
+	stmt := "UPDATE `users` SET First_Login = ? WHERE User_Id = ?"
+
+	_, err := db.Conn.Exec(stmt,
+		user.FirstLogin,
 		user.Id)
 
 	return err

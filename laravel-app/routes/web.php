@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\user;
 use App\Http\Controllers\admin;
+use App\Http\Controllers\apiGet;
 use Illuminate\Support\Facades\Route;
 
 // User routes
