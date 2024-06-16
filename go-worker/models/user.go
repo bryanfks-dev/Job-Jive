@@ -200,7 +200,7 @@ func (user User) UpdateFistLogin(date string) error {
 	stmt := "UPDATE `users` SET First_Login = ? WHERE User_Id = ?"
 
 	_, err := db.Conn.Exec(stmt,
-		user.FirstLogin,
+		date,
 		user.Id)
 
 	return err

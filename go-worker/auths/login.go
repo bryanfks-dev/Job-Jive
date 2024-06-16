@@ -159,8 +159,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		// Update user first login if first login date haven't made
 		if user.FirstLogin == nil {
 			// BUG: user first login cannot be updated
-			var zone configs.Timezone
-			err = zone.Load()
+			var timezone configs.Timezone
+			err = timezone.Load()
 
 			// Ensure no error get timezone from env
 			if err != nil {
@@ -174,7 +174,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			tz, err := time.LoadLocation(zone.Zone)
+			zone, err := time.LoadLocation(timezone.Zone)
 
 			// Ensure no error getting timezone
 			if err != nil {
@@ -189,7 +189,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// Get current time within current timezone
-			curr_date := time.Now().In(tz).String()
+			curr_date := time.Now().In(zone).Format("2006-01-02")
+			
+			log.Println(curr_date)
 
 			err = user.UpdateFistLogin(curr_date)
 

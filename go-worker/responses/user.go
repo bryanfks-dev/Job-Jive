@@ -18,6 +18,7 @@ type UserResponse struct {
 	Department  models.Department `json:"department"`
 	Photo       string            `json:"photo"`
 	Salary      models.Salary     `json:"salary"`
+	First_Login *string           `json:"first_login"`
 }
 
 func (user_response *UserResponse) Create(user models.User) error {
@@ -73,6 +74,7 @@ func (user_response *UserResponse) Create(user models.User) error {
 		Initial: salary.Initial,
 		Current: salary.Current,
 	}
+	user_response.First_Login = user.FirstLogin
 
 	return nil
 }
