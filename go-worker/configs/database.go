@@ -1,6 +1,10 @@
 package configs
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Database struct {
 	User     string
@@ -10,12 +14,19 @@ type Database struct {
 	Database string
 }
 
-func (db Database) Get() Database {
-	return Database{
-		User:     os.Getenv("DB_USER"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		Database: os.Getenv("DB_DATABASE"),
+func (db *Database) Load() error {
+	// Load .env
+	err := godotenv.Load()
+
+	if err != nil {
+		return err
 	}
+
+	db.User = os.Getenv("DB_USER")
+	db.Password = os.Getenv("DB_PASSWORD")
+	db.Host = os.Getenv("DB_HOST")
+	db.Port = os.Getenv("DB_PORT")
+	db.Database = os.Getenv("DB_DATABASE")
+
+	return nil
 }

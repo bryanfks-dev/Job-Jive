@@ -2,9 +2,10 @@ package apis
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
-	"auths"
+	"forms"
 	"models"
 )
 
@@ -16,35 +17,30 @@ func GetConfigsHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		config_json, err :=
-			models.ConfigJson.LoadConfig(models.ConfigJson{})
+			models.ConfigJson{}.LoadConfig()
 
 		// Ensure no error loading config file
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error load config json: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": http.StatusOK,
-			"data":   config_json,
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": config_json,
 		})
 	}
 }
 
 func SaveConfigsHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method)
 	if r.Method == http.MethodPut {
 		postMu.Lock()
 		defer postMu.Unlock()
@@ -52,57 +48,53 @@ func SaveConfigsHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
 
-		var config models.ConfigJson
+		var config_form forms.ConfigForm
 
-		err := req_json.Decode(&config)
+		err := req_json.Decode(&config_form)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
 		}
 
-		// Validating values
-		if config.AbsenceQuota <= 0 || config.DailyWorkHours <= 0 || 
-			config.WeekyWorkHours <= 0 || config.CheckInTime >= config.CheckOutTime || 
-			config.WeekyWorkHours > config.DailyWorkHours {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+		config_form.Sanitize()
+
+		valid, err := config_form.Validate()
+
+		// Ensure form is valid
+		if !valid {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": err.Error(),
 			})
 
 			return
 		}
 
-		err = models.ConfigJson.WriteFile(config)
+		err = models.ConfigJson(config_form).WriteFile()
 
 		// Ensure no error writting config file
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error write config file: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Updated",
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": models.ConfigJson(config_form),
 		})
 	}
 }

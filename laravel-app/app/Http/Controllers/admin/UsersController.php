@@ -5,7 +5,6 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Image;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -13,20 +12,6 @@ use Intervention\Image\ImageManager;
 
 class UsersController extends Controller
 {
-    private function paginate(array $items, int $perPage = 10, ?int $page = null, $options = []): LengthAwarePaginator
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-        $items = collect($items);
-
-        return new LengthAwarePaginator(
-            $items->forPage($page, $perPage),
-            $items->count(),
-            $perPage,
-            $page,
-            $options
-        );
-    }
-
     public function index(Request $request)
     {
         try {

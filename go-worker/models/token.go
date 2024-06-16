@@ -4,37 +4,21 @@ import (
 	"fmt"
 	"time"
 
-	"configs"
-
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 )
 
-func getJWTSecret() []byte {
-	// Load .env
-	err := godotenv.Load()
+var JWT_Secret []byte
 
-	if err != nil {
-		panic(err.Error())
-	}
-
-	jwt := configs.JWT.Get(configs.JWT{})
-
-	return []byte(jwt.Secret)
-}
-
-var secret = getJWTSecret()
-
-func CreateToken(record_id int, role string) (string, error) {
+func CreateToken(record_id int, role string, days int) (string, error) {
 	// Init token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":   record_id,
 		"role": role,
-		"exp":  time.Now().Add(time.Hour * (24 * 7 * 7)).Unix(),
+		"exp":  time.Now().Add(time.Hour * (24 * time.Duration(days))).Unix(),
 	})
 
 	// Hash token
-	token_string, err := token.SignedString(secret)
+	token_string, err := token.SignedString(JWT_Secret)
 
 	return token_string, err
 }
@@ -47,7 +31,7 @@ func ClaimsToken(token_string string) (jwt.MapClaims, error) {
 				return nil, fmt.Errorf("unexpected signing method")
 			}
 
-			return secret, nil
+			return JWT_Secret, nil
 		})
 
 	// Ensure there is no error in parsing token

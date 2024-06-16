@@ -31,6 +31,11 @@ Route::group(['prefix' => '/'], function () {
     Route::get('/attendance', function () {
         return view('user.attendance');
     })->name('user.attendance');
+
+    Route::get('/employees', function () {
+        return view('user.employees');
+    })->name('employees');
+
 });
 
 // Admin routes
@@ -87,10 +92,6 @@ Route::group(['prefix' => '/admin'], function () {
             ->name('admin.configs.save');
     });
 });
-
-Route::get('/employees', function () {
-    return view('user.employees');
-})->name('employees');
 
 Route::get('/employees/view', function () {
     return view('user.view');

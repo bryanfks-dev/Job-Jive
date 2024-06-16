@@ -7,7 +7,12 @@ use Illuminate\Http\Request;
 
 class LogoutController extends Controller {
     public function logout(Request $request) {
-        $request->session()->invalidate();
+        // Forget cookie
+        if (cookie()->hasQueued('auth_token')) {
+            cookie()->queue(
+                cookie()->forget('auth_token')
+            );
+        }
 
         return redirect()->intended(route('admin.login'));
     }

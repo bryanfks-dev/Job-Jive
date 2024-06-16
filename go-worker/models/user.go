@@ -21,7 +21,7 @@ type User struct {
 	FirstLogin   *string `json:"first_login"`
 }
 
-func (user User) GetUsers() ([]User, error) {
+func (user User) Get() ([]User, error) {
 	stmt := "SELECT * FROM `users` ORDER BY User_ID DESC"
 
 	row, err := db.Conn.Query(stmt)
@@ -178,35 +178,19 @@ func (user User) Insert() (int, error) {
 	return int(id), nil
 }
 
-func (user User) UpdateInformation() error {
-	stmt := "UPDATE `users` SET Full_Name = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
+func (user User) Update() error {
+	stmt := "UPDATE `users` SET Full_Name = ?, Email = ?, Password = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
 
 	_, err := db.Conn.Exec(stmt,
 		user.FullName,
+		user.Email,
+		user.Password,
 		user.DateOfBirth,
 		user.Address,
 		user.NIK,
 		user.Gender,
 		user.PhoneNumber,
 		user.DepartmentId,
-		user.Id)
-
-	return err
-}
-
-func (user User) UpdateCredentials(email string, password string) error {
-	stmt := "UPDATE `users` SET Email = ?, Password = ? WHERE User_Id = ?"
-
-	// Hash password
-	hashed_pwd, err := bcrypt.GenerateFromPassword([]byte(password), 11)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Conn.Exec(stmt,
-		email,
-		string(hashed_pwd),
 		user.Id)
 
 	return err

@@ -1,13 +1,24 @@
 package configs
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type JWT struct {
 	Secret string
 }
 
-func (jwt JWT) Get() JWT {
-	return JWT{
-		Secret: os.Getenv("JWT_SECRET"),
+func (jwt *JWT) Load() error {
+	// Load .env
+	err := godotenv.Load()
+
+	if err != nil {
+		return err
 	}
+
+	jwt.Secret = os.Getenv("JWT_SECRET")
+
+	return nil
 }
