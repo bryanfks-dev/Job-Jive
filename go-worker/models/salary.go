@@ -12,8 +12,8 @@ func (salary Salary) GetUsingUserId(user_id int) (Salary, error) {
 	stmt := "SELECT * FROM `salaries` WHERE User_ID = ?"
 
 	err := db.Conn.QueryRow(stmt, user_id).
-		Scan(&salary.UserId, 
-			&salary.Initial, 
+		Scan(&salary.UserId,
+			&salary.Initial,
 			&salary.Current)
 
 	return salary, err

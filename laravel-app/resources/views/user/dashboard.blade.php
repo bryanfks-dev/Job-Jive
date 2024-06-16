@@ -41,7 +41,7 @@
                 </a> --}}
 
                     {{-- DON'T DELETE: Late --}}
-                    
+
                     {{-- <a href="#awda"
                     class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-red-700 hover:bg-red-800 rounded-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
@@ -59,8 +59,8 @@
                 <div class="flex justify-between items-center gap-4">
                     <div class="flex flex-col gap-1">
                         {{-- Warnanya diganti aja:
-                        Kalau 'Late': bg-red-700 
-                        Kalau 'On Time': bg-green-700 
+                        Kalau 'Late': bg-red-700
+                        Kalau 'On Time': bg-green-700
                         Kalau 'Belum attendance': bg-yellow-400
                         --}}
                         <div class="bg-yellow-400 rounded-full py-[2px] px-4 text-white text-sm text-center">Date</div>

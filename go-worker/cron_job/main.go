@@ -13,7 +13,7 @@ import (
 )
 
 type Schedule struct {
-	At time.Time
+	At    time.Time
 	Every time.Duration
 }
 
@@ -47,15 +47,15 @@ func initResetEmployeeSalary(cron *cron.Cron) {
 
 func initCheckInHandler(cron *cron.Cron) {
 	// Change this later into real code
-	_, err := 
+	_, err :=
 		models.ConfigJson{}.LoadConfig()
-	
+
 	// Ensure no error fetching db_config
 	if err != nil {
 		panic(err.Error())
 	}
 
-	cron.AddFunc("@midnight", func()  {
+	cron.AddFunc("@midnight", func() {
 		// code here
 	})
 }

@@ -20,7 +20,7 @@
                         data-modal-target="feedback-modal" data-modal-toggle="feedback-modal">Feedback</a>
                 </li> --}}
                 <li>
-                    <a href="{{ route("user.attendance") }}"
+                    <a href="{{ route('user.attendance') }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
                         Log</a>
                 </li>
@@ -33,7 +33,11 @@
             class="mb-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800">Employee</span>
         <h5 class="mb-1 text-center text-xl font-medium text-gray-900 dark:text-white">Cinta Kuswandari</h5>
         <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-500" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m-.4 4.25l-7.07 4.42c-.32.2-.74.2-1.06 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-500" width="1.2em" height="1.2em"
+                viewBox="0 0 24 24">
+                <path
+                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m-.4 4.25l-7.07 4.42c-.32.2-.74.2-1.06 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44" />
+            </svg>
             cintakuswandari2@gmail.com
         </span>
         <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
@@ -59,8 +63,8 @@
         </span>
 
         <div class="flex mt-4 md:mt-6">
-            <div
-                class="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer" data-modal-target="update-modal" data-modal-toggle="update-modal">Edit</div>
+            <div class="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer"
+                data-modal-target="update-modal" data-modal-toggle="update-modal">Edit</div>
         </div>
 
         {{-- @include("partials.admin.users.update-modal") --}}

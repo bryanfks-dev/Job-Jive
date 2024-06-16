@@ -10,10 +10,10 @@ import (
 type ConfigForm models.ConfigJson
 
 var (
-	ErrInvalidAbsenceQuota = errors.New("invalid absensce quota")
-	ErrInvalidDailyWorkHours = errors.New("invalid daily work hours")
-	ErrInvalidWeeklyWorkHours = errors.New("invalid weekly work hours")
-	ErrInvalidCheckInTime = errors.New("check in time should less than check out time")
+	ErrInvalidAbsenceQuota          = errors.New("invalid absensce quota")
+	ErrInvalidDailyWorkHours        = errors.New("invalid daily work hours")
+	ErrInvalidWeeklyWorkHours       = errors.New("invalid weekly work hours")
+	ErrInvalidCheckInTime           = errors.New("check in time should less than check out time")
 	ErrMismatchWeeklyDailyWorkHours = errors.New("daily work hours should less than weekly work hours")
 )
 

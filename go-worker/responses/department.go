@@ -9,9 +9,9 @@ type DepartmentResponse struct {
 }
 
 func (department_response *DepartmentResponse) Create(department models.Department) error {
-	department_head, err := 
+	department_head, err :=
 		models.DepartmentHead{}.GetUsingDepartmentId(department.Id)
-	
+
 	// Ensure no error get department_head
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (department_response *DepartmentResponse) Create(department models.Departme
 	department_response.Name = department.Name
 
 	if department_head.ManagerId != nil {
-		user, err := 
+		user, err :=
 			models.User{}.GetUsingId(*department_head.ManagerId)
 
 		// Ensure no error fetching manager data
@@ -30,16 +30,16 @@ func (department_response *DepartmentResponse) Create(department models.Departme
 		}
 
 		department_response.Manager = models.User{
-			Id: user.Id,
-			FullName: user.FullName,
-			Email: user.Email,
+			Id:          user.Id,
+			FullName:    user.FullName,
+			Email:       user.Email,
 			DateOfBirth: user.DateOfBirth,
-			Address: user.Address,
-			NIK: user.NIK,
-			Gender: user.Gender,
-			Photo: user.Photo,
+			Address:     user.Address,
+			NIK:         user.NIK,
+			Gender:      user.Gender,
+			Photo:       user.Photo,
 			PhoneNumber: user.PhoneNumber,
-			FirstLogin: user.FirstLogin,
+			FirstLogin:  user.FirstLogin,
 		}
 	}
 

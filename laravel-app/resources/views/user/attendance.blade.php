@@ -93,7 +93,7 @@
                     @include('partials.user.attendance.regular-record')
                     @include('partials.user.attendance.regular-record')
 
-                    
+
                 </div>
 
                 <!-- Pagination -->

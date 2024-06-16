@@ -34,13 +34,13 @@ func initEndPoints() {
 	mux.Handle("/api/users",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.GetUsersHandler))))
-	mux.Handle("/api/user/create", 
+	mux.Handle("/api/user/create",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.CreateUserHandler))))
-	mux.Handle("/api/user/update/{id}", 
+	mux.Handle("/api/user/update/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.UpdateUserHandler))))
-	mux.Handle("/api/user/delete/{id}", 
+	mux.Handle("/api/user/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteUserHandler))))
 
@@ -48,21 +48,21 @@ func initEndPoints() {
 	mux.Handle("/api/departments",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.GetDepartmentsHandler))))
-	mux.Handle("/api/department/create", 
+	mux.Handle("/api/department/create",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.CreateDepartmentHandler))))
-	mux.Handle("/api/department/update/{id}", 
+	mux.Handle("/api/department/update/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.UpdateDepartmentHandler))))
-	mux.Handle("/api/department/delete/{id}", 
+	mux.Handle("/api/department/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteDepartmentHandler))))
 
 	// Config endpoints
-	mux.Handle("/api/configs", 
+	mux.Handle("/api/configs",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.GetConfigsHandler))))
-	mux.Handle("/api/configs/save", 
+	mux.Handle("/api/configs/save",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SaveConfigsHandler))))
 }

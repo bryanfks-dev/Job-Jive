@@ -24,10 +24,10 @@ type UserForm struct {
 }
 
 var (
-	ErrInvalidEmail = errors.New("invalid email address")
-	ErrEmailExist = errors.New("email address exists")
+	ErrInvalidEmail       = errors.New("invalid email address")
+	ErrEmailExist         = errors.New("email address exists")
 	ErrInvalidPhoneNumber = errors.New("invalid phone number")
-	ErrInvalidNIK = errors.New("invalid NIK")	
+	ErrInvalidNIK         = errors.New("invalid NIK")
 )
 
 func (user_form *UserForm) Sanitize() {
@@ -64,7 +64,7 @@ func (user_form UserForm) ValidateCreate() (bool, error) {
 			return false, err
 		}
 	} else {
-		
+
 		return false, ErrEmailExist
 	}
 

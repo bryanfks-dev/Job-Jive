@@ -9,8 +9,7 @@
             <div class="mt-2">
                 <div class="items-center block p-3 sm:flex">
                     <img class="w-32 h-32 md:w-40 md:h-40 mb-3 me-3 rounded-full sm:mb-0 object-cover"
-                        src="{{ asset('/storage/img/user_profile/' . $data['photo']) }}"
-                        alt="Jese Leos image" />
+                        src="{{ asset('/storage/img/user_profile/' . $data['photo']) }}" alt="Jese Leos image" />
                     <div class="text-gray-600 dark:text-gray-400 ml-0 sm:ml-5 mt-4 sm:mt-0">
                         <span class="font-medium text-gray-900 dark:text-white text-2xl">{{ $data['full_name'] }}</span>
                         <p class="text-md font-normal">{{ $data['status'] }}</p>

@@ -6,10 +6,10 @@ import (
 )
 
 type ConfigJson struct {
-	CheckInTime    string `json:"check_in_time"`
-	CheckOutTime   string `json:"check_out_time"`
-	AbsenceQuota   int    `json:"absence_quota"`
-	DailyWorkHours int    `json:"daily_work_hours"`
+	CheckInTime     string `json:"check_in_time"`
+	CheckOutTime    string `json:"check_out_time"`
+	AbsenceQuota    int    `json:"absence_quota"`
+	DailyWorkHours  int    `json:"daily_work_hours"`
 	WeeklyWorkHours int    `json:"weekly_work_hours"`
 }
 
