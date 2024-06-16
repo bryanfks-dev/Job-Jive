@@ -28,7 +28,9 @@ func initEndPoints() {
 		auths.AuthenticationMiddlware(http.HandlerFunc(auths.AdminLoginHandler)))
 
 	// API endpoints
-	mux.HandleFunc("/api/user/profile", apis.GetUserProfileHandler)
+	mux.Handle("/api/user/profile",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.GetUserProfileHandler))))
 
 	// Employees endpoints
 	mux.Handle("/api/users",

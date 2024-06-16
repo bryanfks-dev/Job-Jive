@@ -16,133 +16,9 @@ import (
 
 type context_key string
 
-/* func UserMiddleware(w http.ResponseWriter, r *http.Request) (bool, map[string]any) {
-	// Validate token
-	token_valid, res := AuthorizedToken(w, r)
-
-	if !token_valid {
-		return false, res
-	}
-
-	jwt_claims := res["token"].(jwt.MapClaims)
-
-	// Check user role
-	if jwt_claims["role"].(string) != "user" {
-		w.WriteHeader(http.StatusForbidden)
-
-		return false, map[string]any{
-			"error": "forbidden",
-		}
-	}
-
-	// Check if user is exist in database
-	user, err :=
-		models.User{}.GetUsingId(int(jwt_claims["id"].(float64)))
-
-	// Ensure no error when getting user data
-	if err != nil {
-		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusUnauthorized)
-
-			return false, map[string]any{
-				"error": "Invalid user",
-			}
-		}
-
-		// Other errors
-		log.Panic("Error get user", err.Error())
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		return false, map[string]any{
-			"error": "server error",
-		}
-	}
-
-	// Check for specific user role, either manager or employee
-	department_head, err :=
-		models.DepartmentHead{}.GetUsingDepartmentId(user.DepartmentId)
-
-	// Ensure no error when getting department head data
-	if err != nil {
-		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusUnauthorized)
-
-			return false, map[string]any{
-				"error": "Invalid department",
-			}
-		}
-
-		// Other errors
-		log.Panic("Error get department", err.Error())
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		return false, map[string]any{
-			"error": "server error",
-		}
-	}
-
-	// Specify user position
-	as := "employee"
-
-	if user.Id == *department_head.ManagerId {
-		as = "manager"
-	}
-
-	return true, map[string]any{
-		"as":         as,
-		"jwt_claims": jwt_claims,
-	}
-}
-
-func AdminMiddleware(w http.ResponseWriter, r *http.Request) (bool, map[string]any) {
-	// Validate token
-	token_valid, res := AuthorizedToken(w, r)
-
-	if !token_valid {
-		return false, res
-	}
-
-	jwt_claims := res["token"].(jwt.MapClaims)
-
-	// Check user role
-	if jwt_claims["role"].(string) != "auth/user" {
-		w.WriteHeader(http.StatusForbidden)
-
-		return false, map[string]any{
-			"error": "forbidden",
-		}
-	}
-
-	// Check if auth/user is exist in database
-	_, err :=
-		models.Admin{}.GetUsingId(int(jwt_claims["id"].(float64)))
-
-	// Ensure no error when getting user data
-	if err != nil {
-		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusUnauthorized)
-
-			return false, map[string]any{
-				"error": "Invalid auth/user",
-			}
-		}
-
-		// Other errors
-		log.Panic("Error get auth/user", err.Error())
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		return false, map[string]any{
-			"error": "server error",
-		}
-	}
-
-	return true, map[string]any{
-		"jwt_claims": jwt_claims,
-	}
-} */
+const (
+	TOKEN_KEY context_key = "token"
+)
 
 func AuthenticationMiddlware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -246,7 +122,7 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 
 		// Add token to current api context
 		ctx :=
-			context.WithValue(r.Context(), context_key("token"), extract_token)
+			context.WithValue(r.Context(), TOKEN_KEY, extract_token)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -255,7 +131,7 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 func UserMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jwt_claims, ok :=
-			r.Context().Value(context_key("token")).(jwt.MapClaims)
+			r.Context().Value(TOKEN_KEY).(jwt.MapClaims)
 
 		w.Header().Set("Content-Type", "application/json")
 
@@ -342,7 +218,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 		jwt_claims["as"] = as
 
 		ctx :=
-			context.WithValue(r.Context(), context_key("token"), jwt_claims)
+			context.WithValue(r.Context(), TOKEN_KEY, jwt_claims)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

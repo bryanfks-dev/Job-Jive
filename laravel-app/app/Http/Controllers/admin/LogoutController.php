@@ -10,7 +10,7 @@ class LogoutController extends Controller
     public function logout(Request $request)
     {
         // Forget cookie
-        if (cookie()->hasQueued('auth_token')) {
+        if ($request->cookie('auth_token') !== null) {
             cookie()->queue(
                 cookie()->forget('auth_token')
             );

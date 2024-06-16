@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"auths"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -436,23 +437,23 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		token := r.Context().Value("token").(jwt.MapClaims)
+		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
 
 		user, err :=
-			models.User{}.GetUsingId(token["id"].(int))
+			models.User{}.GetUsingId(int(token["id"].(float64)))
 
 		// Ensure no error when getting user information
 		if err != nil {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid user",
+					"error": "invalid user",
 				})
 
 				return
 			}
 
-			log.Panic("Error get user", err.Error())
+			log.Panic("Error get user: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -468,7 +469,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error create response
 		if err != nil {
-			log.Panic("Error create response", err.Error())
+			log.Panic("Error create response: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
