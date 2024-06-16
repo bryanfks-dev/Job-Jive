@@ -1,7 +1,7 @@
 @echo off
 
 set frontend_path=./laravel-app
-set backend_path=./server
+set backend_path=./go-worker
 
 set frontend_cmd=php artisan serve
 set backend_cmd=go run .

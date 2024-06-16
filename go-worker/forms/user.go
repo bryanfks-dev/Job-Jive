@@ -82,8 +82,8 @@ func (user_form UserForm) ValidateCreate() (bool, error) {
 }
 
 func (user_form UserForm) ValidateUpdate(user_id int) (bool, error) {
-	// Email validator
-	_, err := mail.ParseAddress(user_form.Email)
+    // Email validator
+    _, err := mail.ParseAddress(user_form.Email)
 
 	// Ensure no error parsing email address
 	// but, parsing error potentialy caused by
@@ -93,7 +93,8 @@ func (user_form UserForm) ValidateUpdate(user_id int) (bool, error) {
 	}
 
 	// Validate uniqueness
-	mail_user, err := models.User{}.GetUsingEmail(user_form.Email)
+	_, err =
+		models.User{}.GetUsingEmail(user_form.Email)
 
 	// Ensure no error get user using email
 	if err != nil {
@@ -104,21 +105,21 @@ func (user_form UserForm) ValidateUpdate(user_id int) (bool, error) {
 
 			return false, err
 		}
-	}
-
-	if user_id != mail_user.Id {
+	} else {
+		log.Println("Email exist")
 		return false, ErrEmailExist
 	}
 
-	// Phone number validator
-	if len(user_form.PhoneNumber) < 11 || len(user_form.PhoneNumber) > 13 {
-		return false, ErrInvalidPhoneNumber
-	}
+    // Phone number validator
+    if len(user_form.PhoneNumber) < 11 || len(user_form.PhoneNumber) > 13 {
+        return false, ErrInvalidPhoneNumber
+    }
 
-	// NIK validator
-	if len(user_form.NIK) != 16 {
-		return false, ErrInvalidNIK
-	}
+    // NIK validator
+    if len(user_form.NIK) != 16 {
+        return false, ErrInvalidNIK
+    }
 
-	return true, nil
+    return true, nil
 }
+
