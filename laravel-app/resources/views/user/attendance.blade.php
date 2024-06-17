@@ -64,89 +64,47 @@
             <span class="text-lg font-semibold text-gray-900 dark:text-white">History</span>
             <div class="mt-2">
                 <div class="py-5">
-                    <form class="">
-                        <label for="months" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select
+                    <form id="months-form" method="GET" action="">
+                        <label for="month" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select
                             Month</label>
-                        <select id="months"
+                        <select id="months-selector" name="month"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-pointer">
-                            <option value="March">March</option>
-                            <option value="April">April</option>
-                            <option value="May">May</option>
+                            @foreach ($months as $month)
+                                <option value="{{ $month['id'] }}" {{ $old_month_id === $month['id'] ? 'selected' : '' }}>{{ $month['name'] }}</option>
+                            @endforeach
                         </select>
                     </form>
                 </div>
                 <div>
-                    {{-- @if (count($attendanceHistory) == 0) --}}
-                    <div class="flex items-center justify-center h-60 col-span-3">
-                        <div class="text-center">
-                            <h2 class="text-2xl text-gray-600 dark:text-gray-400">No attendance found</h2>
-                            <p class="text-gray-500 dark:text-gray-400">Please add an attendance</p>
+                    @forelse ($attendances['records'] as $record)
+                        @if (date('Y-m-d') == $record['date'])
+                            @include('partials.user.attendance.today-record')
+                        @else
+                            @include('partials.user.attendance.regular-record')
+                        @endif
+                    @empty
+                        <div class="flex items-center justify-center h-60 col-span-3">
+                            <div class="text-center">
+                                <h2 class="text-2xl text-gray-600 dark:text-gray-400">No attendance found</h2>
+                                <p class="text-gray-500 dark:text-gray-400">Please add an attendance</p>
+                            </div>
                         </div>
-                    </div>
-                    {{-- @endif --}}
-
-                    @include('partials.user.attendance.today-record')
-                    @include('partials.user.attendance.regular-record')
-                    @include('partials.user.attendance.regular-record')
-                    @include('partials.user.attendance.regular-record')
-                    @include('partials.user.attendance.regular-record')
-                    @include('partials.user.attendance.regular-record')
-                    @include('partials.user.attendance.regular-record')
-
-                    
+                    @endforelse
                 </div>
 
                 <!-- Pagination -->
-                <div class="flex items-center justify-between dark:bg-gray-800 px-4 py-3 sm:px-6">
-                    <div class="flex flex-1 justify-between sm:hidden">
-                        <a href="#"
-                            class="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Previous</a>
-                        <a href="#"
-                            class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Next</a>
-                    </div>
-                    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700 dark:text-gray-200">
-                                Showing
-                                <span class="font-medium">1</span>
-                                of
-                                <span class="font-medium">4</span>
-                                pages
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                                <a href="#"
-                                    class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0">
-                                    <span class="sr-only">Previous</span>
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd"
-                                            d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                                <a href="#" aria-current="page"
-                                    class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">1</a>
-                                <a href="#"
-                                    class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0">2</a>
-                                <a href="#"
-                                    class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a>
-                                <a href="#"
-                                    class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 md:inline-flex">4</a>
-                                <a href="#"
-                                    class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd"
-                                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                            </nav>
-                        </div>
-                    </div>
+                <div class="p-4 mt-4">
+                    {{ $attendances['records']->withPath(url()->current())->links() }}
                 </div>
             </div>
         </div>
     </div>
+    <script type="module">
+        const monthsForm = document.querySelector('#months-form');
+        const monthsSelector = document.querySelector('#months-selector');
+
+        monthsSelector.addEventListener('change', (e) => {
+            monthsForm.submit();
+        })
+    </script>
 @endsection

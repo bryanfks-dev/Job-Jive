@@ -2,11 +2,13 @@ go 1.22.2
 
 use (
 	.
-	./cron_job
-	./server
 	./apis
-	./configs
-	./db
 	./auths
+	./configs
+	./cron_job
+	./db
+	./forms
 	./models
+	./responses
+	./server
 )

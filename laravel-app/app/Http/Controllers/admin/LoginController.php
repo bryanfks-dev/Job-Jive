@@ -6,88 +6,81 @@ use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LoginController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // Send request to be server
             $response =
-            Http::withHeaders([
-                'Authorization' => 'Bearer ' . session('token'),
-                'Accept' => 'applications/json'
-            ])->get(BackendServer::url() . '/auth/verify-token');
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                ])->get(BackendServer::url() . '/auth/verify-token');
 
             if ($response->successful()) {
-                if ($response['status'] == 200) { // Ok
-                    return view('admin.login');
-                } else if ($response['status'] == 403) { // Forbidden
-                    if ($response['role'] == 'user') {
-                        return redirect()->intended(route('user.dashboard'));
-                    }
-
-                    return redirect()->intended(route('admin.users'));
-                }
-
-                return abort($response['status']);
+                return view('admin.login');
             }
 
-            return view('admin.login')->withErrors(['error' => 'Client error']);
+            return abort($response->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
-            return view('admin.login')->withErrors(['error' => 'Server error']);
+            return abort(500);
         }
     }
 
     public function login(Request $request)
     {
-        $credentials = \Validator::make($request->all(), [
+        // Validate form
+        $validator = \Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required']
         ]);
 
-        if ($credentials->fails()) {
-            return redirect()->back()->withErrors($credentials->errors());
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors(['error' => $validator->errors()->first()]);
         }
 
         try {
-            // Send request to be server
             $response =
-            Http::withHeaders([
-                'Authorization' => 'Bearer ' . session('token'),
-                'Content-type' => 'application/json',
-                'Accept' => 'applications/json'
-            ])->post(BackendServer::url() . '/auth/admin/login', [
-                'username' => $request['username'],
-                'password' => $request['password'],
-            ]);
+                Http::withHeaders([
+                    'Authorization' => 'Bearer ' . session('token'),
+                    'Content-type' => 'application/json',
+                    'Accept' => 'application/json'
+                ])->post(BackendServer::url() . '/auth/admin/login', [
+                            'username' => $request['username'],
+                            'password' => $request['password']
+                        ]);
 
             if ($response->successful()) {
-                if ($response['status'] == 200) { // Ok
-                    // Create session token
-                    session(['token' => $response['token']]);
+                // Create cookie
+                $expireTime = 60 * 24 * 6; // 6 days expire time
 
-                    return redirect()->intended(route('admin.users'));
-                } else if ($response['status'] == 401) {
-                    return redirect()->back()->withErrors([
-                        'error' => $response['message']
-                    ]);
-                }
-
-                return abort($response['status']);
+                return redirect()->intended(route('admin.users'))
+                    ->cookie(
+                        cookie(
+                            'auth_token',
+                            $response['token'],
+                            $expireTime,
+                            secure: true
+                        )
+                    );
+            } else if ($response->serverError()) {
+                return abort($response->status());
             }
 
-            return redirect()->back()->withErrors(['error' => 'Client error']);
+            return redirect()->back()
+                ->withErrors(['error' => $response['error']]);
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
-            return redirect()->back()->withErrors(['error' => 'Server error']);
+            return abort(500);
         }
     }
 }

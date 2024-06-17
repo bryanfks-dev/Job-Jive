@@ -7,20 +7,7 @@ import (
 	"configs" // ignore: import error
 	"db"      // ignore: import error
 	"models"  // ignore: import error
-
-	"github.com/joho/godotenv" // ignore: import error
 )
-
-func loadConfig() (configs.Database, error) {
-	// Load .env
-	err := godotenv.Load()
-
-	if err != nil {
-		return configs.Database{}, err
-	}
-
-	return configs.Database.Get(configs.Database{}), nil
-}
 
 func main() {
 	// Check input arg length
@@ -29,7 +16,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	dbConf, err := loadConfig()
+	db_config := configs.Database{}
+
+	err := db_config.Load()
 
 	// Ensure no error fetching config
 	if err != nil {
@@ -37,7 +26,7 @@ func main() {
 	}
 
 	// Connect to database
-	err = db.Connect(dbConf.User, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
+	err = db.Connect(db_config.User, db_config.Password, db_config.Host, db_config.Port, db_config.Database)
 
 	// Ensure no error connecting to database
 	if err != nil {

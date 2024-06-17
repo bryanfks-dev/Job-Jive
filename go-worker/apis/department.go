@@ -7,22 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"auths"
 	"db"
+	"forms"
 	"models"
+	"responses"
 )
-
-type DepartmentResponseData struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	ManagerId   int    `json:"manager_id"`
-	ManagerName string `json:"manager_name"`
-}
-
-type DepartmentFields struct {
-	DepartmentName string `json:"department_name"`
-	ManagerId      int    `json:"manager_id"`
-}
 
 func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
@@ -32,72 +21,55 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		departments, err :=
-			models.Department.Get(models.Department{})
+			models.Department{}.Get()
 
 		// Ensure no error when fetching department datas
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error get department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		var response_data []DepartmentResponseData
+		var response_data []responses.DepartmentResponse
 
 		for _, department := range departments {
-			department_head, err :=
-				models.DepartmentHead.GetUsingDepartmentId(
-					models.DepartmentHead{}, department.Id)
+			var department_data responses.DepartmentResponse
 
-			var user models.User
+			err := department_data.Create(department)
 
-			// Ensure no error fetching department
-			if err != nil && err != sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusInternalServerError,
-					"message": "Server error",
+			// Ensure no error create response
+			if err != nil {
+				if err == sql.ErrNoRows {
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(map[string]any{
+						"error": "manager user not found",
+					})
+
+					return
+				}
+
+				log.Panic("Error create response: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
 				})
 
 				return
 			}
 
-			if department_head.ManagerId != nil {
-				user, err =
-					models.User.GetUsingId(models.User{}, *department_head.ManagerId)
-
-				// Ensure no error fetching user
-				if err != nil {
-					json.NewEncoder(w).Encode(map[string]interface{}{
-						"status":  http.StatusInternalServerError,
-						"message": "Server error",
-					})
-
-					return
-				}
-			}
-
-			response_data = append(response_data, DepartmentResponseData{
-				Id:          department.Id,
-				Name:        department.Name,
-				ManagerId:   user.DepartmentId,
-				ManagerName: user.FullName,
-			})
+			response_data = append(response_data, department_data)
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": http.StatusOK,
-			"data":   response_data,
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
 		})
 	}
 }
@@ -110,78 +82,132 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
 
-		var department_fields DepartmentFields
+		var department_form forms.DepartmentForm
 
-		err := req_json.Decode(&department_fields)
+		err := req_json.Decode(&department_form)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "There is an invalid input field",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
 		}
+
+		department_form.Sanitize()
 
 		// Ensure the department name is unique
 		_, err =
-			models.Department.GetUsingDepartmentName(
-				models.Department{}, department_fields.DepartmentName)
+			models.Department{}.GetUsingDepartmentName(department_form.DepartmentName)
 
-		if err == nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Department name already use, please use other department name",
+		// Emsure no error fetching department data
+		if err != nil {
+			if err != sql.ErrNoRows {
+				log.Panic("Error get department using name", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+			}
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "department name exist, user other name",
+			})
+		}
+
+		tx, err := db.Conn.Begin()
+
+		// Ensure no error starting database transaction
+		if err != nil {
+			log.Panic("Error starting database transaction", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		id, err := models.Department.Insert(models.Department{
-			Name: department_fields.DepartmentName,
-		})
+		defer tx.Rollback()
+
+		var department = models.Department{
+			Name: department_form.DepartmentName,
+		}
+
+		id, err := department.Insert()
 
 		// Ensure no error when inserting department
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error insert department", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		err = models.DepartmentHead.Insert(models.DepartmentHead{
-			DepartmentId: id,
-			ManagerId:    nil,
-		})
+		department.Id = id
 
-		// Ensure no error when inserting department_head
+		err =
+			models.DepartmentHead{
+				DepartmentId: id,
+				ManagerId:    nil,
+			}.Insert()
+
+		// Ensure no error inserting department_head
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error insert departmend_head", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		log.Println("New department", department_fields.DepartmentName, "has been created")
+		// Ensure no error commiting to database
+		if err := tx.Commit(); err != nil {
+			log.Panic("Error commiting to database", err.Error())
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Created",
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		var response_data responses.DepartmentResponse
+
+		err = response_data.Create(department)
+
+		// Ensure no error create response
+		if err != nil {
+			log.Panic("Error create response", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		log.Println("New department", department_form.DepartmentName, "has been created")
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
 		})
 	}
 }
@@ -194,22 +220,14 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		// Retrieve value from url
 		id, err := strconv.Atoi(r.PathValue("id"))
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "There is an invalid input field",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
@@ -218,139 +236,107 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
 
-		var department_fields DepartmentFields
+		var department_form forms.DepartmentForm
 
-		err = req_json.Decode(&department_fields)
+		err = req_json.Decode(&department_form)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "There is an invalid input field",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
 		}
 
-		current_department, err :=
-			models.Department.GetUsingId(models.Department{}, id)
+		department, err :=
+			models.Department{}.GetUsingId(id)
 
-		// Ensure no error fetching current department data
+		// Ensure no error fetching department data
 		if err != nil {
-			if err == sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusBadRequest,
-					"message": "Invalid departmnet id",
+			log.Panic("Error get department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		valid, err := department_form.Validate()
+
+		if !valid {
+			if err != forms.ErrManagerIdExist {
+				log.Panic("Error validate department: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
 				})
 
 				return
 			}
 
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			})
-
-			return
-		}
-
-		// Ensure department name is unique
-		result, err :=
-			models.User.GetUsingEmail(models.User{}, department_fields.DepartmentName)
-
-		if err == nil || result.Id != current_department.Id {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Department name already in use, please use other department name",
-			})
-
-			return
-		}
-
-		// Database transaction
-		tx, err := db.Conn.Begin()
-
-		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			})
-
-			return
-		}
-
-		defer tx.Rollback()
-
-		department, err :=
-			models.Department.GetUsingId(models.Department{}, id)
-
-		// Ensure no error when fetching data
-		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": err.Error(),
 			})
 
 			return
 		}
 
 		department_head, err :=
-			models.DepartmentHead.GetUsingDepartmentId(
-				models.DepartmentHead{}, department.Id)
+			models.DepartmentHead{}.GetUsingDepartmentId(department.Id)
 
-		// Ensure no error when fetching data
+		// Ensure no error when fetching department_head data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error get department_head: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
-
-		old_name := department.Name
 
 		// Update records
-		department.Name = department_fields.DepartmentName
-		department_head.ManagerId = &department_fields.ManagerId
+		department_head.ManagerId = &department_form.ManagerId
 
-		err = models.Department.Update(department)
+		err = department_head.Update()
 
-		// Ensure no error when updating depatrment
+		// Ensure no error when updating depatrmen
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error update department_head: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		err = models.DepartmentHead.Update(department_head)
+		var response_data responses.DepartmentResponse
 
-		// Ensure no error when updating department
+		err = response_data.Create(department)
+
+		// Ensure no error creating response
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		if err := tx.Commit(); err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
-			})
+		log.Printf("Department %s record has been updated\n", department.Name)
 
-			return
-		}
-
-		log.Printf("Department %s record has been updated\n", old_name)
-
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Updated",
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
 		})
 	}
 }
@@ -363,47 +349,43 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, res := auths.AdminMiddleware(r)
-
-		if !valid_admin {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
 		// Retrieve value from url
 		id, err := strconv.Atoi(r.PathValue("id"))
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "Bad request",
 			})
 
 			return
 		}
 
 		department, err :=
-			models.Department.GetUsingId(models.Department{}, id)
+			models.Department{}.GetUsingId(id)
 
-		// Ensure no error when fetching data
+		// Ensure no error when fetching department data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error get department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
-		err = models.Department.Delete(department)
+		err = department.Delete()
 
 		// Ensure no error when deleting data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			log.Panic("Error delete department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
@@ -411,9 +393,11 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("Department", department.Name, "deleted")
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Deleted",
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": map[string]any{
+				"id": id,
+			},
 		})
 	}
 }

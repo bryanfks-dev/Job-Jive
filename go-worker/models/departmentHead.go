@@ -51,6 +51,18 @@ func (department_head DepartmentHead) GetUsingDepartmentId(department_id int) (D
 	return department_head, err
 }
 
+func (department_head DepartmentHead) GetUsingManagerId(manager_id int) (DepartmentHead, error) {
+	stmt := "SELECT * FROM `department_heads` WHERE Manager_ID = ?"
+
+	// Query result from department_head table with given manager_id should
+	// be returning 1 row, since the manager_id value is unique
+	err := db.Conn.QueryRow(stmt, manager_id).
+		Scan(&department_head.DepartmentId,
+			&department_head.ManagerId)
+
+	return department_head, err
+}
+
 func (department_head DepartmentHead) Insert() error {
 	stmt := "INSERT INTO `department_heads` (Department_ID, Manager_ID) VALUES(?, ?)"
 

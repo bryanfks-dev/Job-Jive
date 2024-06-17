@@ -26,25 +26,22 @@
                 @method('PUT')
                 <div class="grid gap-4 mb-4">
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="department_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Department Name</label>
-                        <input type="text" name="department_name" id="department_name"
+                        <input type="text"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="ex. Sales"
-                            value="{{ empty(old('department_name')) ? $department['name'] : old('department_name') }}"
-                            disabled required="">
+                            placeholder="ex. Sales" value="{{ $department['name'] }}" disabled required="">
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <label for="manager_id"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Manager Name</label>
                         <select name="manager_id" id="manager_id"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option value="" {{ $department['manager_name'] == '' ? 'selected' : '' }} hidden
+                            <option value="" {{ $department['manager']['id'] == 0 ? 'selected' : '' }} hidden
                                 disabled>Select Manager</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user['id'] }}"
-                                    {{ $user['id'] == (empty(old('manager_id')) ? $department['manager_id'] : old('manager_id')) ? 'selected' : '' }}>
+                                    {{ $department['manager']['id'] === (empty(old('manager_id')) ? $user['id'] : intval(old('manager_id'))) ? 'selected' : '' }}>
                                     {{ $user['full_name'] }}</option>
                             @endforeach
                         </select>

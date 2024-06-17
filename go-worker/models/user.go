@@ -21,7 +21,7 @@ type User struct {
 	FirstLogin   *string `json:"first_login"`
 }
 
-func (user User) GetUsers() ([]User, error) {
+func (user User) Get() ([]User, error) {
 	stmt := "SELECT * FROM `users` ORDER BY User_ID DESC"
 
 	row, err := db.Conn.Query(stmt)
@@ -179,35 +179,9 @@ func (user User) Insert() (int, error) {
 }
 
 func (user User) Update() error {
-	if user.Password == "" {
-		stmt := "UPDATE `users` SET Full_Name = ?, Email = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
-
-		_, err := db.Conn.Exec(stmt,
-			user.FullName,
-			user.Email,
-			user.DateOfBirth,
-			user.Address,
-			user.NIK,
-			user.Gender,
-			user.PhoneNumber,
-			user.DepartmentId,
-			user.Id)
-
-		return err
-	}
-
-	// Hashing password
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 11)
-
-	if err != nil {
-		return err
-	}
-
-	user.Password = string(hash)
-
 	stmt := "UPDATE `users` SET Full_Name = ?, Email = ?, Password = ?, Date_of_Birth = ?, Address = ?, NIK = ?, Gender = ?, Phone_Number = ?, Department_ID = ? WHERE User_ID = ?"
 
-	_, err = db.Conn.Exec(stmt,
+	_, err := db.Conn.Exec(stmt,
 		user.FullName,
 		user.Email,
 		user.Password,
@@ -217,6 +191,16 @@ func (user User) Update() error {
 		user.Gender,
 		user.PhoneNumber,
 		user.DepartmentId,
+		user.Id)
+
+	return err
+}
+
+func (user User) UpdateFistLogin(date string) error {
+	stmt := "UPDATE `users` SET First_Login = ? WHERE User_Id = ?"
+
+	_, err := db.Conn.Exec(stmt,
+		date,
 		user.Id)
 
 	return err

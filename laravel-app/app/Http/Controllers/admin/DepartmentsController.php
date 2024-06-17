@@ -2,87 +2,63 @@
 
 namespace App\Http\Controllers\admin;
 
-use Http;
 use Illuminate\Http\Request;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DepartmentsController extends Controller
 {
-    private function paginate(array $items, int $perPage = 10, ?int $page = null, $options = []): LengthAwarePaginator
-    {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-        $items = collect($items);
-
-        return new LengthAwarePaginator(
-            $items->forPage($page, $perPage),
-            $items->count(),
-            $perPage,
-            $page,
-            $options
-        );
-    }
-
     public function index(Request $request)
     {
         try {
-            $departmentsResponse =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token'),
-                    'Accept' => 'applications/json'
-                ])->get(BackendServer::url() . '/api/departments');
+            $responseDepartment = [];
 
-            $userResponse =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token'),
-                    'Accept' => 'applications/json'
-                ])->get(BackendServer::url() . '/api/users');
+            if ($request->has('query')) {
+                $param = trim($request->get('query'), ' ');
 
-            if ($departmentsResponse->successful() && $userResponse->successful()) {
-                if ($departmentsResponse['status'] == 200 && $userResponse['status'] == 200) {
-                    if ($request->has('query')) {
-                        $query = $request->get('query');
-
-                        if (!empty($query)) {
-                            $results = [];
-
-                            foreach ($departmentsResponse['data'] as $department) {
-                                if (in_array(strtolower($query), array_map('strtolower', $department))) {
-                                    $results[] = $department;
-                                }
-                            }
-
-                            $paginatedDepartments = $this->paginate($results ?? []);
-
-                            return view("admin.departments", [
-                                'departments' => $paginatedDepartments,
-                                'users' => $userResponse['data'] ?? []
-                            ]);
-                        }
-                    }
-
-                    $paginatedDepartments = $this->paginate($departmentsResponse['data'] ?? []);
-
-                    return view("admin.departments", [
-                        'departments' => $paginatedDepartments,
-                        'users' => $userResponse['data'] ?? []
-                    ]);
-                } else if ($departmentsResponse['status'] == 401 || $userResponse['status'] == 401) {
-                    return redirect()->intended(route('admin.login'));
+                if (!empty($param)) {
+                    $responseDepartment =
+                        \Http::withHeaders([
+                            'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                            'Accept' => 'application/json'
+                        ])->get(BackendServer::url() . '/api/department/search/' . $request->get('query'));
                 }
-
-                if ($departmentsResponse['status'] == 200) {
-                    return abort($userResponse['status']);
-                }
-
-                return abort($departmentsResponse['status']);
+            } else {
+                $responseDepartment =
+                    \Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                        'Accept' => 'applications/json'
+                    ])->get(BackendServer::url() . '/api/departments');
             }
 
-            return abort(400); // Bad request
+            $responseUser =
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                    'Accept' => 'application/json'
+                ])->get(BackendServer::url() . '/api/users');
+
+            if ($responseDepartment->successful() && $responseUser->successful()) {
+                $paginatedDepartments =
+                    $this->paginate($responseDepartment['data'] ?? []);
+
+                $paginatedUsers =
+                    $this->paginate($responseUser['data'] ?? []);
+
+                return view("admin.departments", [
+                    'departments' => $paginatedDepartments,
+                    'users' => $paginatedUsers
+                ]);
+            } else if ($responseDepartment->unauthorized() || $responseUser->unauthorized()) {
+                return redirect()->intended(route('admin.login'));
+            } else if ($responseDepartment->serverError() || $responseUser->serverError()) {
+                return abort(500);
+            }
+
+            return abort($responseDepartment->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($responseDepartment->status());
             }
 
             return abort(500);
@@ -91,13 +67,13 @@ class DepartmentsController extends Controller
 
     public function create(Request $request)
     {
-        $fields = \Validator::make($request->all(), [
+        $validator = \Validator::make($request->all(), [
             'department_name' => ['required']
         ]);
 
-        if ($fields->fails()) {
+        if ($validator->fails()) {
             return redirect()->back()->withErrors([
-                'create-error' => $fields->errors()->first()
+                'create-error' => $validator->errors()->first()
             ])
                 ->withInput([
                     'department_name' => $request['department_name']
@@ -106,8 +82,8 @@ class DepartmentsController extends Controller
 
         try {
             $response =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token'),
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json'
                 ])->post(BackendServer::url() . '/api/department/create', [
@@ -115,29 +91,22 @@ class DepartmentsController extends Controller
                         ]);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 200: // Ok
-                        return redirect()->intended(route('admin.departments'));
-
-                    case 400: // Bad request
-                        return redirect()->back()->withErrors([
-                            'create-error' => $response['message']
-                        ])
-                            ->withInput([
-                                'department_name' => $request['department_name']
-                            ]);
-
-                    case 401: // Unauthorized
-                        return redirect()->intended(route('admin.login'));
-                }
-
-                return abort($response['status']);
+                return redirect()->intended(route('admin.departments'));
+            } else if ($response->badRequest()) {
+                return redirect()->back()->withErrors([
+                    'create-error' => $response['error']
+                ])
+                    ->withInput([
+                        'department_name' => $request['department_name']
+                    ]);
+            } else if ($response->unauthorized()) {
+                return redirect()->intended(route('admin.login'));
             }
 
-            return abort(400); // Bad request
+            return abort($response->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
             return abort(500);
@@ -148,24 +117,23 @@ class DepartmentsController extends Controller
     {
         $id = intval($id);
 
-        $fields = \Validator::make($request->all(), [
+        $validator = \Validator::make($request->all(), [
             'manager_id' => ['required']
         ]);
 
-        if ($fields->fails()) {
+        if ($validator->fails()) {
             return redirect()->back()->withErrors([
-                'update-error-' . $id => $fields->errors()->first(),
+                'update-error-' . $id => $validator->errors()->first(),
             ])
                 ->withInput([
-                    'department_name' => $request['department_name'],
                     'manager_id' => $request['manager_id']
                 ]);
         }
 
         try {
             $response =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token'),
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json'
                 ])->put(BackendServer::url() . '/api/department/update/' . $id, [
@@ -173,30 +141,23 @@ class DepartmentsController extends Controller
                         ]);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 200: // Ok
-                        return redirect()->intended(route('admin.departments'));
-
-                    case 400: // Bad request
-                        return redirect()->intended(route('admin.departments'))->withErrors([
-                            'update-error' . $id => $response['message']
-                        ])
-                            ->withInput([
-                                'department_name' => $request['department_name'],
-                                'manager_id' => $request['manager_id']
-                            ]);
-
-                    case 401: // Unauthorized
-                        return redirect()->intended(route('admin.login'));
-                }
-
-                return abort($response['status']);
+                return redirect()->intended(route('admin.departments'));
+            } else if ($response->badRequest()) {
+                return redirect()->intended(route('admin.departments'))->withErrors([
+                    'update-error' . $id => $response['message']
+                ])
+                    ->withInput([
+                        'department_name' => $request['department_name'],
+                        'manager_id' => $request['manager_id']
+                    ]);
+            } else if ($response->unauthorized()) {
+                return redirect()->intended(route('admin.login'));
             }
 
-            return abort(400); // Bad request
+            return abort($response->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
             return abort(500);
@@ -209,28 +170,22 @@ class DepartmentsController extends Controller
 
         try {
             $response =
-                Http::withHeaders([
+                \Http::withHeaders([
                     'Authorization' => 'Bearer ' . session('token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json'
                 ])->delete(BackendServer::url() . '/api/department/delete/' . $id);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 200: // Ok
-                        return redirect()->intended(route('admin.departments'));
-
-                    case 401: // Unauthorized
-                        return redirect()->intended(route('admin.login'));
-                }
-
-                return abort($response['status']);
+                return redirect()->intended(route('admin.departments'));
+            } else if ($response->unauthorized()) {
+                return redirect()->intended(route('admin.login'));
             }
 
-            return abort(400); // Bad request
+            return abort($response->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
             return abort(500);

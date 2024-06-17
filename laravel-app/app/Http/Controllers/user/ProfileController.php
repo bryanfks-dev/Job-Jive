@@ -2,39 +2,34 @@
 
 namespace App\Http\Controllers\user;
 
-use Http;
 use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProfileController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
             $response =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer ' . session('token'),
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Accept' => 'application/json'
                 ])->get(BackendServer::url() . '/api/user/profile');
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 200: // Ok
-                        return view('user.profile', [
-                            'data' => $response['data']
-                        ]);
-
-                    case 401: // Unauthorized
-                        return redirect()->intended(route('user.login'));
-                }
-
-                return abort($response['status']);
+                return view('user.profile', [
+                    'user' => $response['data']
+                ]);
+            } else if ($response->unauthorized()) {
+                return redirect()->intended(route('user.login'));
             }
 
-            return abort(400); // Bad request
+            return abort($response->status());
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
             return abort(500);

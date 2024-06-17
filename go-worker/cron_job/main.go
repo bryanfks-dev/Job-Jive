@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -8,24 +9,12 @@ import (
 	"db"
 	"models"
 
-	"github.com/joho/godotenv"
 	"github.com/robfig/cron"
 )
 
 type Schedule struct {
-	At time.Time
+	At    time.Time
 	Every time.Duration
-}
-
-func loadConfig() (configs.Database, error) {
-	// Load .env
-	err := godotenv.Load()
-
-	if err != nil {
-		return configs.Database{}, err
-	}
-
-	return configs.Database.Get(configs.Database{}), err
 }
 
 func initResetEmployeeSalary(cron *cron.Cron) {
@@ -58,29 +47,31 @@ func initResetEmployeeSalary(cron *cron.Cron) {
 
 func initCheckInHandler(cron *cron.Cron) {
 	// Change this later into real code
-	_, err := 
-		models.ConfigJson.LoadConfig(models.ConfigJson{})
-	
-	// Ensure no error fetching config
+	_, err :=
+		models.ConfigJson{}.LoadConfig()
+
+	// Ensure no error fetching db_config
 	if err != nil {
 		panic(err.Error())
 	}
 
-	cron.AddFunc("@midnight", func()  {
+	cron.AddFunc("@midnight", func() {
 		// code here
 	})
 }
 
 func main() {
-	config, err := loadConfig()
+	var db_config = configs.Database{}
 
-	// Ensure no error fetching config
+	err := db_config.Load()
+
+	// Ensure no error fetching db_config
 	if err != nil {
 		panic(err.Error())
 	}
 
 	err =
-		db.Connect(config.User, config.Password, config.Host, config.Port, config.Database)
+		db.Connect(db_config.User, db_config.Password, db_config.Host, db_config.Port, db_config.Database)
 
 	// Ensure no error connecting to database
 	if err != nil {
@@ -92,7 +83,7 @@ func main() {
 	initResetEmployeeSalary(cron)
 	initCheckInHandler(cron)
 
-	log.Println("Start cron job")
+	fmt.Println("Start cron job")
 	cron.Start()
 
 	defer cron.Stop()
