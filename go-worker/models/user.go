@@ -213,3 +213,41 @@ func (user User) Delete() error {
 
 	return err
 }
+
+
+func (user User) SearchByFullName(name string) ([]User, error) {
+	stmt := "SELECT * FROM `users` WHERE Full_Name LIKE %?%"
+
+	row, err := db.Conn.Query(stmt, "%"+name+"%")
+
+	if err != nil {
+		return []User{}, err
+	}
+
+	defer row.Close()
+
+	var users []User
+
+	for row.Next() {
+		err := row.Scan(&user.Id,
+			&user.FullName,
+			&user.Email,
+			&user.Password,
+			&user.DateOfBirth,
+			&user.Address,
+			&user.NIK,
+			&user.Photo,
+			&user.Gender,
+			&user.PhoneNumber,
+			&user.DepartmentId,
+			&user.FirstLogin)
+
+		if err != nil {
+			return []User{}, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

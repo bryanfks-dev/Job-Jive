@@ -53,16 +53,28 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 			err := user_data.Create(user)
 
 			if err != nil {
+				if err == sql.ErrNoRows {
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(map[string]any{
+						"error": "server error",
+					})
+
+					return
+				}
+
+				log.Panic("Error create response: ", err.Error())
+
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
 
 				return
+				
 			}
 
-			// Prepare response
 			response_data = append(response_data, user_data)
+			
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -92,7 +104,6 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "bad request",
 			})
-
 			return
 		}
 
@@ -108,7 +119,6 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
-
 				return
 			}
 
@@ -116,9 +126,22 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": err.Error(),
 			})
-
 			return
 		}
+
+
+		tx, err := db.Conn.Begin()
+
+		if err != nil {
+			log.Panic("Error starting database transaction: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+			return
+		}
+
+		defer tx.Rollback()
 
 		// Prepare new user field
 		user := models.User{
@@ -134,22 +157,20 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			Photo:        user_form.Photo,
 		}
 
+		// Ensure no error inserting user
 		id, err := user.Insert()
 
-		// Assign inserted id into current field
-		user.Id = id
-
-		// Ensure no error when inserting user
 		if err != nil {
-			log.Panic("Error insert user", err.Error())
-
+			log.Printf("Error inserting user: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
-
 			return
 		}
+
+		// Assign inserted id into current field
+		user.Id = id
 
 		err = models.Salary{
 			UserId:  id,
@@ -159,17 +180,22 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when inserting salary
 		if err != nil {
-			log.Panic("Error insert salary", err.Error())
-
+			log.Panic("Error insert salary: ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
-
 			return
 		}
 
-		log.Printf("New user `%s` has been created", user.FullName)
+		if err := tx.Commit(); err != nil {
+			log.Panic("Error committing to database: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+			return
+		}
 
 		var response_data responses.UserResponse
 
@@ -177,15 +203,15 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error creating response
 		if err != nil {
-			log.Panic("Error create response", err.Error())
-
+			log.Panic("Error create response: ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
-
 			return
 		}
+
+		log.Printf("New user `%s` has been created", user.FullName)
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(map[string]any{
@@ -194,102 +220,86 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPut {
-		postMu.Lock()
-		defer postMu.Unlock()
+		
+        postMu.Lock()
+        defer postMu.Unlock()
 
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
+        // Set HTTP header
+        w.Header().Set("Content-Type", "application/json")
 
-		// Retrieve value from url
-		id, err := strconv.Atoi(r.PathValue("id"))
+        
 
-		// Ensure user provide a valid record id
-		if err != nil || id <= 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "Invalid user id",
-			})
+        // Retrieve value from url
+        id, err := strconv.Atoi(r.PathValue("id"))
 
-			return
-		}
+        // Ensure user provides a valid record id
+        if err != nil || id <= 0 {
+            w.WriteHeader(http.StatusBadRequest)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "error": "Invalid user id",
+            })
+            return
+        }
+		
+        _, err = models.User{}.GetUsingId(id)
 
-		_, err = models.User{}.GetUsingId(id)
+        // Ensure no error fetching user using id
+        if err != nil {
+            if err == sql.ErrNoRows {
+                w.WriteHeader(http.StatusBadRequest)
+                json.NewEncoder(w).Encode(map[string]any{
+                    "error": "Invalid user id",
+                })
+                return
+            }
 
-		// Ensure no error fetching user using id
-		if err != nil {
-			if err == sql.ErrNoRows {
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid user id",
-				})
+            log.Println("Error get user: ", err.Error())
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]any{
+                "error": "server error",
+            })
+            return
+        }
 
-				return
-			}
-
-			log.Panic("Error get user", err)
-
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "server error",
-			})
-
-			return
-		}
-
-		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
+        var user_form forms.UserForm
+        
+        err = req_json.Decode(&user_form)
 
-		var user_form forms.UserForm
+        if err != nil {
+            w.WriteHeader(http.StatusBadRequest)
+            json.NewEncoder(w).Encode(map[string]any{
+                "error": "bad request",
+            })
+            return
+        }
 
-		err = req_json.Decode(&user_form)
+        valid, err := user_form.ValidateUpdate(id)
 
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "bad request",
-			})
-		}
-
-		valid, err := user_form.ValidateUpdate(id)
-
-		// Ensure no error validating form
-		if !valid {
+        // Ensure no error validating form
+        if !valid {
 			if err != forms.ErrInvalidEmail && err != forms.ErrEmailExist &&
 				err != forms.ErrInvalidPhoneNumber && err != forms.ErrInvalidNIK {
+                
+				log.Panic("Error validate user: ", err.Error())
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
 
 				return
-			}
+            }
 
-			w.WriteHeader(http.StatusBadRequest)
+            w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": err.Error(),
 			})
-
+			log.Println(err.Error())
 			return
-		}
-
-		// Database transaction
-		tx, err := db.Conn.Begin()
-
-		// Ensure no error starting database transaction
-		if err != nil {
-			log.Panic("Error starting database transaction", err.Error())
-
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "server error",
-			})
-
-			return
-		}
-
-		defer tx.Rollback()
+        }
 
 		user, err := models.User{}.GetUsingId(id)
 
@@ -304,70 +314,68 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
+		
 
-		// Update records
-		user.FullName = user_form.FullName
-		user.Email = user_form.Email
-		user.DateOfBirth = user_form.BirthDate
-		user.Address = user_form.Address
-		user.NIK = user_form.NIK
-		user.Gender = user_form.Gender
-		user.PhoneNumber = user_form.PhoneNumber
-		user.DepartmentId = user_form.DepartmentId
+        // Update records
+        user.FullName = user_form.FullName
+        user.Email = user_form.Email
+        user.DateOfBirth = user_form.BirthDate
+        user.Address = user_form.Address
+        user.NIK = user_form.NIK
+        user.Gender = user_form.Gender
+        user.PhoneNumber = user_form.PhoneNumber
+        user.DepartmentId = user_form.DepartmentId
 
-		// Try update user credentials
-		if strings.TrimSpace(user_form.NewPassword) != "" {
-			hashed_pwd, err := bcrypt.GenerateFromPassword([]byte(user_form.NewPassword), 11)
+        // Try update user credentials
+        if strings.TrimSpace(user_form.NewPassword) != "" {
+            hashed_pwd, err := bcrypt.GenerateFromPassword([]byte(user_form.NewPassword), 11)
 
-			// Ensure no error hasing new password
-			if err != nil {
-				log.Panic("Error hashing password", err.Error())
+            // Ensure no error hashing new password
+            if err != nil {
+                log.Println("Error hashing password", err.Error())
+                w.WriteHeader(http.StatusInternalServerError)
+                json.NewEncoder(w).Encode(map[string]interface{}{
+                    "error": "server error",
+                })
+                return
+            }
 
-				w.WriteHeader(http.StatusInternalServerError)
-				json.NewEncoder(w).Encode(map[string]any{
-					"error": "server error",
-				})
+            user.Password = string(hashed_pwd)
+        }
 
-				return
-			}
+        err = user.Update()
 
-			user.Password = string(hashed_pwd)
-		}
+        // Ensure no error when updating user
+        if err != nil {
+            log.Println("Error update user", err.Error())
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "error": "server error",
+            })
+            return
+        }
 
-		err = user.Update()
+        var response_data responses.UserResponse
 
-		// Ensure no error when updating user
-		if err != nil {
-			log.Panic("Error update user", err.Error())
+        err = response_data.Create(user)
 
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "server error",
-			})
+        if err != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "error": "server error",
+            })
+            return
+        }
 
-			return
-		}
+        log.Printf("User `%s` record has been updated\n", user.FullName)
 
-		// Ensure no error commiting to database
-		if err := tx.Commit(); err != nil {
-			log.Panic("Error commiting to database", err.Error())
-
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "server error",
-			})
-
-			return
-		}
-
-		log.Printf("User `%s` record has been updated\n", user.FullName)
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]any{
-			"data": user,
-		})
-	}
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(map[string]interface{}{
+            "data": response_data,
+        })
+    }
 }
+
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodDelete {
@@ -475,6 +483,64 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
+func SearchUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		// Retrieve value from url	
+		full_name := r.URL.Query().Get("full_name")
+
+		if full_name == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{	
+				"error": "bad request",
+			})
+
+			return
+		}
+
+		users, err := models.User{}.SearchByFullName(full_name)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+		}
+
+		var response_data []responses.UserResponse
+
+		for _, user := range users {
+			var user_data responses.UserResponse
+
+			err := user_data.Create(user)
+
+			// Ensure no error create response
+			if err != nil {
+				log.Panic("Error create response", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			response_data = append(response_data, user_data)
 		}
 
 		w.WriteHeader(http.StatusOK)

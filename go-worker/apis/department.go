@@ -400,4 +400,5 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	}
+	
 }
