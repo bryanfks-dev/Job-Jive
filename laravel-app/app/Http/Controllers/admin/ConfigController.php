@@ -51,7 +51,14 @@ class ConfigController extends Controller
         ]);
 
         if ($fields->fails()) {
-            return redirect()->back()->withErrors($fields->errors());
+            return redirect()->back()->withErrors($fields->errors())
+                ->withInput([
+                    'check_in_time' => $request['check_in_time'],
+                    'check_out_time' => $request['check_out_time'],
+                    'absence_quota' => $request['absence_quota'],
+                    'daily_work_hours' => $request['daily_work_hours'],
+                    'weekly_work_hours' => $request['weekly_work_hours']
+                ]);
         }
 
         try {

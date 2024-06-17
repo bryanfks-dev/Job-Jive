@@ -1,0 +1,9 @@
+# Ignore all files without extensions
+*
+!*/
+!*.*
+
+.env
+*.exe
+/bin
+config.json

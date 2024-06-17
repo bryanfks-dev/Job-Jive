@@ -14,6 +14,9 @@ Route::group(['prefix' => '/'], function () {
         Route::post('/', [user\LoginController::class, 'login']);
     });
 
+    Route::post('/logout', [user\LogoutController::class, 'logout'])
+        ->name('user.logout');
+
     // Dashboard route
     Route::get('/', function () {
         return view('user.dashboard');
@@ -39,10 +42,24 @@ Route::group(['prefix' => '/admin'], function () {
         Route::post('/', [admin\LoginController::class, 'login']);
     });
 
-    // Employees route
-    Route::group(['prefix' => '/employees'], function () {
-        Route::get('/', [admin\EmployeesController::class, 'index'])
-            ->name('admin.employees');
+    Route::post('/logout', [admin\LogoutController::class, 'logout'])
+        ->name('admin.logout');
+
+    Route::get('/', [admin\LoginController::class, 'login']);
+
+    // Users route
+    Route::group(['prefix' => '/users'], function () {
+        Route::get('/', [admin\UsersController::class, 'index'])
+            ->name('admin.users');
+
+        Route::post('/', [admin\UsersController::class, 'create'])
+            ->name('admin.users.create');
+
+        Route::put('/update/{id}', [admin\UsersController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.users.update');
+
+        Route::delete('/delete/{id}', [admin\UsersController::class, 'delete'])
+            ->where(['id' => '[1-9][0-9]*'])->name('admin.users.delete');
     });
 
     // Departments route

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('salaries', function (Blueprint $table) {
             $table->integer('User_ID')->unsigned();
-            $table->integer('Initial_Salary');
-            $table->integer('Final_Salary');
+            $table->float('Initial_Salary');
+            $table->float('Current_Salary');
 
             $table->foreign('User_ID')->references('User_ID')
                 ->on('users')->onDelete('cascade');

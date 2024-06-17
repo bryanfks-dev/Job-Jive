@@ -27,7 +27,7 @@ class LoginController extends Controller
                         return redirect()->intended(route('user.dashboard'));
                     }
 
-                    return redirect()->intended(route('admin.employees'));
+                    return redirect()->intended(route('admin.users'));
                 }
 
                 return abort($response['status']);
@@ -71,7 +71,11 @@ class LoginController extends Controller
                     // Create session token
                     session(['token' => $response['token']]);
 
-                    return redirect()->intended(route('admin.employees'));
+                    return redirect()->intended(route('admin.users'));
+                } else if ($response['status'] == 401) {
+                    return redirect()->back()->withErrors([
+                        'error' => $response['message']
+                    ]);
                 }
 
                 return abort($response['status']);

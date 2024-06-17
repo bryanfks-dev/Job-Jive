@@ -64,7 +64,7 @@ class LoginController extends Controller
                     'Content-type' => 'application/json',
                     'Accept' => 'applications/json'
                 ])->post(BackendServer::url() . '/auth/user/login', [
-                    'username' => $request['username'],
+                    'email' => $request['email'],
                     'password' => $request['password'],
                     'remember' => $remember
                 ]);
@@ -80,6 +80,10 @@ class LoginController extends Controller
                     }
 
                     return redirect()->intended(route('user.dashboard'));
+                } else if ($response['status'] == 401) {
+                    return redirect()->back()->withErrors([
+                        'error' => $response['message']
+                    ]);
                 }
 
                 return abort($response['status']);
