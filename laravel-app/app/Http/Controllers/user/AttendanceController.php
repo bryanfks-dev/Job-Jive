@@ -12,14 +12,21 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         try {
-            $response =
+            $responseAttendance =
                 \Http::withHeaders([
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Accept' => 'application/json'
                 ])->get(BackendServer::url() . '/api/user/attendance');
 
-            $attendances = $response['data'][0];
+            $responseConfig =
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                    'Accept' => 'applicaton/json'
+                ])->get(BackendServer::url() . '/api/configs');
 
+            $attendances = $responseAttendance['data'][0];
+
+            // Check for filter key
             if ($request->has('month')) {
                 $param = trim($request->get('month'));
 
@@ -30,7 +37,7 @@ class AttendanceController extends Controller
 
                     // Validate param value, so index won't be out of bound
                     if ($param <= $maxMonth && $param >= $maxMonth - 2) {
-                        $attendances = $response['data'][$maxMonth - $param];
+                        $attendances = $responseAttendance['data'][$maxMonth - $param];
                     }
                 }
             }
@@ -38,12 +45,10 @@ class AttendanceController extends Controller
             $attendances['records'] =
                 $this->paginate($attendances['records'] ?? [], 7);
 
-            if ($response->successful()) {
+            if ($responseAttendance->successful() && $responseConfig->successful()) {
                 return view('user.attendance', [
                     'old_month_id' => intval($request->get('month')),
-                    'stats' => [
-
-                    ],
+                    'configs' => $responseConfig['data'],
                     'months' =>
                         array_map(function ($v) {
                             return [
@@ -53,16 +58,17 @@ class AttendanceController extends Controller
                                     mktime(0, 0, 0, $v['month'], 1)
                                 )
                             ];
-                        }, $response['data']),
+                        }, $responseAttendance['data']),
                     'attendances' => $attendances
                 ]);
+            } else if ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
+                return redirect()->intended(route('user.login'));
+            } else if ($responseAttendance->serverError() || $responseConfig->serverError()) {
+                return abort(500);
             }
 
+            return abort(400);
         } catch (\Exception $e) {
-            if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
-            }
-
             return abort(500);
         }
     }

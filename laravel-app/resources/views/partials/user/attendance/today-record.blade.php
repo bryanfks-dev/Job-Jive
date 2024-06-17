@@ -69,7 +69,7 @@
         now = new Date(`${uDate} ${now}`);
 
         // Calculate time diff
-        const timeDiff = now.getTime() - checkInTime.getTime();
+        const timeDiff = now.getTime() - time.getTime();
 
         let diff = {
             time: Math.floor(timeDiff / (1000 * 3600)),
@@ -77,25 +77,22 @@
         };
 
         // Decide wheter use hours or minutes
-        if (diff === 0) {
+        if (diff.time === 0) {
             diff.time = Math.floor(timeDiff / (1000 * 60));
             diff.unit = 'minutes';
         }
 
-        target.innerText = (diff === 0) ? 'Less than a minute ago' : `${diff.time} ${diff.unit} ago`;
+        target.textContent =
+            (diff === 0) ? 'Less than a minute ago' : `${diff.time} ${diff.unit} ago`;
     }
 
-    (function checkIn() {
+    (function init() {
         initTime(checkInTime, checkInSpan);
 
-        setTimeout(checkIn, 1000);
-    })();
-
-    /* (function checkOut() {
-        if (typeof checkOutTime === 'number') {
+        if (checkOutTime instanceof Date) {
             initTime(checkOutTime, checkOutSpan);
-
-            setTimeout(checkOut, 1000);
         }
-    })(); */
+
+        setTimeout(init, 60000);
+    })();
 </script>

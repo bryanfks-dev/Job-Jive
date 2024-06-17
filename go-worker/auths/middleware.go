@@ -91,7 +91,7 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 					return
 				}
 
-				log.Panic("Unable to claim token", err.Error())
+				log.Panic("Unable to claim token: ", err.Error())
 
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
@@ -171,7 +171,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 			}
 
 			// Other errors
-			log.Panic("Error get user", err.Error())
+			log.Panic("Error get user: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -197,7 +197,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 			}
 
 			// Other errors
-			log.Panic("Error get department", err.Error())
+			log.Panic("Error get department: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -266,7 +266,7 @@ func AdminMiddleware(next http.Handler) http.Handler {
 			}
 
 			// Other errors
-			log.Panic("Error get admin", err.Error())
+			log.Panic("Error get admin: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{

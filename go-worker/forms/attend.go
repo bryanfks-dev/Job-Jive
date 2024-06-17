@@ -45,9 +45,6 @@ func (attend_form AttendForm) Validate() (bool, error) {
 	const threshold = 2 * time.Second
 
 	if time_diff < -threshold || time_diff > threshold {
-		log.Println("Client check time: ", client_check_time)
-		log.Println("Server check Time: ", server_check_time)
-		log.Println("Server and Client check time difference: ", time_diff)
 		log.Println("WARNING: Server and client time are not sync")
 
 		return false, ErrTimeNotSync
