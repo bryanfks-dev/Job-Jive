@@ -23,7 +23,7 @@ class UsersController extends Controller
                 $param = trim($request->get('query'), ' ');
 
                 if (! empty($param)) {
-                    $responseDepartment =
+                    $responseUser =
                         Http::withHeaders([
                             'Authorization' => 'Bearer '.$request->cookie('auth_token'),
                             'Accept' => 'application/json',
@@ -63,6 +63,7 @@ class UsersController extends Controller
             return abort($responseUser->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
+                dd($e);
                 throw new HttpException($responseUser->status());
             }
 
@@ -220,8 +221,8 @@ class UsersController extends Controller
             if ($response->successful()) {
                 return redirect()->intended(route('admin.users'));
             } elseif ($response->badRequest()) {
-                return redirect()->back()->withErrors([
-                    'update-error-'.$id => $response['message'],
+                return redirect()->intended(route('admin.users'))->withErrors([
+                    'update-error-'.$id => $response['error'],
                 ])
                     ->withInput([
                         'full_name' => $request['full_name'],
@@ -242,7 +243,6 @@ class UsersController extends Controller
             if ($e instanceof HttpException) {
                 throw new HttpException($response->status());
             }
-            dd($response);
 
             return abort(500);
         }
@@ -250,32 +250,29 @@ class UsersController extends Controller
 
     public function delete(Request $request, int $id)
     {
+
         $id = intval($id);
 
         try {
             $response =
                 Http::withHeaders([
-                    'Authorization' => 'Bearer '.session('token'),
+                    'Authorization' => 'Bearer '.$request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
                 ])->delete(BackendServer::url().'/api/user/delete/'.$id);
 
             if ($response->successful()) {
-                switch ($response['status']) {
-                    case 200: // Ok
-                        return redirect()->intended(route('admin.users'));
+                return redirect()->intended(route('admin.users'));
+            } elseif ($response->unauthorized()) {
+                dd($response);
 
-                    case 401: // Unauthorized
-                        return redirect()->intended(route('admin.login'));
-                }
-
-                return abort($response['status']);
+                return redirect()->intended(route('admin.login'));
             }
 
-            return abort(400); // Bad request
+            return abort($response->status()); // Bad request
         } catch (\Exception $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-                return abort($e->getStatusCode());
+            if ($e instanceof HttpException) {
+                throw new HttpException($response->status());
             }
 
             return abort(500);
