@@ -38,10 +38,6 @@ class DepartmentsController extends Controller
                     'Accept' => 'application/json'
                 ])->get(BackendServer::url() . '/api/users');
 
-            if ($responseDepartment->serverError() || $responseUser->serverError()) {
-                return abort(500);
-            }
-
             if ($responseDepartment->successful() && $responseUser->successful()) {
                 $paginatedDepartments =
                     $this->paginate($responseDepartment['data'] ?? []);
@@ -55,6 +51,8 @@ class DepartmentsController extends Controller
                 ]);
             } else if ($responseDepartment->unauthorized() || $responseUser->unauthorized()) {
                 return redirect()->intended(route('admin.login'));
+            } else if ($responseDepartment->serverError() || $responseUser->serverError()) {
+                return abort(500);
             }
 
             return abort($responseDepartment->status());

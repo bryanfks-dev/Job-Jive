@@ -26,9 +26,9 @@ type AdminCred struct {
 }
 
 var (
-	postMu sync.Mutex
+	postMu             sync.Mutex
 	_token_expire_time = map[bool]int{
-		true: 30,
+		true:  30,
 		false: 6,
 	}
 )
@@ -141,7 +141,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Generate jwt token
-		token, err := 
+		token, err :=
 			models.CreateToken(user.Id, "user", _token_expire_time[login_cred.Remember])
 
 		// Ensure jwt token generated
@@ -158,42 +158,21 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Update user first login if first login date haven't made
 		if user.FirstLogin == nil {
-			// BUG: user first login cannot be updated
-			var timezone configs.Timezone
-			err = timezone.Load()
+			loc, err := configs.Timezone{}.GetTimeZone()
 
-			// Ensure no error get timezone from env
+			// Ensure no error get timezone location
 			if err != nil {
-				log.Panic("Error get timezone from env: ", err.Error())
-
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
-
+	
 				return
 			}
+	
+			curr_date_time := time.Now().In(loc)
 
-			zone, err := time.LoadLocation(timezone.Zone)
-
-			// Ensure no error getting timezone
-			if err != nil {
-				log.Panic("Error get timezone", err.Error())
-
-				w.WriteHeader(http.StatusInternalServerError)
-				json.NewEncoder(w).Encode(map[string]any{
-					"error": "server error",
-				})
-
-				return
-			}
-
-			// Get current time within current timezone
-			curr_date := time.Now().In(zone).Format("2006-01-02")
-			
-			log.Println(curr_date)
-
-			err = user.UpdateFistLogin(curr_date)
+			err = user.UpdateFistLogin(curr_date_time.Format(time.DateOnly))
 
 			// Ensure no error updating user
 			if err != nil {

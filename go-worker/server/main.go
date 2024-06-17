@@ -19,7 +19,7 @@ var (
 )
 
 func initEndPoints() {
-	// Forms endpoints
+	// Login endpoints
 	mux.Handle("/auth/verify-token",
 		auths.AuthenticationMiddlware(http.HandlerFunc(auths.VerifyToken)))
 	mux.Handle("/auth/user/login",
@@ -27,7 +27,7 @@ func initEndPoints() {
 	mux.Handle("/auth/admin/login",
 		auths.AuthenticationMiddlware(http.HandlerFunc(auths.AdminLoginHandler)))
 
-	// API endpoints
+	// User
 	mux.Handle("/api/user/profile",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserProfileHandler))))
@@ -37,6 +37,9 @@ func initEndPoints() {
 	mux.Handle("/api/user/attendance",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceHandler))))
+	mux.Handle("/api/user/attendance/today/latest",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.GetUserTodayLatestAttendanceHandler))))
 
 	// Employees endpoints
 	mux.Handle("/api/users",
@@ -68,15 +71,14 @@ func initEndPoints() {
 
 	// Config endpoints
 	mux.Handle("/api/configs",
-		auths.AuthenticationMiddlware(
-			auths.AdminMiddleware(http.HandlerFunc(apis.GetConfigsHandler))))
+		auths.AuthenticationMiddlware(http.HandlerFunc(apis.GetConfigsHandler)))
 	mux.Handle("/api/configs/save",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SaveConfigsHandler))))
 }
 
-func loadConfig(obj configs.ConfigInterfaces) {
-	err := obj.Load()
+func loadConfig(config configs.ConfigInterfaces) {
+	err := config.Load()
 
 	// Ensure no error load config
 	if err != nil {

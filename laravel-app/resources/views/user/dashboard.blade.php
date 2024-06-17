@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        @include('partials.user.dashboard.attend-checker')
+        @include('partials.user.dashboard.attendance-checker')
         <div class="rounded-lg dark:border-gray-600 h-full md:h-full">
             <div class="w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
                 <div class="flex justify-between items-start w-full">

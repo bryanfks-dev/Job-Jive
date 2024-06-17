@@ -11,7 +11,7 @@
                 <input type="time" name="check_in_time" id="check_in_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales"
-                    value="{{ empty(old('check_in_time')) ? $check_in_time : old('check_in_time') }}" required="">
+                    value="{{ empty(old('check_in_time')) ? $configs['check_in_time'] : old('check_in_time') }}" required="">
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="check_out_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -19,14 +19,14 @@
                 <input type="time" name="check_out_time" id="check_out_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales"
-                    value="{{ empty(old('check_out_time')) ? $check_out_time : old('check_out_time') }}" required="">
+                    value="{{ empty(old('check_out_time')) ? $configs['check_out_time'] : old('check_out_time') }}" required="">
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="absence_quota" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Absence Quota</label>
                 <input type="number" name="absence_quota" id="absence_quota"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ empty(old('absence_quota')) ? $absence_quota : old('absence_quota') }}" required=""
+                    value="{{ empty(old('absence_quota')) ? $configs['absence_quota'] : old('absence_quota') }}" required=""
                     min="1">
             </div>
             <div class="col-span-2 sm:col-span-1">
@@ -34,7 +34,7 @@
                     Daily Work Hours</label>
                 <input type="number" name="daily_work_hours" id="daily_work_hours"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ empty(old('daily_work_hours')) ? $daily_work_hours : old('daily_work_hours') }}"
+                    value="{{ empty(old('daily_work_hours')) ? $configs['daily_work_hours'] : old('daily_work_hours') }}"
                     required="" min="1" max="24">
             </div>
             <div class="col-span-2 sm:col-span-1">
@@ -42,7 +42,7 @@
                     Weekly Work Hours</label>
                 <input type="number" name="weekly_work_hours" id="weekly_work_hours"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ empty(old('weekly_work_hours')) ? $weekly_work_hours : old('daily_work_hours') }}"
+                    value="{{ empty(old('weekly_work_hours')) ? $configs['weekly_work_hours'] : old('daily_work_hours') }}"
                     required="" min="1" max="168">
             </div>
         </div>

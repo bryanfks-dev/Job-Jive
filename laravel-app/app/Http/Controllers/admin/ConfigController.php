@@ -20,7 +20,9 @@ class ConfigController extends Controller
                 ])->get(BackendServer::url() . '/api/configs');
 
             if ($response->successful()) {
-                return view('admin.config', $response['data']);
+                return view('admin.config', [
+                    'configs' => $response['data']
+                ]);
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('admin.login'));
             }
