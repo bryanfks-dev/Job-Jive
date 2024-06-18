@@ -70,7 +70,7 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error fetching employees data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -85,7 +85,7 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 				models.Department.GetUsingId(models.Department{}, user.DepartmentId)
 
 			if err != nil {
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				json.NewEncoder(w).Encode(map[string]any{
 					"status":  http.StatusInternalServerError,
 					"message": "Server error",
 				})
@@ -106,7 +106,7 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"status": http.StatusOK,
 			"data":   response_data,
 		})
@@ -137,7 +137,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		err := req_json.Decode(&user_fields)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -150,7 +150,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = mail.ParseAddress(user_fields.Email)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -160,7 +160,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Phone number validator
 		if len(user_fields.PhoneNumber) < 11 || len(user_fields.PhoneNumber) > 13 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -170,7 +170,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// NIK validator
 		if len(user_fields.NIK) != 16 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -196,7 +196,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// If err is nil, therefore there is an user that already have this email
 		if err == nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "Email already in use, please use other email",
 			})
@@ -208,7 +208,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when inserting user
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -224,7 +224,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when inserting salary
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -234,7 +234,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("New user `%s` has been created", user.FullName)
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"status":  http.StatusOK,
 			"message": "Created",
 		})
@@ -262,7 +262,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "Invalid user id",
 			})
@@ -278,7 +278,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		err = req_json.Decode(&user_fields)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -291,7 +291,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = mail.ParseAddress(user_fields.Email)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -301,7 +301,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Phone number validator
 		if len(user_fields.PhoneNumber) < 11 || len(user_fields.PhoneNumber) > 13 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -311,7 +311,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// NIK validator
 		if len(user_fields.NIK) != 16 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "There is an invalid input field",
 			})
@@ -325,7 +325,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		// Ensure no error fetching user data
 		if err != nil {
 			if err == sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				json.NewEncoder(w).Encode(map[string]any{
 					"status":  http.StatusBadRequest,
 					"message": "Invalid user id",
 				})
@@ -333,7 +333,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -346,7 +346,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			models.User.GetUsingEmail(models.User{}, user_fields.Email)
 
 		if err == nil && result.Id != current_user.Id {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "Email already in use, please use other email",
 			})
@@ -358,7 +358,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		tx, err := db.Conn.Begin()
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -373,7 +373,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when fetching data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -396,7 +396,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when updating user
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -410,18 +410,18 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Ensure no error updating user credentials
 			if err != nil {
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				json.NewEncoder(w).Encode(map[string]any{
 					"status":  http.StatusInternalServerError,
 					"message": "Server error",
 				})
-	
+
 				return
 			}
 		}
 
 		// Ensure no error commiting to database
 		if err := tx.Commit(); err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -431,7 +431,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("User `%s` record has been updated\n", old_name)
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"status":  http.StatusOK,
 			"message": "Updated",
 		})
@@ -459,7 +459,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusBadRequest,
 				"message": "Bad request",
 			})
@@ -471,7 +471,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 			models.User.GetUsingId(models.User{}, id)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -483,7 +483,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when deleting data
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -493,7 +493,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("User", user.FullName, "deleted")
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"status":  http.StatusOK,
 			"message": "Deleted",
 		})
@@ -524,7 +524,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		// Ensure no error when getting user information
 		if err != nil {
 			if err == sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				json.NewEncoder(w).Encode(map[string]any{
 					"status":  http.StatusUnauthorized,
 					"message": "Invalid token value",
 				})
@@ -532,7 +532,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -544,7 +544,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			models.DepartmentHead.GetUsingDepartmentId(models.DepartmentHead{}, user.DepartmentId)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -564,7 +564,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			models.Department.GetUsingId(models.Department{}, user.DepartmentId)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"status":  http.StatusInternalServerError,
 				"message": "Server error",
 			})
@@ -587,9 +587,77 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			FirstLogin:  user.FirstLogin,
 		}
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"status": http.StatusOK,
 			"data":   response_data,
 		})
+	}
+}
+
+func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		valid_user, res := auths.UserMiddleware(w, r)
+
+		if !valid_user {
+			json.NewEncoder(w).Encode(res)
+
+			return
+		}
+
+		// Manager role validation
+		if res["as"] != "manager" {
+			w.WriteHeader(http.StatusForbidden)
+
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "Forbidden",
+			})
+
+			return
+		}
+
+		// Get token data
+		token := res["jwt_claims"].(jwt.MapClaims)
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		// Error handling
+		if err != nil || id <= 0 {
+			json.NewEncoder(w).Encode(map[string]any{
+				"status":  http.StatusBadRequest,
+				"message": "Bad request",
+			})
+		}
+
+		department, err := models.Department{}.GetUsingId(id)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusBadRequest)
+
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "Invalid department id",
+				})
+
+				return
+			}
+
+			log.Panic("Error fetching department occured", err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "Server error",
+			})
+
+			return
+		}
+
+		users, err := 
+			models.User{}.GetEmployees(department.Id, int(token["id"].(float64)))
 	}
 }

@@ -48,6 +48,7 @@ func initEndPoints() {
 	mux.HandleFunc("/api/department/create", apis.CreateDepartmentHandler)
 	mux.HandleFunc("/api/department/update/{id}", apis.UpdateDepartmentHandler)
 	mux.HandleFunc("/api/department/delete/{id}", apis.DeleteDepartmentHandler)
+	mux.HandleFunc("/api/department/{id}/users", apis.DeleteDepartmentHandler)
 
 	// Config endpoints
 	mux.HandleFunc("/api/configs", apis.GetConfigsHandler)
