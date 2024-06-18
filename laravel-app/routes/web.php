@@ -51,7 +51,8 @@ Route::group(['prefix' => '/admin'], function () {
     Route::post('/logout', [admin\LogoutController::class, 'logout'])
         ->name('admin.logout');
 
-    Route::get('/', [admin\LoginController::class, 'index']);
+    Route::get('/', function () {
+        return redirect(route('admin.users')); });
 
     // Users route
     Route::group(['prefix' => '/users'], function () {

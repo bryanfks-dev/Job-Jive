@@ -210,7 +210,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 		// Specify user position
 		as := "employee"
 
-		if user.Id == *department_head.ManagerId {
+		if department_head.ManagerId == &user.Id {
 			as = "manager"
 		}
 
