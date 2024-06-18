@@ -243,6 +243,13 @@ class UsersController extends Controller
                 ])->delete(BackendServer::url() . '/api/user/delete/' . $id);
 
             if ($response->successful()) {
+                // Delete user profile picture
+                $imgPath = '/public/img/user_profile/' . $response['data']['photo'];
+
+                if (\File::exists($imgPath)) {
+                    \File::delete($imgPath);
+                }
+
                 return redirect()->intended(route('admin.users'));
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('admin.login'));

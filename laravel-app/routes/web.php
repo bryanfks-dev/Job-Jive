@@ -17,7 +17,7 @@ Route::group(['prefix' => '/'], function () {
     Route::post('/logout', [user\LogoutController::class, 'logout'])
         ->name('user.logout');
 
-    // Dashboard route
+    // Dashboard / default route
     Route::get('/', [user\DashboardController::class, 'index'])
         ->name('user.dashboard');
 
@@ -40,6 +40,11 @@ Route::group(['prefix' => '/'], function () {
 
 // Admin routes
 Route::group(['prefix' => '/admin'], function () {
+    // Default route
+    Route::get('/', function () {
+        return redirect(route('admin.users'));
+    });
+
     // Login route
     Route::group(['prefix' => '/login'], function () {
         Route::get('/', [admin\LoginController::class, 'index'])
@@ -50,9 +55,6 @@ Route::group(['prefix' => '/admin'], function () {
 
     Route::post('/logout', [admin\LogoutController::class, 'logout'])
         ->name('admin.logout');
-
-    Route::get('/', function () {
-        return redirect(route('admin.users')); });
 
     // Users route
     Route::group(['prefix' => '/users'], function () {

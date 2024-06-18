@@ -166,10 +166,10 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
-	
+
 				return
 			}
-	
+
 			curr_date_time := time.Now().In(loc)
 
 			err = user.UpdateFistLogin(curr_date_time.Format(time.DateOnly))

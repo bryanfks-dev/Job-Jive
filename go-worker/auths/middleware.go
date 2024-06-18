@@ -18,14 +18,19 @@ type context_key string
 
 const (
 	TOKEN_KEY context_key = "token"
+
+	/* ENUM */
+	EMPLOYEE string = "Employee"
+	MANAGER  string = "Manager"
 )
 
 func AuthenticationMiddlware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set HTTP Header
+		w.Header().Set("Content-Type", "application/json")
+		
 		// Get authorization header
 		auth_header := r.Header.Get("Authorization")
-
-		w.Header().Set("Content-Type", "application/json")
 
 		login_routes := []string{"/auth/verify-token", "/auth/user/login", "/auth/admin/login"}
 		is_login_route := slices.Contains(login_routes, r.URL.Path)
@@ -130,16 +135,17 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 
 func UserMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set HTTP Header
+		w.Header().Set("Content-Type", "application/json")
+		
 		jwt_claims, ok :=
 			r.Context().Value(TOKEN_KEY).(jwt.MapClaims)
-
-		w.Header().Set("Content-Type", "application/json")
 
 		// Ensure token is available
 		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]any{
-				"error": "No token found in context",
+				"error": "no token found in context",
 			})
 
 			return
@@ -156,6 +162,57 @@ func UserMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Check if user is exist in database
+		_, err :=
+			models.User{}.GetUsingId(int(jwt_claims["id"].(float64)))
+
+		// Ensure no error when getting user data
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+
+				return
+			}
+
+			// Other errors
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		ctx :=
+			context.WithValue(r.Context(), TOKEN_KEY, jwt_claims)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func userRoleMiddleware(role string, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set HTTP Header
+		w.Header().Set("Content-Type", "application/json")
+
+		jwt_claims, ok :=
+			r.Context().Value(TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token is available
+		if !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "no token found in context",
+			})
+
+			return
+		}
+
+		// Check if user is exist in database
 		user, err :=
 			models.User{}.GetUsingId(int(jwt_claims["id"].(float64)))
 
@@ -164,7 +221,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusUnauthorized)
 				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid user id",
+					"error": "invalid user id",
 				})
 
 				return
@@ -190,7 +247,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusUnauthorized)
 				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid department id",
+					"error": "invalid department id",
 				})
 
 				return
@@ -207,34 +264,52 @@ func UserMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Specify user position
-		as := "employee"
+		// Decide whether user is manager or not
+		is_manager := false
 
-		if department_head.ManagerId == &user.Id {
-			as = "manager"
+		if department_head.ManagerId != nil {
+			if department_head.ManagerId == &user.Id {
+				is_manager = true
+			}
 		}
 
-		// Edit token value
-		jwt_claims["as"] = as
+		// User role is valid depends on middleware roles
+		if (is_manager && role == MANAGER) || (!is_manager && role == EMPLOYEE) {
+			ctx :=
+				context.WithValue(r.Context(), TOKEN_KEY, jwt_claims)
 
-		ctx :=
-			context.WithValue(r.Context(), TOKEN_KEY, jwt_claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
 
-		next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]any{
+			"error": "forbidden",
+		})
 	})
+}
+
+func EmployeeMiddleware(next http.Handler) http.Handler {
+	return userRoleMiddleware(EMPLOYEE, next)
+}
+
+func ManagerMiddleware(next http.Handler) http.Handler {
+	return userRoleMiddleware(MANAGER, next)
 }
 
 func AdminMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		jwt_claims, ok := r.Context().Value(context_key("token")).(jwt.MapClaims)
-
+		// Set HTTP Header
 		w.Header().Set("Content-Type", "application/json")
+
+		jwt_claims, ok := r.Context().Value(context_key("token")).(jwt.MapClaims)
 
 		// Ensure token is available
 		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]any{
-				"error": "No token found in context",
+				"error": "no token found in context",
 			})
 
 			return
@@ -259,7 +334,7 @@ func AdminMiddleware(next http.Handler) http.Handler {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusUnauthorized)
 				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid admin id",
+					"error": "invalid admin id",
 				})
 
 				return
