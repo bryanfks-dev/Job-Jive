@@ -31,11 +31,14 @@ Route::group(['prefix' => '/'], function () {
         return view('user.attendance');
     })->name('user.attendance');
 
-    Route::get('/employees', [user\UsersController::class, 'index'])
-        ->name('user.employees');
+    // Employees route
+    Route::group(['prefix' => '/employees'], function () {
+        Route::get('/', [user\UsersController::class, 'index'])
+            ->name('user.employees');
 
-    Route::get('/employees/update/{id}', [user\UsersController::class, 'edit'])
-        ->name('user.employees-edit');
+        Route::put('/update/{id}', [user\UsersController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('users.update-employee');
+    });
 
 });
 
