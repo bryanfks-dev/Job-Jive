@@ -449,6 +449,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": models.User{
 				Id: id,
+				Photo: user.Photo,
 			},
 		})
 	}
@@ -488,12 +489,22 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var response_data responses.UserResponse
+
+		err = response_data.Create(user)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "server error",
+			})
+
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": models.User{
-				Id:    user.Id,
-				Photo: user.Photo,
-			},
+			"data": response_data,
 		})
 	}
 }
