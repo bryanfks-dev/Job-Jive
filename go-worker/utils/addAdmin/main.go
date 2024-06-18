@@ -12,7 +12,7 @@ import (
 func main() {
 	// Check input arg length
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: addAdmin <username> <password>")
+		fmt.Println("Usage: ./addAdmin <username> <password>")
 		os.Exit(1)
 	}
 

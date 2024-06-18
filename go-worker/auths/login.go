@@ -187,7 +187,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		log.Println("user", user.FullName, "logged in")
+		log.Printf("user `%s` logged in", user.FullName)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
@@ -258,7 +258,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("Admin", login_cred.Username, "logged in")
+		log.Printf("Admin `%s` logged in", login_cred.Username)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
