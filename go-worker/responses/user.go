@@ -23,7 +23,7 @@ type UserResponse struct {
 
 func (user_response *UserResponse) Create(user models.User) error {
 	department, err :=
-		models.Department{}.GetUsingId(user.DepartmentId)
+		models.Department{}.GetUsingId(*user.DepartmentId)
 
 	// Ensure no error fetching department
 	if err != nil {
@@ -43,7 +43,7 @@ func (user_response *UserResponse) Create(user models.User) error {
 	}
 
 	department_head, err :=
-		models.DepartmentHead{}.GetUsingDepartmentId(user.DepartmentId)
+		models.DepartmentHead{}.GetUsingDepartmentId(*user.DepartmentId)
 
 	// Ensure no error get department_head
 	if err != nil {

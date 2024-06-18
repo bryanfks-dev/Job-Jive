@@ -153,7 +153,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			Address:      user_form.Address,
 			NIK:          user_form.NIK,
 			Gender:       user_form.Gender,
-			DepartmentId: user_form.DepartmentId,
+			DepartmentId: &user_form.DepartmentId,
 			Photo:        user_form.Photo,
 		}
 
@@ -328,7 +328,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		user.NIK = user_form.NIK
 		user.Gender = user_form.Gender
 		user.PhoneNumber = user_form.PhoneNumber
-		user.DepartmentId = user_form.DepartmentId
+		user.DepartmentId = &user_form.DepartmentId
 
 		// Try update user credentials
 		if strings.TrimSpace(user_form.NewPassword) != "" {

@@ -17,7 +17,7 @@ type User struct {
 	Photo        string  `json:"photo"`
 	Gender       string  `json:"gender"`
 	PhoneNumber  string  `json:"phone_number"`
-	DepartmentId int     `json:"department_id"`
+	DepartmentId *int     `json:"department_id"`
 	FirstLogin   *string `json:"first_login"`
 }
 

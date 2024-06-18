@@ -16,7 +16,9 @@ abstract class Controller
             $items->count(),
             $perPage,
             $page,
-            $options
+            [
+                'path' => \Request::url()
+            ]
         );
     }
 }

@@ -68,7 +68,6 @@
             <div class="mt-2">
                 <div class="py-5">
                     <form id="months-form" method="GET" action="">
-                        @csrf
                         <label for="month" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select
                             Month</label>
                         <select id="months-selector" name="month"
@@ -92,7 +91,8 @@
 
                 <!-- Pagination -->
                 <div class="p-4 mt-4">
-                    {{ $attendances['records']->withPath(url()->current())->links() }}
+                    {{ $attendances['records']->withPath(url()->current())
+                        ->appends(['month' => $old_month_id])->links() }}
                 </div>
             </div>
         </div>
