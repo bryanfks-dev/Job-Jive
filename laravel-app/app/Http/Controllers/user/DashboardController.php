@@ -5,6 +5,7 @@ namespace App\Http\Controllers\user;
 use App\Http\Controllers\Controller;
 use App\Models\BackendServer;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DashboardController extends Controller
 {
@@ -62,8 +63,12 @@ class DashboardController extends Controller
                 return abort(500);
             }
 
-            return abort(400);
+            return abort($responseTodayAttendance->status());
         } catch (\Exception $e) {
+            if ($e instanceof HttpException) {
+                return abort($responseTodayAttendance->status());
+            }
+
             return abort(500);
         }
     }

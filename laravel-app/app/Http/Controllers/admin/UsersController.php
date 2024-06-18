@@ -51,8 +51,12 @@ class UsersController extends Controller
                 return abort(500);
             }
 
-            return abort(400);
+            return abort($responseUser->status());
         } catch (\Exception $e) {
+            if ($e instanceof HttpException) {
+                return abort($responseUser->status());
+            }
+
             return abort(500);
         }
     }
@@ -144,7 +148,7 @@ class UsersController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -154,6 +158,10 @@ class UsersController extends Controller
     public function update(Request $request, int $id)
     {
         $id = intval($id);
+
+        if ($id <= 0) {
+            return abort(404);
+        }
 
         $validator = \Validator::make($request->all(), [
             'full_name' => ['required'],
@@ -223,7 +231,7 @@ class UsersController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -233,6 +241,10 @@ class UsersController extends Controller
     public function delete(Request $request, int $id)
     {
         $id = intval($id);
+
+        if ($id <= 0) {
+            return abort(404);
+        }
 
         try {
             $response =
@@ -258,7 +270,7 @@ class UsersController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);

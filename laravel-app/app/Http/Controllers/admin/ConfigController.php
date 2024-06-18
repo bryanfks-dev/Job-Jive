@@ -30,7 +30,7 @@ class ConfigController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -92,7 +92,7 @@ class ConfigController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);

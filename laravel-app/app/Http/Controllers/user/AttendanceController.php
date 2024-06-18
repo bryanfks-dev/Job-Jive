@@ -71,8 +71,12 @@ class AttendanceController extends Controller
                 return abort(500);
             }
 
-            return abort(400);
+            return abort($responseAttendance->status());
         } catch (\Exception $e) {
+            if ($e instanceof HttpException) {
+                return abort($responseAttendance->status());
+            }
+
             return abort(500);
         }
     }
@@ -99,7 +103,7 @@ class AttendanceController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);

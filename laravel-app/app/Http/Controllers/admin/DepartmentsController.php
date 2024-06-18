@@ -52,8 +52,12 @@ class DepartmentsController extends Controller
                 return abort(500);
             }
 
-            return abort(400);
+            return abort($responseDepartment->status());
         } catch (\Exception $e) {
+            if ($e instanceof HttpException) {
+                return abort($responseDepartment->status());
+            }
+
             return abort(500);
         }
     }
@@ -99,7 +103,7 @@ class DepartmentsController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -109,6 +113,10 @@ class DepartmentsController extends Controller
     public function update(Request $request, int $id)
     {
         $id = intval($id);
+
+        if ($id <= 0) {
+            return abort(404);
+        }
 
         $validator = \Validator::make($request->all(), [
             'manager_id' => ['required'],
@@ -150,7 +158,7 @@ class DepartmentsController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -162,7 +170,7 @@ class DepartmentsController extends Controller
         $id = intval($id);
 
         if ($id <= 0) {
-            return abort(400);
+            return abort(404);
         }
 
         try {
@@ -182,7 +190,7 @@ class DepartmentsController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);

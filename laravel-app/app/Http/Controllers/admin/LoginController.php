@@ -25,7 +25,7 @@ class LoginController extends Controller
             return abort($response->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
@@ -77,7 +77,7 @@ class LoginController extends Controller
                 ->withErrors(['error' => $response['error']]);
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                throw new HttpException($response->status());
+                return abort($response->status());
             }
 
             return abort(500);
