@@ -1,6 +1,9 @@
 package responses
 
-import "models"
+import (
+	"log"
+	"models"
+)
 
 type DepartmentResponse struct {
 	Id      int         `json:"id"`
@@ -14,6 +17,8 @@ func (department_response *DepartmentResponse) Create(department models.Departme
 
 	// Ensure no error get department_head
 	if err != nil {
+		log.Panic("Error get department_head: ", err.Error())
+
 		return err
 	}
 
@@ -26,6 +31,8 @@ func (department_response *DepartmentResponse) Create(department models.Departme
 
 		// Ensure no error fetching manager data
 		if err != nil {
+			log.Panic("Error get manager user: ", err.Error())
+
 			return err
 		}
 

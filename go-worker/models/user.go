@@ -214,12 +214,12 @@ func (user User) Delete() error {
 	return err
 }
 
+func (user User) Search(query string) ([]User, error) {
+	stmt := "SELECT u.* FROM `users` u LEFT JOIN `departments` d ON d.Department_ID = u.Department_ID WHERE CONCAT(u.Full_Name, '|', u.Email, '|', u.Phone_Number, '|', u.Date_of_Birth, '|', u.Gender, '|', d.Department_Name) REGEXP ?"
 
-func (user User) SearchByFullName(name string) ([]User, error) {
-	stmt := "SELECT * FROM `users` WHERE Full_Name LIKE %?%"
+	row, err := db.Conn.Query(stmt, query)
 
-	row, err := db.Conn.Query(stmt, "%"+name+"%")
-
+	// Ensure no error get user data
 	if err != nil {
 		return []User{}, err
 	}

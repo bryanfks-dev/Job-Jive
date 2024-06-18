@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"db"
 	"forms"
@@ -46,15 +47,13 @@ func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 			// Ensure no error create response
 			if err != nil {
 				if err == sql.ErrNoRows {
-					w.WriteHeader(http.StatusInternalServerError)
+					w.WriteHeader(http.StatusNotFound)
 					json.NewEncoder(w).Encode(map[string]any{
 						"error": "manager user not found",
 					})
 
 					return
 				}
-
-				log.Panic("Error create response: ", err.Error())
 
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
@@ -100,32 +99,31 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		department_form.Sanitize()
 
-		// Ensure the department name is unique
-		_, err =
-			models.Department{}.GetUsingDepartmentName(department_form.DepartmentName)
+		valid, err := department_form.ValidateCreate()
 
-		// Emsure no error fetching department data
-		if err != nil {
-			if err != sql.ErrNoRows {
-				log.Panic("Error get department using name", err.Error())
-
+		if !valid {
+			if err != forms.ErrDepartmentNameExist {
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
+
+				return
 			}
-		} else {
+
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]any{
-				"error": "department name exist, user other name",
+				"error": err.Error(),
 			})
+
+			return
 		}
 
 		tx, err := db.Conn.Begin()
 
 		// Ensure no error starting database transaction
 		if err != nil {
-			log.Panic("Error starting database transaction", err.Error())
+			log.Panic("Error starting database transaction: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -145,7 +143,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when inserting department
 		if err != nil {
-			log.Panic("Error insert department", err.Error())
+			log.Panic("Error insert department: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -155,6 +153,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Assign department id
 		department.Id = id
 
 		err =
@@ -165,7 +164,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error inserting department_head
 		if err != nil {
-			log.Panic("Error insert departmend_head", err.Error())
+			log.Panic("Error insert departmend_head: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -177,7 +176,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error commiting to database
 		if err := tx.Commit(); err != nil {
-			log.Panic("Error commiting to database", err.Error())
+			log.Panic("Error commiting to database: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -193,8 +192,6 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error create response
 		if err != nil {
-			log.Panic("Error create response", err.Error())
-
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
@@ -203,7 +200,7 @@ func CreateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("New department", department_form.DepartmentName, "has been created")
+		log.Printf("New department `%s` has been created", department_form.DepartmentName)
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(map[string]any{
@@ -225,9 +222,9 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(map[string]any{
-				"error": "bad request",
+				"error": "invalid department id",
 			})
 
 			return
@@ -254,6 +251,15 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error fetching department data
 		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid department id",
+				})
+
+				return
+			}
+
 			log.Panic("Error get department: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
@@ -264,12 +270,10 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		valid, err := department_form.Validate()
+		valid, err := department_form.ValidateUpdate()
 
 		if !valid {
 			if err != forms.ErrManagerIdExist {
-				log.Panic("Error validate department: ", err.Error())
-
 				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
@@ -332,7 +336,7 @@ func UpdateDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("Department %s record has been updated\n", department.Name)
+		log.Printf("Department `%s` record has been updated\n", department.Name)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
@@ -354,9 +358,9 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure user provide a valid record id
 		if err != nil || id <= 0 {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(map[string]any{
-				"error": "Bad request",
+				"error": "invalid department id",
 			})
 
 			return
@@ -367,6 +371,15 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when fetching department data
 		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid department id",
+				})
+
+				return
+			}
+
 			log.Panic("Error get department: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
@@ -391,14 +404,74 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("Department", department.Name, "deleted")
+		log.Printf("Department `%s` deleted", department.Name)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": map[string]any{
-				"id": id,
+			"data": models.Department{
+				Id: department.Id,
 			},
 		})
 	}
-	
+}
+
+func SearchDepartmentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		// Retrieve value from url
+		query := strings.TrimSpace(r.PathValue("query"))
+
+		departments, err := models.Department{}.Search(query)
+
+		// Ensure no error search department
+		if err != nil {
+			log.Panic("Error search department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		var response_data []responses.DepartmentResponse
+
+		for _, department := range departments {
+			var department_data responses.DepartmentResponse
+
+			err := department_data.Create(department)
+
+			// Ensure no error create response
+			if err != nil {
+				if err == sql.ErrNoRows {
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(map[string]any{
+						"error": "manager user not found",
+					})
+
+					return
+				}
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			response_data = append(response_data, department_data)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
 }

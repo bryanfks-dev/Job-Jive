@@ -16,7 +16,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-
 func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()

@@ -59,7 +59,7 @@ func (user_form UserForm) ValidateCreate() (bool, error) {
 		// Ignore no row found error, because
 		// the objective is finding an existing email
 		if err != sql.ErrNoRows {
-			log.Panic("Error get user", err.Error())
+			log.Panic("Error get user: ", err.Error())
 
 			return false, err
 		}
@@ -82,45 +82,46 @@ func (user_form UserForm) ValidateCreate() (bool, error) {
 }
 
 func (user_form UserForm) ValidateUpdate(user_id int) (bool, error) {
-    // Email validator
+	// Email validator
 	_, err := mail.ParseAddress(user_form.Email)
 
 	// Ensure no error parsing email address
 	// but, parsing error potentialy caused by
 	// invalid email address
 	if err != nil {
-		return false, ErrEmailExist
+		return false, ErrInvalidEmail
 	}
 
 	// Validate uniqueness
-	mail_user, err := models.User{}.GetUsingEmail(user_form.Email)
+	mail_user, err := 
+		models.User{}.GetUsingEmail(user_form.Email)
 
 	// Ensure no error get user using email
 	if err != nil {
 		// Ignore no row found error, because
 		// the objective is finding an existing email
 		if err != sql.ErrNoRows {
-			log.Panic("Error get user", err.Error())
+			log.Panic("Error get user: ", err.Error())
 
 			return false, err
 		}
 	}
 
-	if user_id != mail_user.Id {
-		log.Print("Email exist")
-		return false, ErrEmailExist
+	if user_form.Email == mail_user.Email {
+		if user_id != mail_user.Id {
+			return false, ErrEmailExist
+		}
 	}
 
-    // Phone number validator
-    if len(user_form.PhoneNumber) < 11 || len(user_form.PhoneNumber) > 13 {
-        return false, ErrInvalidPhoneNumber
-    }
+	// Phone number validator
+	if len(user_form.PhoneNumber) < 11 || len(user_form.PhoneNumber) > 13 {
+		return false, ErrInvalidPhoneNumber
+	}
 
-    // NIK validator
-    if len(user_form.NIK) != 16 {
-        return false, ErrInvalidNIK
-    }
+	// NIK validator
+	if len(user_form.NIK) != 16 {
+		return false, ErrInvalidNIK
+	}
 
-    return true, nil
+	return true, nil
 }
-

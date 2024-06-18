@@ -42,10 +42,10 @@ class AttendanceController extends Controller
                 }
             }
 
-            $attendances['records'] =
-                $this->paginate($attendances['records'] ?? [], 7);
-
             if ($responseAttendance->successful() && $responseConfig->successful()) {
+                $attendances['records'] =
+                    $this->paginate($attendances['records'] ?? [], 7);
+
                 return view('user.attendance', [
                     'old_month_id' => intval($request->get('month')),
                     'configs' => $responseConfig['data'],

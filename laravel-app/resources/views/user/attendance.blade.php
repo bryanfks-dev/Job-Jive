@@ -68,6 +68,7 @@
             <div class="mt-2">
                 <div class="py-5">
                     <form id="months-form" method="GET" action="">
+                        @csrf
                         <label for="month" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select
                             Month</label>
                         <select id="months-selector" name="month"
@@ -80,20 +81,13 @@
                     </form>
                 </div>
                 <div>
-                    @forelse ($attendances['records'] as $record)
+                    @foreach ($attendances['records'] as $record)
                         @if (date('Y-m-d') === $record['date'])
                             @include('partials.user.attendance.today-record')
                         @else
                             @include('partials.user.attendance.regular-record')
                         @endif
-                    @empty
-                        <div class="flex items-center justify-center h-60 col-span-3">
-                            <div class="text-center">
-                                <h2 class="text-2xl text-gray-600 dark:text-gray-400">No attendance found</h2>
-                                <p class="text-gray-500 dark:text-gray-400">Please add an attendance</p>
-                            </div>
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
 
                 <!-- Pagination -->
@@ -103,7 +97,7 @@
             </div>
         </div>
     </div>
-    @if (count($attendances['records']) > 0)
+    @if (isset($attendances['records'][0]['check_in_time']))
         {{-- Script stats handler --}}
         <script type="module">
             const today = {

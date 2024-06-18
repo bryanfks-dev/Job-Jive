@@ -1,8 +1,10 @@
 package responses
 
 import (
+	"configs"
 	"log"
 	"strconv"
+	"time"
 
 	"db"
 )
@@ -14,7 +16,7 @@ type AttendanceReponseWrapper struct {
 
 type AttendanceReponse struct {
 	Date     string  `json:"date"`
-	CheckIn  string  `json:"check_in_time"`
+	CheckIn  *string  `json:"check_in_time"`
 	CheckOut *string `json:"check_out_time"`
 }
 
@@ -23,10 +25,24 @@ type (
 	AttendanceResponseArray       []AttendanceReponse
 )
 
-func (attendace_response_array *AttendanceResponseArray) GetAttendaceUsingMonth(month int, user_id int) error {
-	stmt := `SELECT DATE(a1.Date_Time) Date, TIME(a1.Date_Time) Check_In, CASE WHEN a2.Type = "Check-Out" THEN TIME(a2.Date_Time) ELSE NULL END Check_Out FROM attendances a1 LEFT JOIN attendances a2 ON a1.User_ID = a2.User_ID AND DATE(a2.Date_Time) = DATE(a1.Date_Time) AND a2.Type = "Check-Out" WHERE a1.Type = "Check-In" AND a1.User_ID = ? AND MONTH(a1.Date_Time) = ? ORDER BY a1.Date_Time DESC`
+func (attendace_response_array *AttendanceResponseArray) GetAttendaceUsingMonth(curr_date time.Time, target_month int, user_id int) error {
+	var month_digit string
 
-	row, err := db.Conn.Query(stmt, user_id, month)
+	if target_month < 10 {
+		month_digit = "0" + strconv.Itoa(target_month)
+	} else {
+		month_digit = strconv.Itoa(target_month)
+	}
+
+	first_date :=
+		strconv.Itoa(curr_date.Year()) + "-" + month_digit + "-01"
+
+	curr_date_formatted := curr_date.Format(time.DateOnly)
+
+	stmt1 := "WITH RECURSIVE dateList AS (SELECT '" + first_date + "' AS Date UNION ALL (SELECT ADDDATE(Date, INTERVAL 1 DAY) FROM dateList WHERE Date < LEAST('" + curr_date_formatted + "', LAST_DAY('" + first_date + "'))))"
+	stmt2 := `SELECT d.Date, TIME(ci.Date_Time) Check_In, TIME(co.Date_Time) Check_Out FROM dateList d LEFT JOIN attendances ci ON DATE(ci.Date_Time) = d.Date AND ci.Type = "Check-In" AND ci.User_ID = ? LEFT JOIN attendances co ON DATE(co.Date_Time) = d.Date AND co.Type = "Check-Out" AND co.User_ID = ? ORDER BY d.Date DESC`
+
+	row, err := db.Conn.Query(stmt1+stmt2, user_id, user_id)
 
 	if err != nil {
 		return err
@@ -57,7 +73,7 @@ func (attendance_wrappers *AttendanceReponseWrapperArray) Create(months []int, u
 		curr_wrapper := &(*attendance_wrappers)[idx]
 
 		var attendance_responses AttendanceResponseArray
-		
+
 		err := attendance_responses.createRecord(month, user_id)
 
 		// Ensure no error create record
@@ -73,7 +89,15 @@ func (attendance_wrappers *AttendanceReponseWrapperArray) Create(months []int, u
 }
 
 func (attendance_responses_array *AttendanceResponseArray) createRecord(month int, user_id int) error {
-	err := (*attendance_responses_array).GetAttendaceUsingMonth(month, user_id)
+	tz, err := configs.Timezone{}.GetTimeZone()
+
+	if err != nil {
+		return err
+	}
+
+	curr_date := time.Now().In(tz)
+
+	err = (*attendance_responses_array).GetAttendaceUsingMonth(curr_date, month, user_id)
 
 	// Ensure no error get user attendance
 	if err != nil {

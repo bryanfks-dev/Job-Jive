@@ -54,7 +54,7 @@ func initEndPoints() {
 	mux.Handle("/api/user/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteUserHandler))))
-	mux.Handle("/api/user/search/{search}",
+	mux.Handle("/api/user/search/{query}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SearchUserHandler))))
 
@@ -71,6 +71,9 @@ func initEndPoints() {
 	mux.Handle("/api/department/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteDepartmentHandler))))
+	mux.Handle("/api/department/search/{query}",
+		auths.AuthenticationMiddlware(
+			auths.AdminMiddleware(http.HandlerFunc(apis.SearchDepartmentHandler))))
 
 	// Config endpoints
 	mux.Handle("/api/configs",
