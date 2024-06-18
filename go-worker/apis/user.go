@@ -448,7 +448,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": models.User{
-				Id: id,
+				Id:    id,
 				Photo: user.Photo,
 			},
 		})

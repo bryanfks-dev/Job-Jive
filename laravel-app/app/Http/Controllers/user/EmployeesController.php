@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\user;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\BackendServer;
+use App\Http\Controllers\Controller;
 
 class EmployeesController extends Controller
 {
@@ -13,11 +14,9 @@ class EmployeesController extends Controller
             $response = \Http::withHeaders([
                 'Authoration' => 'Bearer ' . session('token'),
                 'Accept' => 'application/json',
-            ])->get(BackendServer::url() . '/api/')
-        }   
-        catch(\Exception $e) {
+            ])->get(BackendServer::url() . '/api/');
+        } catch(\Exception $e) {
 
         }
-        
     }
 }
