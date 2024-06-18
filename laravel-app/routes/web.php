@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\user;
 use App\Http\Controllers\admin;
-use App\Http\Controllers\apiGet;
+use App\Http\Controllers\user;
 use Illuminate\Support\Facades\Route;
 
 // User routes
@@ -32,9 +31,8 @@ Route::group(['prefix' => '/'], function () {
         return view('user.attendance');
     })->name('user.attendance');
 
-    Route::get('/employees', function () {
-        return view('user.employees');
-    })->name('employees');
+    Route::get('/employees', [user\UsersController::class, 'index'])
+        ->name('employees');
 
 });
 

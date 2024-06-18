@@ -18,39 +18,34 @@ class UsersController extends Controller
     {
         try {
             $responseUser = [];
-
             if ($request->has('query')) {
-                $param = trim($request->get('query'), ' ');
+                $param = trim($request->get('query'));
 
                 if (! empty($param)) {
-                    $responseUser =
-                        Http::withHeaders([
-                            'Authorization' => 'Bearer '.$request->cookie('auth_token'),
-                            'Accept' => 'application/json',
-                        ])->get(BackendServer::url().'/api/user/search/'.$request->get('query'));
+                    $responseUser = Http::withHeaders([
+                        'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                        'Accept' => 'application/json',
+                    ])->get(BackendServer::url().'/api/user/search/'.$request->get('query'));
+
                 }
             } else {
-                $responseUser =
-                    Http::withHeaders([
-                        'Authorization' => 'Bearer '.$request->cookie('auth_token'),
-                        'Accept' => 'applications/json',
-                    ])->get(BackendServer::url().'/api/users');
+                $responseUser = Http::withHeaders([
+                    'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                    'Accept' => 'application/json',
+                ])->get(BackendServer::url().'/api/users');
             }
 
-            $responseDepartment =
-                Http::withHeaders([
-                    'Authorization' => 'Bearer '.$request->cookie('auth_token'),
-                    'Accept' => 'applications/json',
-                ])->get(BackendServer::url().'/api/departments');
+            $responseDepartment = Http::withHeaders([
+                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                'Accept' => 'application/json',
+            ])->get(BackendServer::url().'/api/departments');
 
             if ($responseDepartment->serverError() || $responseUser->serverError()) {
                 return abort(500);
             }
 
             if ($responseDepartment->successful() && $responseUser->successful()) {
-
-                $paginatedUsers =
-                    $this->paginate($responseUser['data'] ?? []);
+                $paginatedUsers = $this->paginate($responseUser['data'] ?? []);
 
                 return view('admin.users', [
                     'users' => $paginatedUsers,
@@ -63,8 +58,7 @@ class UsersController extends Controller
             return abort($responseUser->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                dd($e);
-                throw new HttpException($responseUser->status());
+                throw new HttpException($e->getStatusCode(), $e->getMessage());
             }
 
             return abort(500);
