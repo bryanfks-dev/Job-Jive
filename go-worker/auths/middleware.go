@@ -82,7 +82,8 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 		}
 
 		// Claims user id from token
-		extract_token, err := models.ClaimsToken(token)
+		extract_token, err := 
+			models.ClaimsToken(token)
 
 		// Ensure no error when claimming token
 		if err != nil {
@@ -275,6 +276,8 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 
 		// User role is valid depends on middleware roles
 		if (is_manager && role == MANAGER) || (!is_manager && role == EMPLOYEE) {
+			jwt_claims["as"] = role
+
 			ctx :=
 				context.WithValue(r.Context(), TOKEN_KEY, jwt_claims)
 

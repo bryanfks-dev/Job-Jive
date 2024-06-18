@@ -16,7 +16,7 @@ type AttendanceReponseWrapper struct {
 
 type AttendanceReponse struct {
 	Date     string  `json:"date"`
-	CheckIn  *string  `json:"check_in_time"`
+	CheckIn  *string `json:"check_in_time"`
 	CheckOut *string `json:"check_out_time"`
 }
 
@@ -24,6 +24,15 @@ type (
 	AttendanceReponseWrapperArray [3]AttendanceReponseWrapper
 	AttendanceResponseArray       []AttendanceReponse
 )
+
+func (attendance_response *AttendanceReponse) GetAttendanceOnDate(date string, user_id int) error {
+	stmt := "SELECT TIME(a1.Date_Time), TIME(a2.Date_Time) FROM `attendances` a1 LEFT JOIN `attendances` a2 ON DATE(a2.Date_Time) = DATE(a1.Date_Time) AND a2.User_ID = a1.User_ID AND a2.Type = 'Check-Out' WHERE a1.Type = 'Check-In' AND a1.User_ID = ? AND DATE(a1.Date_Time) = ?"
+
+	err := db.Conn.QueryRow(stmt, user_id, date).
+		Scan(&attendance_response.CheckIn, &attendance_response.CheckOut)
+
+	return err
+}
 
 func (attendace_response_array *AttendanceResponseArray) GetAttendaceUsingMonth(curr_date time.Time, target_month int, user_id int) error {
 	var month_digit string
@@ -40,7 +49,7 @@ func (attendace_response_array *AttendanceResponseArray) GetAttendaceUsingMonth(
 	curr_date_formatted := curr_date.Format(time.DateOnly)
 
 	stmt1 := "WITH RECURSIVE dateList AS (SELECT '" + first_date + "' AS Date UNION ALL (SELECT ADDDATE(Date, INTERVAL 1 DAY) FROM dateList WHERE Date < LEAST('" + curr_date_formatted + "', LAST_DAY('" + first_date + "'))))"
-	stmt2 := `SELECT d.Date, TIME(ci.Date_Time) Check_In, TIME(co.Date_Time) Check_Out FROM dateList d LEFT JOIN attendances ci ON DATE(ci.Date_Time) = d.Date AND ci.Type = "Check-In" AND ci.User_ID = ? LEFT JOIN attendances co ON DATE(co.Date_Time) = d.Date AND co.Type = "Check-Out" AND co.User_ID = ? ORDER BY d.Date DESC`
+	stmt2 := `SELECT d.Date, TIME(ci.Date_Time), TIME(co.Date_Time) FROM dateList d LEFT JOIN attendances ci ON DATE(ci.Date_Time) = d.Date AND ci.Type = "Check-In" AND ci.User_ID = ? LEFT JOIN attendances co ON DATE(co.Date_Time) = d.Date AND co.Type = "Check-Out" AND co.User_ID = ? ORDER BY d.Date DESC`
 
 	row, err := db.Conn.Query(stmt1+stmt2, user_id, user_id)
 

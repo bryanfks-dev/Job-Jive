@@ -4,6 +4,7 @@ import (
 	"configs"
 	"errors"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -16,7 +17,12 @@ var (
 	ErrTimeNotSync = errors.New("client and server time are not sync")
 )
 
-func (attend_form AttendForm) Validate() (bool, error) {
+func (attend_form *AttendForm) Sanitize() {
+	attend_form.Date = strings.TrimSpace(attend_form.Date)
+	attend_form.Time = strings.TrimSpace(attend_form.Time)
+}
+
+func (attend_form *AttendForm) Validate() (bool, error) {
 	// Try to parse datetime
 	loc, err := configs.Timezone{}.GetTimeZone()
 

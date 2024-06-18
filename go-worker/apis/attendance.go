@@ -16,6 +16,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const (
+	CHECK_IN  = "Check-In"
+	CHECK_OUT = "Check-Out"
+)
+
 func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()
@@ -63,7 +68,7 @@ func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetUserTodayLatestAttendanceHandler(w http.ResponseWriter, r *http.Request) {
+func GetUserAttendanceTodayHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()
 		defer postMu.Unlock()
@@ -85,15 +90,16 @@ func GetUserTodayLatestAttendanceHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		curr_date_time := time.Now().In(loc)
+		curr_date_time := time.Now().In(loc).Format(time.DateOnly)
 
-		attendance, err :=
-			models.Attendance{}.GetTodayLatestAttendance(
-				curr_date_time.Format(time.DateOnly), int(token["id"].(float64)))
+		var response_data responses.AttendanceReponse
+
+		err = response_data.GetAttendanceOnDate(
+			curr_date_time, int(token["id"].(float64)))
 
 		// Ensure no error get user today latest attendance
 		if err != nil && err != sql.ErrNoRows {
-			log.Panic("Error get user latest attendance: ", err.Error())
+			log.Panic("Error get user today attendance: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -103,9 +109,11 @@ func GetUserTodayLatestAttendanceHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
+		response_data.Date = curr_date_time
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": attendance,
+			"data": response_data,
 		})
 	}
 }
@@ -136,6 +144,8 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		attend_form.Sanitize()
+
 		valid, err := attend_form.Validate()
 
 		if !valid {
@@ -158,6 +168,33 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		user_id := int(token["id"].(float64))
 
+		var response_data responses.AttendanceReponse
+
+		err =
+			response_data.GetAttendanceOnDate(attend_form.Date, user_id)
+
+		// Ensure no error get attendance on date
+		if err != nil && err != sql.ErrNoRows {
+			log.Panic("Error get user today attendance: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Check whether new attendance is valid
+		if response_data.CheckIn != nil && response_data.CheckOut != nil {
+			w.WriteHeader(http.StatusAlreadyReported)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "already reported",
+			})
+
+			return
+		}
+
 		user, err :=
 			models.User{}.GetUsingId(user_id)
 
@@ -174,15 +211,67 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Decide whether attendance type is check-in or check-out
-		check_type := "Check-In"
+		check_type := CHECK_IN
 
-		last_check, err :=
-			models.Attendance{}.GetTodayLatestAttendance(attend_form.Date, user_id)
+		if response_data.CheckIn != nil && response_data.CheckOut == nil {
+			check_type = CHECK_OUT
 
-		if err != sql.ErrNoRows && last_check.Type == "Check-In" {
-			check_type = "Check-Out"
+			// Validate user check out record
+			configs, err := models.ConfigJson{}.LoadConfig()
+
+			if err != nil {
+				log.Panic("Error load config json: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			min_check_out_time, err :=
+				time.Parse(time.TimeOnly, configs.CheckOutTime)
+
+			// Ensure no error parsing min check out time
+			if err != nil {
+				log.Panic("Error parse time: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			user_check_out_time, err :=
+				time.Parse(time.TimeOnly, attend_form.Time)
+
+			// Ensure no error parsing user check out time
+			if err != nil {
+				log.Panic("Error parse time: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			if min_check_out_time.After(user_check_out_time) {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "user attend too early",
+				})
+
+				return
+			}
 		}
 
+		// Do update hour code
+		
 		attendance := models.Attendance{
 			UserId:    user_id,
 			Date_Time: attend_form.Date + " " + attend_form.Time,
@@ -203,11 +292,48 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		response_data.Date = attend_form.Date
+		response_data.CheckOut = &attend_form.Time
+
 		log.Printf("User `%s` just %s", user.FullName, check_type)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": attendance,
+		})
+	}
+}
+
+func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		user_id := int(token["id"].(float64))
+
+		stats, err :=
+			models.AttendanceStats{}.GetUsingUserId(user_id)
+
+		// Ensure no error get attendance stats
+		if err != nil {
+			log.Panic("Error get attendance stats: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": stats,
 		})
 	}
 }

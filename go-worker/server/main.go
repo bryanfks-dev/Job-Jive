@@ -37,9 +37,12 @@ func initEndPoints() {
 	mux.Handle("/api/user/attendance",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceHandler))))
-	mux.Handle("/api/user/attendance/today/latest",
+	mux.Handle("/api/user/attendance/today",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.GetUserTodayLatestAttendanceHandler))))
+			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceTodayHandler))))
+	mux.Handle("/api/user/attendance/stats",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceStatsHandler))))
 
 	// Employees endpoints
 	mux.Handle("/api/users",

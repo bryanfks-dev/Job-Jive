@@ -192,6 +192,36 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		configs, err := 
+			models.ConfigJson{}.LoadConfig()
+
+		// Ensure no error load conifg json file
+		if err != nil {
+			log.Panic("Error load config json: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		err = 
+			models.AttendanceStats{}.Insert(id, configs.AbsenceQuota)
+
+		// Ensure no error insert attendance stats
+		if err != nil {
+			log.Panic("Error insert attendance stats: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
 		if err := tx.Commit(); err != nil {
 			log.Panic("Error committing to database: ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
