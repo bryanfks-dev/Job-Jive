@@ -3,6 +3,30 @@
 @section('content')
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         @include('partials.user.dashboard.attendance-checker')
+        <div class="border bg-white rounded-lg shadow-sm p-4 mb-4 mt-4 md:p-9 text-gray-900">
+    <figure class="max-w-screen-md mx-auto text-center">
+        <svg class="w-10 h-10 mx-auto mb-3 text-gray-400 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 14">
+            <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z"/>
+        </svg>
+        <blockquote>
+            <p class="text-2xl italic font-semibold text-gray-900 dark:text-white">"Your dedication to being on time is truly inspiring. Keep it up!"</p>
+        </blockquote>
+        <figcaption class="flex items-center justify-center mt-6 space-x-2">
+            <cite class="font-medium text-gray-900 dark:text-white">Powered by</cite>
+            <cite class="text-sm text-gray-500 dark:text-gray-400">Gemini</cite>
+            <svg class="w-4 h-4 text-blue-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)"/>
+                <defs>
+                    <radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)">
+                        <stop offset=".067" stop-color="#9168C0"/>
+                        <stop offset=".343" stop-color="#5684D1"/>
+                        <stop offset=".672" stop-color="#1BA1E3"/>
+                    </radialGradient>
+                </defs>
+            </svg>
+        </figcaption>
+    </figure>
+</div>
         <div class="rounded-lg dark:border-gray-600 h-full md:h-full">
             <div class="w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
                 <div class="flex justify-between items-start w-full">
