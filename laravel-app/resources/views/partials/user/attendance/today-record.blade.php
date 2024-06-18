@@ -97,7 +97,7 @@
             }
 
             target.textContent =
-                (diff === 0) ? 'Less than a minute ago' : `${diff.time} ${diff.unit} ago`;
+                (diff.time === 0) ? 'Less than a minute ago' : `${diff.time} ${diff.unit} ago`;
         }
 
         (function init() {

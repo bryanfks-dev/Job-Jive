@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
 	"responses"
 	"time"
@@ -215,9 +216,11 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		if response_data.CheckIn != nil && response_data.CheckOut == nil {
 			check_type = CHECK_OUT
+		}
 
+		if check_type == CHECK_OUT {
 			// Validate user check out record
-			configs, err := models.ConfigJson{}.LoadConfig()
+			config, err := models.ConfigJson{}.LoadConfig()
 
 			if err != nil {
 				log.Panic("Error load config json: ", err.Error())
@@ -231,7 +234,7 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			min_check_out_time, err :=
-				time.Parse(time.TimeOnly, configs.CheckOutTime)
+				time.Parse(time.TimeOnly, config.CheckOutTime+":00")
 
 			// Ensure no error parsing min check out time
 			if err != nil {
@@ -268,10 +271,55 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 
 				return
 			}
+
+			loc, err := configs.Timezone{}.GetTimeZone()
+
+			// Ensure no error get timezone location
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			now := time.Now().In(loc)
+
+			check_in_time, err :=
+				time.Parse(time.DateTime, attend_form.Date+" "+attend_form.Time)
+
+			// Ensure no error parse time
+			if err != nil {
+				log.Panic("Error parse time: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			err =
+				models.AttendanceStats{}.
+					UpdateHours(user_id,
+						int(math.Min(
+							float64(now.Hour()-check_in_time.Hour()), float64(config.DailyWorkHours))))
+
+			// Ensure no error update attendance stats
+			if err != nil {
+				log.Panic("Error update attendance stats: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
 		}
 
-		// Do update hour code
-		
 		attendance := models.Attendance{
 			UserId:    user_id,
 			Date_Time: attend_form.Date + " " + attend_form.Time,

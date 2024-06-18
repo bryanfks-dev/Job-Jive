@@ -12,17 +12,19 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         try {
+            $httpHeaders = [
+                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                'Accept' => 'application/json'
+            ];
+
             $responseAttendance =
-                \Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
-                    'Accept' => 'application/json'
-                ])->get(BackendServer::url() . '/api/user/attendance');
+                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/user/attendance');
 
             $responseConfig =
-                \Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
-                    'Accept' => 'applicaton/json'
-                ])->get(BackendServer::url() . '/api/configs');
+                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/configs');
+
+            $responseAttendenceStats =
+                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/user/attendance/stats');
 
             $attendances = $responseAttendance['data'][0];
 
@@ -47,8 +49,9 @@ class AttendanceController extends Controller
                     $this->paginate($attendances['records'] ?? [], 7);
 
                 return view('user.attendance', [
-                    'old_month_id' => intval($request->get('month')),
                     'configs' => $responseConfig['data'],
+                    'attendance_stats' => $responseAttendenceStats['data'],
+                    'old_month_id' => intval($request->get('month')),
                     'months' =>
                         array_map(function ($v) {
                             return [
@@ -59,6 +62,7 @@ class AttendanceController extends Controller
                                 )
                             ];
                         }, $responseAttendance['data']),
+                    'check_in_time' => $responseAttendance['data'][0]['records'][0]['check_in_time'],
                     'attendances' => $attendances
                 ]);
             } else if ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
