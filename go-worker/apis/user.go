@@ -449,6 +449,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": models.User{
 				Id: id,
+				Photo: user.Photo,
 			},
 		})
 	}
@@ -488,12 +489,22 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var response_data responses.UserResponse
+
+		err = response_data.Create(user)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "server error",
+			})
+
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": models.User{
-				Id:    user.Id,
-				Photo: user.Photo,
-			},
+			"data": response_data,
 		})
 	}
 }
@@ -547,73 +558,5 @@ func SearchUserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,
 		})
-	}
-}
-
-func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		postMu.Lock()
-		defer postMu.Unlock()
-
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
-
-		valid_user, res := auths.UserMiddleware(w, r)
-
-		if !valid_user {
-			json.NewEncoder(w).Encode(res)
-
-			return
-		}
-
-		// Manager role validation
-		if res["as"] != "manager" {
-			w.WriteHeader(http.StatusForbidden)
-
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "Forbidden",
-			})
-
-			return
-		}
-
-		// Get token data
-		token := res["jwt_claims"].(jwt.MapClaims)
-		id, err := strconv.Atoi(r.PathValue("id"))
-
-		// Error handling
-		if err != nil || id <= 0 {
-			json.NewEncoder(w).Encode(map[string]any{
-				"status":  http.StatusBadRequest,
-				"message": "Bad request",
-			})
-		}
-
-		department, err := models.Department{}.GetUsingId(id)
-
-		if err != nil {
-			if err == sql.ErrNoRows {
-				w.WriteHeader(http.StatusBadRequest)
-
-				json.NewEncoder(w).Encode(map[string]any{
-					"error": "Invalid department id",
-				})
-
-				return
-			}
-
-			log.Panic("Error fetching department occured", err)
-
-			w.WriteHeader(http.StatusInternalServerError)
-
-			json.NewEncoder(w).Encode(map[string]any{
-				"error": "Server error",
-			})
-
-			return
-		}
-
-		users, err := 
-			models.User{}.GetEmployees(department.Id, int(token["id"].(float64)))
 	}
 }
