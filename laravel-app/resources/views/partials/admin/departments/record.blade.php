@@ -6,10 +6,10 @@
         {{ $department['name'] }}
     </td>
     <td class="px-6 py-4">
-        @if (empty($department['manager_name']))
+        @if (empty($department['manager']['full_name']))
             -
         @else
-            {{ $department['manager_name'] }}
+            {{ $department['manager']['full_name'] }}
         @endif
     </td>
     <td class="flex px-6 py-4 justify-end items-center gap-2">

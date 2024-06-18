@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\user;
 use App\Http\Controllers\admin;
-use App\Http\Controllers\apiGet;
 use Illuminate\Support\Facades\Route;
 
 // User routes
@@ -19,18 +18,24 @@ Route::group(['prefix' => '/'], function () {
         ->name('user.logout');
 
     // Dashboard route
-    Route::get('/', function () {
-        return view('user.dashboard');
-    })->name('user.dashboard');
+    Route::get('/', [user\DashboardController::class, 'index'])
+        ->name('user.dashboard');
+
+    Route::post('/attend', [user\AttendanceController::class, 'attend'])
+        ->name('user.attend');
 
     // Profile route
     Route::get('/profile', [user\ProfileController::class, 'index'])
         ->name('user.profile');
 
     // Attendances route
-    Route::get('/attendance', function () {
-        return view('user.attendance');
-    })->name('user.attendance');
+    Route::get('/attendance', [user\AttendanceController::class, 'index'])
+        ->name('user.attendance');
+
+    Route::get('/employees', function () {
+        return view('user.employees');
+    })->name('employees');
+
 });
 
 // Admin routes
@@ -87,10 +92,6 @@ Route::group(['prefix' => '/admin'], function () {
             ->name('admin.configs.save');
     });
 });
-
-Route::get('/employees', function () {
-    return view('user.employees');
-})->name('employees');
 
 Route::get('/employees/view', function () {
     return view('user.view');

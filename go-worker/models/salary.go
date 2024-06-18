@@ -3,16 +3,27 @@ package models
 import "db"
 
 type Salary struct {
-	UserId        int     `json:"user_id"`
-	InitialSalary  float64 `json:"initial_salary"`
-	CurrentSalary float64 `json:"current_salary"`
+	UserId  int     `json:"-"`
+	Initial float64 `json:"initial"`
+	Current float64 `json:"current"`
+}
+
+func (salary Salary) GetUsingUserId(user_id int) (Salary, error) {
+	stmt := "SELECT * FROM `salaries` WHERE User_ID = ?"
+
+	err := db.Conn.QueryRow(stmt, user_id).
+		Scan(&salary.UserId,
+			&salary.Initial,
+			&salary.Current)
+
+	return salary, err
 }
 
 func (salary Salary) Insert() error {
 	stmt := "INSERT INTO `salaries` (User_ID, Initial_Salary, Current_Salary) VALUES(?, ?, ?)"
 
-	_, err := 
-		db.Conn.Exec(stmt, salary.UserId, salary.InitialSalary, salary.CurrentSalary)
+	_, err :=
+		db.Conn.Exec(stmt, salary.UserId, salary.Initial, salary.Current)
 
 	return err
 }

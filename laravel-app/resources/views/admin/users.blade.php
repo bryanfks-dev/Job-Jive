@@ -15,7 +15,6 @@
 
             {{-- Search bar --}}
             <form class="flex items-center max-w-sm" method="GET">
-                @csrf
                 <label for="simple-search" class="sr-only">Search</label>
                 <div class="relative w-full">
                     <input type="text" id="simple-search"

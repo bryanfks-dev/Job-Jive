@@ -6,11 +6,11 @@ import (
 )
 
 type ConfigJson struct {
-	CheckInTime    string `json:"check_in_time"`
-	CheckOutTime   string `json:"check_out_time"`
-	AbsenceQuota   int    `json:"absence_quota"`
-	DailyWorkHours int    `json:"daily_work_hours"`
-	WeekyWorkHours int    `json:"weekly_work_hours"`
+	CheckInTime     string `json:"check_in_time"`
+	CheckOutTime    string `json:"check_out_time"`
+	AbsenceQuota    int    `json:"absence_quota"`
+	DailyWorkHours  int    `json:"daily_work_hours"`
+	WeeklyWorkHours int    `json:"weekly_work_hours"`
 }
 
 var (
@@ -29,7 +29,8 @@ func (config_json ConfigJson) LoadConfig() (ConfigJson, error) {
 
 			defer file.Close()
 
-			err = ConfigJson.WriteFile(ConfigJson{})
+			// Create file
+			err = ConfigJson{}.WriteFile()
 
 			// Ensure no error writting file
 			if err != nil {
@@ -40,14 +41,14 @@ func (config_json ConfigJson) LoadConfig() (ConfigJson, error) {
 		}
 	}
 
-	plan, err := os.ReadFile(json_path)
+	plain_text, err := os.ReadFile(json_path)
 
 	// Ensure no error when openning config file
 	if err != nil {
 		return ConfigJson{}, err
 	}
 
-	err = json.Unmarshal(plan, &config_json)
+	err = json.Unmarshal(plain_text, &config_json)
 
 	return config_json, err
 }

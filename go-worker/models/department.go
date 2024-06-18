@@ -101,3 +101,30 @@ func (department Department) Delete() error {
 
 	return err
 }
+
+func (department Department) Search(query string) ([]Department, error) {
+	stmt := "SELECT d.* FROM `department_heads` dh LEFT JOIN `departments` d ON d.Department_ID = dh.Department_ID LEFT JOIN `users` u ON u.User_ID = dh.Manager_ID WHERE CONCAT(COALESCE(u.Full_Name, ''), '|', d.Department_Name) REGEXP ?"
+
+	row, err := db.Conn.Query(stmt, query)
+
+	// Ensure no error get department
+	if err != nil {
+		return []Department{}, err
+	}
+
+	defer row.Close()
+
+	var departments []Department
+
+	for row.Next() {
+		err := row.Scan(&department.Id, &department.Name)
+
+		if err != nil {
+			return []Department{}, err
+		}
+
+		departments = append(departments, department)
+	}
+
+	return departments, nil
+}

@@ -11,7 +11,6 @@ import (
 	"configs"
 	"models"
 
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,12 +26,26 @@ type AdminCred struct {
 }
 
 var (
-	postMu sync.Mutex
+	postMu             sync.Mutex
+	_token_expire_time = map[bool]int{
+		true:  30,
+		false: 6,
+	}
 )
+
+func VerifyToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func verifyPassword(hashed_pwd string, cred_pwd string) error {
 	// Comparing hashed password from database and login credential
-	err := bcrypt.CompareHashAndPassword([]byte(hashed_pwd), []byte(cred_pwd))
+	err :=
+		bcrypt.CompareHashAndPassword([]byte(hashed_pwd), []byte(cred_pwd))
 
 	// Not nil value in err possibly cause of hash and password
 	// values are not match, otherwise, means hash and password
@@ -42,7 +55,7 @@ func verifyPassword(hashed_pwd string, cred_pwd string) error {
 
 func verifyUser(cred UserCred) (models.User, error) {
 	user, err :=
-		models.User.GetUsingEmail(models.User{}, cred.Email)
+		models.User{}.GetUsingEmail(cred.Email)
 
 	// Ensure user is exist
 	if err != nil {
@@ -62,7 +75,7 @@ func verifyUser(cred UserCred) (models.User, error) {
 
 func verifyAdmin(cred AdminCred) (models.Admin, error) {
 	admin, err :=
-		models.Admin.GetUsingUsername(models.Admin{}, cred.Username)
+		models.Admin{}.GetUsingUsername(cred.Username)
 
 	// Ensure admin is exist
 	if err != nil {
@@ -80,58 +93,6 @@ func verifyAdmin(cred AdminCred) (models.Admin, error) {
 	return admin, nil
 }
 
-func getTimezone() string {
-	// Load .env
-	err := godotenv.Load()
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	jwt := configs.Timezone.Get(configs.Timezone{})
-
-	return string(jwt.Zone)
-}
-
-func VerifyLoginToken(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		postMu.Lock()
-		defer postMu.Unlock()
-
-		// Set HTTP header
-		w.Header().Set("Content-Type", "application/json")
-
-		valid_user, _ := UserMiddleware(r)
-
-		if valid_user {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-				"role":    "user",
-			})
-
-			return
-		}
-
-		valid_admin, _ := AdminMiddleware(r)
-
-		if valid_admin {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-				"role":    "admin",
-			})
-
-			return
-		}
-
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Ok",
-		})
-	}
-}
-
 func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		postMu.Lock()
@@ -139,28 +100,6 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
-
-		valid_user, _ := UserMiddleware(r)
-
-		if valid_user {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
-
-		valid_admin, _ := AdminMiddleware(r)
-
-		if valid_admin {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
 
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
@@ -170,9 +109,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		err := req_json.Decode(&login_cred)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusBadRequest,
-				"message": "Bad request",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
@@ -183,33 +122,35 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// Incorrect password or user not found
 			if err == bcrypt.ErrMismatchedHashAndPassword || err == sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusUnauthorized,
-					"message": "Invalid credential",
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid credential",
 				})
 
 				return
 			}
 
-			log.Println(err.Error())
+			log.Panic("Error get user: ", err.Error())
 
-			// Other errors
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
 		// Generate jwt token
-		token, err := models.CreateToken(user.Id, "user")
+		token, err :=
+			models.CreateToken(user.Id, "user", _token_expire_time[login_cred.Remember])
 
 		// Ensure jwt token generated
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Could not generate token",
+			log.Panic("Error generate token: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "Could not generate token",
 			})
 
 			return
@@ -217,35 +158,29 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Update user first login if first login date haven't made
 		if user.FirstLogin == nil {
-			// BUG: user first login cannot be updated
-			zone := getTimezone()
+			loc, err := configs.Timezone{}.GetTimeZone()
 
-			tz, err := time.LoadLocation(zone)
-
-			// Ensure no error getting timezone
+			// Ensure no error get timezone location
 			if err != nil {
-				log.Println("Could not get provided timezone")
-
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusInternalServerError,
-					"message": "Server error",
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
 				})
-
+	
 				return
 			}
+	
+			curr_date_time := time.Now().In(loc)
 
-			// Get current time within current timezone
-			curr_date := time.Now().In(tz).String()
-
-			log.Println(curr_date)
-
-			err = user.UpdateFistLogin(curr_date)
+			err = user.UpdateFistLogin(curr_date_time.Format(time.DateOnly))
 
 			// Ensure no error updating user
 			if err != nil {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusInternalServerError,
-					"message": "Server error",
+				log.Panic("Error update first_login user: ", err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
 				})
 
 				return
@@ -254,10 +189,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("user", user.FullName, "logged in")
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Login success",
-			"token":   token,
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"token": token,
 		})
 	}
 }
@@ -270,28 +204,6 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		valid_admin, _ := AdminMiddleware(r)
-
-		if valid_admin {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
-
-		valid_user, _ := UserMiddleware(r)
-
-		if valid_user {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusForbidden,
-				"message": "Forbidden",
-			})
-
-			return
-		}
-
 		// Decode json to struct
 		req_json := json.NewDecoder(r.Body)
 
@@ -300,9 +212,9 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		err := req_json.Decode(&login_cred)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusUnauthorized,
-				"message": "Invalid credential",
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
 			})
 
 			return
@@ -313,33 +225,34 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// Incorrect password or user not found
 			if err == bcrypt.ErrMismatchedHashAndPassword || err == sql.ErrNoRows {
-				json.NewEncoder(w).Encode(map[string]interface{}{
-					"status":  http.StatusUnauthorized,
-					"message": "Invalid credential",
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid credential",
 				})
 
 				return
 			}
 
-			log.Println(err.Error())
+			log.Panic("Error get admin", err.Error())
 
-			// Other errors
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Server error",
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
 		}
 
 		// Generate jwt token
-		token, err := models.CreateToken(admin.Id, "admin")
+		token, err := models.CreateToken(admin.Id, "admin", 1)
 
 		// Ensure jwt token generated
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status":  http.StatusInternalServerError,
-				"message": "Could not generate token",
+			log.Panic("Error generate token", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
 			})
 
 			return
@@ -347,10 +260,9 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("Admin", login_cred.Username, "logged in")
 
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  http.StatusOK,
-			"message": "Login success",
-			"token":   token,
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"token": token,
 		})
 	}
 }

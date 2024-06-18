@@ -1,15 +1,15 @@
 package db
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
 	Conn *sql.DB
-	err error
+	err  error
 )
 
 func Connect(user string, password string, host string, port string, db_name string) error {
