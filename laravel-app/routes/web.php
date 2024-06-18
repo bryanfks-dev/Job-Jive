@@ -92,7 +92,7 @@ Route::group(['prefix' => '/admin'], function () {
 });
 
 Route::get('/employees/view', function () {
-    return view('user.view');
+    return view('view');
 })->name('view');
 
 Route::get('/sandbox', function () {

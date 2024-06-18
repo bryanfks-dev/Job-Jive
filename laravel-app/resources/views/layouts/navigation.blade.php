@@ -40,8 +40,7 @@
                 <div class="z-40 hidden w-56 my-4 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
                     id="dropdown">
                     <div class="px-4 py-3">
-                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{
-                            $users[0]['full_name'] }}</span>
+                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Aldo </span>
                         <span class="block text-sm text-gray-900 truncate dark:text-white">Manager</span>
                     </div>
                     <ul class="py-1 text-gray-700 dark:text-gray-300" aria-labelledby="dropdown">
