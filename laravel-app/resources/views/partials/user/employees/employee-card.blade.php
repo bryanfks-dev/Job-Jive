@@ -29,8 +29,8 @@
         </a>
     </div>
     <div class="flex flex-col items-center justify-center pb-10">
-        <img class="object-cover w-24 h-24 mb-3 rounded-full shadow-lg" src="{{ url('storage/img/user_profile/' . $user['photo'])  }}"
-                    alt="Chinese man image" />
+        <img class="object-cover w-24 h-24 mb-3 rounded-full shadow-lg"
+            src="{{ url('storage/img/user_profile/' . $user['photo'])  }}" alt="Chinese man image" />
         <span
             class="mb-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800">Employee</span>
         <h5 class="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">{{ $user['full_name'] }}</h5>
@@ -67,9 +67,10 @@
 
         <div class="flex mt-4 md:mt-6">
             <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer ms-2 focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                data-modal-target="update-modal" data-modal-toggle="update-modal">Edit</div>
+                data-modal-target="update-modal-{{ $user['id'] }}" data-modal-toggle="update-modal-{{ $user['id'] }}">
+                Edit</div>
         </div>
 
-        {{-- @include("partials.admin.users.update-modal") --}}
+        @include("partials.user.employees.update-modal")
     </div>
 </div>

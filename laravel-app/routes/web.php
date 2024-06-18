@@ -32,7 +32,10 @@ Route::group(['prefix' => '/'], function () {
     })->name('user.attendance');
 
     Route::get('/employees', [user\UsersController::class, 'index'])
-        ->name('employees');
+        ->name('user.employees');
+
+    Route::get('/employees/update/{id}', [user\UsersController::class, 'edit'])
+        ->name('user.employees-edit');
 
 });
 

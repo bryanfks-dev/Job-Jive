@@ -9,10 +9,10 @@
         </div>
         <div class="flex flex-col items-center w-full pb-10">
             <img class="object-cover w-24 h-24 mb-3 rounded-full shadow-lg"
-                src="{{ url('storage/img/user_profile/' . $users[0]['photo'])  }}" alt="Chinese man image" />
+                src="{{ url('storage/img/user_profile/' . $manager['photo'] )  }}" alt="Chinese man image" />
             <span
                 class="mb-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Manager</span>
-            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $users[0]['full_name'] }}</h5>
+            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $manager['full_name'] }}</h5>
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-500" width="1.2em" height="1.2em"
                 viewBox="0 0 24 24">
                 <path
@@ -20,7 +20,7 @@
             </svg>
             <span class="text-sm text-gray-500 dark:text-gray-400 text-wrap">
 
-                <a href="mailto: {{ $users[0]['email'] }}">{{ $users[0]['email'] }}</a>
+                <a href="mailto: {{ $manager['email'] }}">{{ $manager['email'] }}</a>
 
             </span>
         </div>
@@ -30,7 +30,7 @@
         style="grid-column: span 3; background-image: url('https://images.unsplash.com/photo-1523841589119-b55aee0f66e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); background-size: cover;">
         <div class="flex flex-col justify-between p-4 leading-normal">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{
-                $users[0]['department']['name'] }} Department</h5>
+                $manager['department']['name'] }} Department</h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">PT. Sri Rejeki
             </p>
         </div>
@@ -65,8 +65,9 @@
 
     {{-- @endif --}}
 
-    @forelse ($users->skip(1) as $user)
+    @forelse ($users as $user)
     @include('partials.user.employees.employee-card')
+
     @empty
     <div class="flex items-center justify-center h-60 md:col-span-3">
         <div class="text-center">
@@ -85,7 +86,11 @@
     @include('partials.user.employees.employee-card')
     @include('partials.user.employees.employee-card')
     @include('partials.user.employees.employee-card') --}}
-</div>
 
+
+</div>
+<div class="p-4 mt-4">
+    {{ $users->withPath(url()->current())->links() }}
+</div>
 {{-- @include('partials.user.employees.feedback-modal') --}}
 @endsection
