@@ -8,6 +8,10 @@ type Attendance struct {
 	Type      string `json:"type"`
 }
 
+func (attendance Attendance) GetCount(user_id int) /* (int, error) */ {
+	// Stuck bgt
+}
+
 func (attendance Attendance) Insert() error {
 	stmt := "INSERT INTO `attendances` (User_ID, Date_Time, Type) VALUES(?, ?, ?)"
 
