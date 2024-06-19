@@ -33,7 +33,7 @@ func initEndPoints() {
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserProfileHandler))))
 	mux.Handle("/api/user/motivation",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.SaveConfigsHandler))))
+			auths.UserMiddleware(http.HandlerFunc(apis.GetUserMotivation))))
 	mux.Handle("/api/user/attend",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.AttendUserHandler))))

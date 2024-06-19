@@ -192,7 +192,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		configs, err := 
+		configs, err :=
 			models.ConfigJson{}.LoadConfig()
 
 		// Ensure no error load conifg json file
@@ -207,7 +207,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = 
+		err =
 			models.AttendanceStats{}.Insert(id, configs.AbsenceQuota)
 
 		// Ensure no error insert attendance stats
@@ -588,12 +588,5 @@ func SearchUserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,
 		})
-	}
-}
-
-func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		postMu.Lock()
-		defer postMu.Unlock()
 	}
 }
