@@ -27,18 +27,22 @@ class DashboardController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/users/me/attendance/today');
 
+            $responseMotivation =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/motivation');
+
             if ($responseConfig->successful() && $responseTodayAttendance->successful()) {
                 // Decide next needed check type
                 $neededCheckType = null;
 
                 if (
-                    !isset($responseTodayAttendance['data']['check_out_time']) &&
-                    !isset($responseTodayAttendance['data']['check_in_time'])
+                    !isset($responseTodayAttendance['data']['check_in_time']) &&
+                    !isset($responseTodayAttendance['data']['check_out_time'])
                 ) {
                     $neededCheckType = 'check_in';
                 } else if (
                     isset($responseTodayAttendance['data']['check_in_time']) &&
-                    !isset($responseTodayAttendance['data']['check_in_time'])
+                    !isset($responseTodayAttendance['data']['check_out_time'])
                 ) {
                     $neededCheckType = 'check_out';
                 }
@@ -59,7 +63,8 @@ class DashboardController extends Controller
                     'today_attendance' => [
                         'needed_check_type' => $neededCheckType,
                         'is_late' => $isLate
-                    ]
+                    ],
+                    'motivation' => $responseMotivation['data']['motivation']
                 ]);
             } else if ($responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()) {
                 return redirect()->intended(route('user.login'));

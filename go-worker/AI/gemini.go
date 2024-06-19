@@ -2,55 +2,54 @@ package ai
 
 import (
 	"context"
-	"log"
+	"errors"
+	"fmt"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 )
 
 var (
-	Ctx    context.Context
-	Client *genai.Client
-	Model  *genai.GenerativeModel
-	err    error
+	ctx          = context.Background()
+	GeminiClient *genai.Client
+	Model        *genai.GenerativeModel
+	err          error
+
+	ErrNoGeminiResponse = errors.New("no response from gemini")
 )
 
-func CreateClient(api_key string) {
-	Ctx := context.Background()
-
+func InitGeminiClient(api_key string) error {
 	// Create new gemini client
-	Client, err = genai.NewClient(Ctx, option.WithAPIKey(api_key))
+	GeminiClient, err = genai.NewClient(ctx, option.WithAPIKey(api_key))
 
 	// Ensure no error create client
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 
-	Model = Client.GenerativeModel("gemini-pro")
+	Model = GeminiClient.GenerativeModel("gemini-1.5-pro")
+
+	return nil
 }
 
-func Generate(promt string) /* (string, error) */ {
-	res, err := Model.GenerateContent(Ctx, genai.Text(promt))
+func GeminiGenerate(promt string) (string, error) {
+	res, err := Model.GenerateContent(ctx, genai.Text(promt))
 
 	if err != nil {
-		/* return "", err */
+		return "", err
 	}
 
 	if res != nil {
 		candidates := res.Candidates
 
 		if candidates != nil {
-			for iter, candidate := range candidates {
-				if iter > 0 {
-					content := candidate.Content
+			content := candidates[0].Content
 
-					if content != nil {
-						text := content.Parts[0]
-
-						log.Println(text)
-					}
-				}
+			if content != nil {
+				return fmt.Sprintf("%v", content.Parts), nil
 			}
 		}
 	}
+
+	return "", ErrNoGeminiResponse
 }

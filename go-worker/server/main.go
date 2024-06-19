@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"models"
 	"net/http"
 
+	"ai"
 	"apis"
 	"auths"
 	"configs"
 	"db"
+	"models"
 )
 
 var (
@@ -16,6 +17,7 @@ var (
 	server_config = configs.Server{}
 	db_config     = configs.Database{}
 	jwt_config    = configs.JWT{}
+	gemini_config = configs.Gemini{}
 )
 
 func initEndPoints() {
@@ -31,7 +33,7 @@ func initEndPoints() {
 	mux.Handle("/api/users/me/profile",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserProfileHandler))))
-	mux.Handle("/api/user/motivation",
+	mux.Handle("/api/motivation",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserMotivation))))
 	mux.Handle("/api/user/attend",
@@ -113,12 +115,19 @@ func main() {
 	loadConfig(&server_config)
 	loadConfig(&db_config)
 	loadConfig(&jwt_config)
+	loadConfig(&gemini_config)
 
 	// Assign secret key
 	models.JWT_Secret = []byte(jwt_config.Secret)
 
+	err := ai.InitGeminiClient(gemini_config.APIKey)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// Connect to database
-	err :=
+	err =
 		db.Connect(db_config.User, db_config.Password,
 			db_config.Host, db_config.Port, db_config.Database)
 
