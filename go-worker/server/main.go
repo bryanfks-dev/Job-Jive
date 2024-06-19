@@ -126,6 +126,8 @@ func main() {
 		panic(err.Error())
 	}
 
+	defer ai.GeminiClient.Close()
+
 	// Connect to database
 	err =
 		db.Connect(db_config.User, db_config.Password,
@@ -135,6 +137,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	defer db.Conn.Close()
 
 	fmt.Printf("Connected to database %s:%s (%s)\n", db_config.Host, db_config.Port, db_config.Database)
 
@@ -150,6 +154,4 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	defer db.Conn.Close()
 }

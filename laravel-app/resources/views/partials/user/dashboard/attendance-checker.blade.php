@@ -97,7 +97,7 @@
                 <div>:</div>
             </div>
             <div class="flex flex-col gap-1">
-                <div id="date">{{ \Carbon\Carbon::today()->format('l, d M Y') }}</div>
+                <div id="date">{{ \Carbon\Carbon::today()->format('l, d F Y') }}</div>
                 <div>
                     {{ $today_attendance['needed_check_type'] === 'check_in' ? $configs['check_in_time'] : $configs['check_out_time'] }}
                 </div>

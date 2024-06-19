@@ -12,6 +12,7 @@ import (
 	"responses"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/googleapis/gax-go/v2/apierror"
 )
 
 func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +47,15 @@ func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error promting to gemini
 		if err != nil {
-			log.Panic("Error generate motivation from gemini: ", err.Error())
+			if api_err, ok := err.(*apierror.APIError); ok &&
+				api_err.HTTPCode() == http.StatusTooManyRequests {
+				w.WriteHeader(http.StatusTooManyRequests)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "too many request",
+				})
+
+				return
+			}
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -57,7 +66,7 @@ func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
 		}
 		motivation = strings.ReplaceAll(motivation, "*", "")
 
-		motivation = 
+		motivation =
 			regexp.MustCompile(`[^a-zA-Z0-9 ',./&-?]+`).ReplaceAllString(motivation, "")
 
 		response_data := responses.MotivationResponse{

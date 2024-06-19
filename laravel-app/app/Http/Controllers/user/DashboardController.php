@@ -31,7 +31,10 @@ class DashboardController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/motivation');
 
-            if ($responseConfig->successful() && $responseTodayAttendance->successful()) {
+            if (
+                $responseConfig->successful() && $responseTodayAttendance->successful() &&
+                ($responseMotivation->successful() || $responseMotivation->tooManyRequests())
+            ) {
                 // Decide next needed check type
                 $neededCheckType = null;
 
@@ -58,17 +61,34 @@ class DashboardController extends Controller
                     $isLate = $dueTime->lt($checkInTime);
                 }
 
+                $motivation = "";
+
+                if ($responseMotivation->tooManyRequests()) {
+                    $motivation = "Too many request, please try again for a few moments to generate motivation.";
+                } else {
+                    $motivation = $responseMotivation['data']['motivation'];
+                }
+
                 return view('user.dashboard', [
                     'configs' => $responseConfig['data'],
                     'today_attendance' => [
                         'needed_check_type' => $neededCheckType,
                         'is_late' => $isLate
                     ],
-                    'motivation' => $responseMotivation['data']['motivation']
+                    'motivation' => [
+                        'success_generated' => !$responseMotivation->tooManyRequests(),
+                        'content' => $motivation
+                    ]
                 ]);
-            } else if ($responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()) {
+            } else if (
+                $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
+                || $responseMotivation->unauthorized()
+            ) {
                 return redirect()->intended(route('user.login'));
-            } else if ($responseConfig->serverError() || $responseTodayAttendance->serverError()) {
+            } else if (
+                $responseConfig->serverError() || $responseTodayAttendance->serverError()
+                || $responseMotivation->serverError()
+            ) {
                 return abort(500);
             }
 

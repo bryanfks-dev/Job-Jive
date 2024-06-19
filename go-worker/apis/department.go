@@ -574,6 +574,11 @@ func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		is_manager := 
+			(response_data.Manager != nil && user_id == response_data.Manager.Id)
+		
+		response_data.IsManager = &is_manager
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,

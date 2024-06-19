@@ -74,6 +74,7 @@ class PeoplesController extends Controller
                 return view('user.peoples', [
                     'department_name' => $response['data']['name'],
                     'manager' => $response['data']['manager'],
+                    'is_manager' => $response['data']['is_manager'],
                     'employees' => $paginatedEmployees,
                 ]);
             } else if ($response->unauthorized()) {

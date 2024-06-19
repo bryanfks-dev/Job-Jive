@@ -1,4 +1,6 @@
 <div class="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    @if ($is_manager)
+    @endif
     <div class="flex justify-end px-4 pt-4">
         <button id="dropdownButton-{{ $employee['id'] }}" data-dropdown-toggle="dropdown-{{ $employee['id'] }}"
             class="inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
@@ -26,10 +28,9 @@
                 </li>
             </ul>
         </div>
-        </a>
     </div>
     <div class="flex flex-col items-center justify-center pb-10">
-        <img class="object-cover w-24 h-24 mb-3 rounded-full shadow-lg"
+        <img class="object-cover w-24 h-24 mb-3 rounded-full"
             src="{{ asset('/storage/img/user_profile/' . $employee['photo']) }}" alt="Employee image" />
         <span
             class="mb-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800">Employee</span>
@@ -65,13 +66,15 @@
             <a href="https://wa.me/{{ $employee['phone_number'] }}">{{ $employee['phone_number'] }}</a>
         </span>
 
-        <div class="flex mt-4 md:mt-6">
-            <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer ms-2 focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                data-modal-target="update-modal-{{ $employee['id'] }}"
-                data-modal-toggle="update-modal-{{ $employee['id'] }}">
-                Edit</div>
-        </div>
+        @if ($is_manager)
+            <div class="flex mt-4 md:mt-6">
+                <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer ms-2 focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                    data-modal-target="update-modal-{{ $employee['id'] }}"
+                    data-modal-toggle="update-modal-{{ $employee['id'] }}">
+                    Edit</div>
+            </div>
 
-        @include('partials.user.employees.update-modal')
+            @include('partials.user.employees.update-modal')
+        @endif
     </div>
 </div>
