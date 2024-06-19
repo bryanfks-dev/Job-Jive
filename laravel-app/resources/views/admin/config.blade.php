@@ -45,6 +45,14 @@
                     value="{{ empty(old('weekly_work_hours')) ? $configs['weekly_work_hours'] : old('daily_work_hours') }}"
                     required="" min="1" max="168">
             </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="salary_cut" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Salary Cut Amount (Late Attendance)</label>
+                <input type="number" name="salary_cut" id="salary_cut"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    {{-- value="{{ empty(old('salary_cut')) ? $configs['salary_cut'] : old('daily_work_hours') }}" --}}
+                    required="" min="1">
+            </div>
         </div>
 
         {{-- Catch write config failed --}}
