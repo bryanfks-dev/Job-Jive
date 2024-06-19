@@ -5,7 +5,7 @@
         <div class="flex justify-between gap-16 mb-6">
             {{-- Create button --}}
             <button type="button" data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full sm:rounded-lg text-sm px-4 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 gap-2">
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 sm:rounded-lg dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 256 256">
                     <path fill="currentColor"
                         d="M128 24a104 104 0 1 0 104 104A104.13 104.13 0 0 0 128 24m40 112h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 0 16" />
@@ -15,9 +15,9 @@
 
             {{-- Search bar --}}
             <form class="flex items-center max-w-sm" method="GET">
-                <label for="simple-search" class="sr-only">Search</label>
+                <label for="query" class="sr-only">Search</label>
                 <div class="relative w-full">
-                    <input type="text" id="simple-search"
+                    <input type="text" id="query"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full  p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Search..." name="query" />
                 </div>
@@ -33,7 +33,7 @@
             </form>
         </div>
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <table class="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">
@@ -57,7 +57,7 @@
                         <th scope="col" class="px-6 py-3">
                             Department
                         </th>
-                        <th scope="col" class="text-right px-6 py-3">
+                        <th scope="col" class="px-6 py-3 text-right">
                             Action
                         </th>
                     </tr>

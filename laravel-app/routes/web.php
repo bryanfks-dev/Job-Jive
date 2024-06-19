@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\user;
 use App\Http\Controllers\admin;
+use App\Http\Controllers\user;
 use Illuminate\Support\Facades\Route;
 
 // User routes
@@ -32,9 +32,14 @@ Route::group(['prefix' => '/'], function () {
     Route::get('/attendance', [user\AttendanceController::class, 'index'])
         ->name('user.attendance');
 
-    Route::get('/employees', function () {
-        return view('user.employees');
-    })->name('employees');
+    // Employees route
+    Route::group(['prefix' => '/employees'], function () {
+        Route::get('/', [user\UsersController::class, 'index'])
+            ->name('user.employees');
+
+        Route::put('/update/{id}', [user\UsersController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('users.update-employee');
+    });
 
 });
 
@@ -97,7 +102,7 @@ Route::group(['prefix' => '/admin'], function () {
 });
 
 Route::get('/employees/view', function () {
-    return view('user.view');
+    return view('view');
 })->name('view');
 
 Route::get('/sandbox', function () {

@@ -1,8 +1,8 @@
 <div class="antialiased bg-gray-50 dark:bg-gray-900">
     <nav
         class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-40">
-        <div class="flex flex-wrap justify-between items-center">
-            <div class="flex justify-start items-center">
+        <div class="flex flex-wrap items-center justify-between">
+            <div class="flex items-center justify-start">
                 <button data-drawer-target="drawer-navigation" data-drawer-toggle="drawer-navigation"
                     aria-controls="drawer-navigation"
                     class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
@@ -20,8 +20,8 @@
                     </svg>
                     <span class="sr-only">Toggle sidebar</span>
                 </button>
-                <a href="#" class="hidden lg:flex items-center justify-between mr-4">
-                    <img src="https://flowbite.s3.amazonaws.com/logo.svg" class="mr-3 h-8" alt="Flowbite Logo" />
+                <a href="#" class="items-center justify-between hidden mr-4 lg:flex">
+                    <img src="https://flowbite.s3.amazonaws.com/logo.svg" class="h-8 mr-3" alt="Flowbite Logo" />
                     <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Employee
                         Center</span>
                 </a>
@@ -33,20 +33,20 @@
                     class="flex mx-3 text-sm bg-gray-800 rounded-full lg:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                     id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
                     <span class="sr-only">Open user menu</span>
-                    <img class="w-10 h-10 rounded-full object-cover" src="https://source.unsplash.com/v6771a4avV4"
+                    <img class="object-cover w-10 h-10 rounded-full" src="https://source.unsplash.com/v6771a4avV4"
                         alt="user photo" />
                 </button>
                 <!-- Dropdown menu -->
-                <div class="hidden z-40 my-4 w-56 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
+                <div class="z-40 hidden w-56 my-4 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
                     id="dropdown">
-                    <div class="py-3 px-4">
-                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Aldo Arista</span>
+                    <div class="px-4 py-3">
+                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Aldo </span>
                         <span class="block text-sm text-gray-900 truncate dark:text-white">Manager</span>
                     </div>
                     <ul class="py-1 text-gray-700 dark:text-gray-300" aria-labelledby="dropdown">
                         <li>
                             <a href="{{ route('user.profile') }}"
-                                class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">My
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">My
                                 Profile</a>
                         </li>
                     </ul>
@@ -59,7 +59,7 @@
     <aside
         class="fixed top-0 left-0 z-[35] w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
         aria-label="Sidenav" id="drawer-navigation">
-        <div class="flex flex-col overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800 justify-between">
+        <div class="flex flex-col justify-between h-full px-3 py-5 overflow-y-auto bg-white dark:bg-gray-800">
             <ul class="space-y-2">
                 <li>
                     <a href="{{ route('user.dashboard') }}"
@@ -85,7 +85,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('employees') }}"
+                    <a href="{{ route('user.employees') }}"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
                             class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -102,8 +102,8 @@
                     <form action="{{ route('user.logout') }}" method="POST">
                         @csrf
                         <button type="submit"
-                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group">
-                            <svg class="h-6 w-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                            class="flex items-center p-2 text-base font-medium text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group">
+                            <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
                                 aria-hidden="true" width="30" height="30" viewBox="0 0 30 30" fill="currentColor"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -119,7 +119,7 @@
         </div>
     </aside>
 
-    <main class="flex flex-col justify-between p-4 lg:ml-64 h-screen pt-20 overflow-scroll">
+    <main class="flex flex-col justify-between h-screen p-4 pt-20 overflow-scroll lg:ml-64">
         @yield('main')
     </main>
 

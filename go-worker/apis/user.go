@@ -208,7 +208,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err =
-			models.AttendanceStats{}.Insert(id, configs.AbsenceQuota)
+			models.AttendanceStats{}.
+				Insert(id, configs.AbsenceQuota)
 
 		// Ensure no error insert attendance stats
 		if err != nil {
@@ -224,6 +225,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err := tx.Commit(); err != nil {
 			log.Panic("Error committing to database: ", err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
@@ -269,7 +271,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		// Ensure user provides a valid record id
 		if err != nil || id <= 0 {
 			w.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "invalid user id",
 			})
 
@@ -290,12 +292,12 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			log.Println("Error get user: ", err.Error())
-
+			
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
-
+			
 			return
 		}
 
@@ -340,7 +342,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when fetching data
 		if err != nil {
-			log.Panic("Error get user", err.Error())
+			log.Panic("Error get user: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -362,14 +364,15 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Try update user credentials
 		if strings.TrimSpace(user_form.NewPassword) != "" {
-			hashed_pwd, err := bcrypt.GenerateFromPassword([]byte(user_form.NewPassword), 11)
+			hashed_pwd, err := 
+				bcrypt.GenerateFromPassword([]byte(user_form.NewPassword), 11)
 
 			// Ensure no error hashing new password
 			if err != nil {
 				log.Println("Error hashing password: ", err.Error())
 
 				w.WriteHeader(http.StatusInternalServerError)
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				json.NewEncoder(w).Encode(map[string]any{
 					"error": "server error",
 				})
 
@@ -386,7 +389,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error update user: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
 
@@ -399,7 +402,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
 
@@ -409,7 +412,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("User `%s` record has been updated\n", user.FullName)
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,
 		})
 	}
@@ -486,7 +489,9 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method == http.MethodGet {
+
 		postMu.Lock()
 		defer postMu.Unlock()
 
@@ -525,7 +530,7 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
 
