@@ -1,92 +1,127 @@
 package main
 
 import (
+	"db"
 	"fmt"
 	"log"
-	"time"
-
-	"configs"
-	"db"
 	"models"
+	"configs"
 
 	"github.com/robfig/cron"
 )
 
-type Schedule struct {
-	At    time.Time
-	Every time.Duration
+type Config struct {
+    AbsenceQuota int `json:"absence_quota"`
 }
 
-func initResetEmployeeSalary(cron *cron.Cron) {
-	err := cron.AddFunc("@monthly", func() {
-		tx, err := db.Conn.Begin()
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		defer tx.Rollback()
-
-		err = models.ResetCurrentSalary()
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		if err := tx.Rollback(); err != nil {
-			panic(err.Error())
-		}
-
-		log.Println("User salary has been reset")
-	})
-
+func resetWeekly() {
+	log.Println("Running weekly reset")
+	tx, err := db.Conn.Begin()
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err)
 	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("UPDATE attendance_statistics SET weekly = 0")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Panic(err)
+	}
+	log.Println("Weekly reset complete")
 }
 
-func initCheckInHandler(cron *cron.Cron) {
-	// Change this later into real code
-	_, err :=
-		models.ConfigJson{}.LoadConfig()
-
-	// Ensure no error fetching db_config
+func resetMonthly() {
+	log.Println("Running monthly reset")
+	tx, err := db.Conn.Begin()
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("UPDATE attendance_statistics SET monthly = 0")
+	if err != nil {
+		log.Panic(err)
 	}
 
-	cron.AddFunc("@midnight", func() {
-		// code here
-	})
+	if err := tx.Commit(); err != nil {
+		log.Panic(err)
+	}
+	log.Println("Monthly reset complete")
+}
+
+func resetKuotaAbsen(absenceQuota int) {
+    log.Println("Running yearly reset for kuota absen")
+    tx, err := db.Conn.Begin()
+    if err != nil {
+        log.Panic(err)
+    }
+    defer tx.Rollback()
+
+    _, err = tx.Exec("UPDATE attendance_statistics SET annual_leave = ?", absenceQuota)
+    if err != nil {
+        log.Panic(err)
+    }
+
+    if err := tx.Commit(); err != nil {
+        log.Panic(err)
+    }
+    log.Println("Yearly reset for kuota absen complete")
+}
+
+func resetCurrentSalary() {
+	log.Println("Running monthly reset for current salary")
+	tx, err := db.Conn.Begin()
+	if err != nil {
+		log.Panic(err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("UPDATE salaries SET current_salary = initial_salary")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Panic(err)
+	}
+	log.Println("Monthly reset for current salary complete")
 }
 
 func main() {
 	var db_config = configs.Database{}
 
 	err := db_config.Load()
-
 	// Ensure no error fetching db_config
 	if err != nil {
 		panic(err.Error())
 	}
 
-	err =
-		db.Connect(db_config.User, db_config.Password, db_config.Host, db_config.Port, db_config.Database)
-
+	err = db.Connect(db_config.User, db_config.Password, db_config.Host, db_config.Port, db_config.Database)
 	// Ensure no error connecting to database
 	if err != nil {
 		panic(err.Error())
 	}
 
-	cron := cron.New()
+	// Load the config file for AbsenceQuota
+    var config models.ConfigJson
+    config, err = config.LoadConfig()
+    if err != nil {
+        log.Panic("Error loading config file: ", err)
+    }
 
-	initResetEmployeeSalary(cron)
-	initCheckInHandler(cron)
+	c := cron.New()
+
+	c.AddFunc("@weekly", resetWeekly)
+	c.AddFunc("@monthly", resetMonthly)
+    c.AddFunc("@every 1m", func() { resetKuotaAbsen(config.AbsenceQuota) })
+	c.AddFunc("@monthly", resetCurrentSalary)
 
 	fmt.Println("Start cron job")
-	cron.Start()
-
-	defer cron.Stop()
+	c.Start()
+	defer c.Stop()
 
 	select {}
 }
