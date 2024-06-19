@@ -58,6 +58,30 @@ func (user User) Get() ([]User, error) {
 	return users, nil
 }
 
+func (user User) GetDepartmentId(id int) (int, error) {
+	stmt := "SELECT Department_ID FROM `users` WHERE User_ID = ?"
+
+	row, err := db.Conn.Query(stmt, id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	defer row.Close()
+
+	var department_id int
+
+	for row.Next() {
+		err := row.Scan(&department_id)
+
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return department_id, nil
+}
+
 func (user User) GetEmployees(manager_id int, department_id int) ([]User, error) {
 	stmt := "SELECT * FROM `users` WHERE Department_ID = ? AND User_ID <> ? ORDER BY User_ID DESC"
 

@@ -43,9 +43,6 @@ func initEndPoints() {
 	mux.Handle("/api/user/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteUserHandler))))
-	mux.Handle("/api/user/search/{search}",
-		auths.AuthenticationMiddlware(
-			auths.AdminMiddleware(http.HandlerFunc(apis.SearchUserHandler))))
 
 	// Department endpoints
 	mux.Handle("/api/departments",
@@ -68,6 +65,19 @@ func initEndPoints() {
 	mux.Handle("/api/configs/save",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SaveConfigsHandler))))
+
+	// Manager Endpoints
+	mux.Handle("/api/manager/users",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.GetEmployeesHandler))))
+	mux.Handle("/api/manager/update-user/{id}",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.UpdateEmployeeHandler))))
+	mux.Handle("/api/manager/departments",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentsHandler))))
+
+	// Jobs endpoints
 }
 
 func loadConfig(obj configs.ConfigInterfaces) {

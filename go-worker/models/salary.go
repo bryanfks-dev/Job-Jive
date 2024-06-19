@@ -28,6 +28,14 @@ func (salary Salary) Insert() error {
 	return err
 }
 
+func (salary Salary) Update() error {
+	stmt := "UPDATE `salaries` SET Initial_Salary = ?, Current_Salary = ? WHERE User_ID = ?"
+
+	_, err := db.Conn.Exec(stmt, salary.Initial, salary.Current, salary.UserId)
+
+	return err
+}
+
 func ResetCurrentSalary() error {
 	stmt := "UPDATE `salaries` SET Current_Salary = Initial_Salary"
 
