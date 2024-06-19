@@ -7,18 +7,18 @@ import (
 )
 
 type User struct {
-	Id           int     `json:"id"`
-	FullName     string  `json:"full_name"`
-	Email        string  `json:"email"`
-	Password     string  `json:"password"`
-	DateOfBirth  string  `json:"date_of_birth"`
-	Address      string  `json:"address"`
-	NIK          string  `json:"nik"`
-	Photo        string  `json:"photo"`
-	Gender       string  `json:"gender"`
-	PhoneNumber  string  `json:"phone_number"`
-	DepartmentId *int     `json:"department_id"`
-	FirstLogin   *string `json:"first_login"`
+	Id           int
+	FullName     string
+	Email        string
+	Password     string
+	DateOfBirth  string
+	Address      string
+	NIK          string
+	Photo        string
+	Gender       string
+	PhoneNumber  string
+	DepartmentId *int
+	FirstLogin   *string
 }
 
 func (user User) Get() ([]User, error) {
@@ -56,30 +56,6 @@ func (user User) Get() ([]User, error) {
 	}
 
 	return users, nil
-}
-
-func (user User) GetDepartmentId(id int) (int, error) {
-	stmt := "SELECT Department_ID FROM `users` WHERE User_ID = ?"
-
-	row, err := db.Conn.Query(stmt, id)
-
-	if err != nil {
-		return 0, err
-	}
-
-	defer row.Close()
-
-	var department_id int
-
-	for row.Next() {
-		err := row.Scan(&department_id)
-
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return department_id, nil
 }
 
 func (user User) GetEmployees(manager_id int, department_id int) ([]User, error) {

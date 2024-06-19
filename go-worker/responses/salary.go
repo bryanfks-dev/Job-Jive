@@ -6,9 +6,9 @@ import (
 )
 
 type SalaryResponse struct {
-	UserId  int     `json:"user_id"`
-	Initial float64 `json:"initial_salary"`
-	Current float64 `json:"current_salary"`
+	UserId  int     `json:"user_id,omitempty"`
+	Initial float64 `json:"initial"`
+	Current float64 `json:"current"`
 }
 
 func (salary_response *SalaryResponse) Create(salary models.Salary) error {
@@ -22,7 +22,6 @@ func (salary_response *SalaryResponse) Create(salary models.Salary) error {
 		return err
 	}
 
-	salary_response.UserId = salary.UserId
 	salary_response.Initial = salary.Initial
 	salary_response.Current = salary.Current
 

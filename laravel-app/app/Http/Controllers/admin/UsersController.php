@@ -26,7 +26,7 @@ class UsersController extends Controller
             if (!empty($param)) {
                 $responseUser =
                     \Http::withHeaders($httpHeaders)
-                        ->get(BackendServer::url() . '/api/user/search/' . $param);
+                        ->get(BackendServer::url() . '/api/users/search/' . $param);
             } else {
                 $responseUser =
                     \Http::withHeaders($httpHeaders)
@@ -63,17 +63,18 @@ class UsersController extends Controller
 
     public function create(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'full_name' => ['required'],
-            'email' => ['required', 'email'],
-            'phone_number' => ['required', 'max:13', 'regex:/^\d+$/'],
-            'date_of_birth' => ['required', 'date'],
-            'address' => ['required'],
-            'nik' => ['required', 'digits:16'],
-            'gender' => ['required', 'in:Male,Female'],
-            'department_id' => ['required', 'integer'],
-            'photo.*' => ['required', 'mimes:png,jpg,jpeg'],
-        ]);
+        $validator =
+            \Validator::make($request->all(), [
+                'full_name' => ['required'],
+                'email' => ['required', 'email'],
+                'phone_number' => ['required', 'max:13', 'regex:/^\d+$/'],
+                'date_of_birth' => ['required', 'date'],
+                'address' => ['required'],
+                'nik' => ['required', 'digits:16'],
+                'gender' => ['required', 'in:Male,Female'],
+                'department_id' => ['required', 'integer'],
+                'photo.*' => ['required', 'mimes:png,jpg,jpeg'],
+            ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
@@ -101,7 +102,7 @@ class UsersController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->post(BackendServer::url() . '/api/user/create', [
+                ])->post(BackendServer::url() . '/api/users/create', [
                             'full_name' => $request['full_name'],
                             'email' => $request['email'],
                             'date_of_birth' => $request['date_of_birth'],
@@ -163,16 +164,17 @@ class UsersController extends Controller
             return abort(404);
         }
 
-        $validator = \Validator::make($request->all(), [
-            'full_name' => ['required'],
-            'email' => ['required', 'email'],
-            'phone_number' => ['required', 'max:13', 'regex:/^\d+$/'],
-            'date_of_birth' => ['required', 'date'],
-            'address' => ['required'],
-            'nik' => ['required', 'digits:16'],
-            'gender' => ['required', 'in:Male,Female'],
-            'department_id' => ['required', 'integer'],
-        ]);
+        $validator =
+            \Validator::make($request->all(), [
+                'full_name' => ['required'],
+                'email' => ['required', 'email'],
+                'phone_number' => ['required', 'max:13', 'regex:/^\d+$/'],
+                'date_of_birth' => ['required', 'date'],
+                'address' => ['required'],
+                'nik' => ['required', 'digits:16'],
+                'gender' => ['required', 'in:Male,Female'],
+                'department_id' => ['required', 'integer'],
+            ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
@@ -196,7 +198,7 @@ class UsersController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->put(BackendServer::url() . '/api/user/update/' . $id, [
+                ])->put(BackendServer::url() . '/api/users/update/' . $id, [
                             'full_name' => $request['full_name'],
                             'email' => $request['email'],
                             'date_of_birth' => $request['date_of_birth'],
@@ -252,7 +254,7 @@ class UsersController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->delete(BackendServer::url() . '/api/user/delete/' . $id);
+                ])->delete(BackendServer::url() . '/api/users/delete/' . $id);
 
             if ($response->successful()) {
                 // Delete user profile picture

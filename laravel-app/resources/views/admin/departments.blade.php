@@ -68,7 +68,7 @@
             @endforeach
 
             <div class="p-4 mt-4">
-                {{ $departments->withPath(url()->current())->links() }}
+                {{ $departments->withPath(url()->current())->appends(['query' => request()->get('query')])->links() }}
             </div>
         </div>
     </div>

@@ -93,7 +93,7 @@
 
                 <!-- Pagination -->
                 <div class="p-4 mt-4">
-                    {{ $attendances['records']->withPath(url()->current())->appends(['month' => $old_month_id])->links() }}
+                    {{ $attendances['records']->withPath(url()->current())->appends(['month' => request()->get('month')])->links() }}
                 </div>
             </div>
         </div>

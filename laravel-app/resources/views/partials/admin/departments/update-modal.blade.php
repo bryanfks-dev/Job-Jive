@@ -37,13 +37,21 @@
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Manager Name</label>
                         <select name="manager_id" id="manager_id"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option value="" {{ $department['manager']['id'] == 0 ? 'selected' : '' }} hidden
-                                disabled>Select Manager</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user['id'] }}"
-                                    {{ $department['manager']['id'] === (empty(old('manager_id')) ? $user['id'] : intval(old('manager_id'))) ? 'selected' : '' }}>
-                                    {{ $user['full_name']." - ".$user['email'] }}</option>
-                            @endforeach
+                            @if (isset($department['manager']))
+                                <option value="" {{ $department['manager']['id'] == 0 ? 'selected' : '' }} hidden
+                                    disabled>Select Manager</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user['id'] }}"
+                                        {{ $department['manager']['id'] === (empty(old('manager_id')) ? $user['id'] : intval(old('manager_id'))) ? 'selected' : '' }}>
+                                        {{ $user['full_name'] . ' - ' . $user['email'] }}</option>
+                                @endforeach
+                            @else
+                                <option value="" selected hidden disabled>Select Manager</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user['id'] }}">
+                                        {{ $user['full_name'] . ' - ' . $user['email'] }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
 

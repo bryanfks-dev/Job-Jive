@@ -7,6 +7,7 @@ import (
 
 	"forms"
 	"models"
+	"responses"
 )
 
 func GetConfigsHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,9 +33,12 @@ func GetConfigsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var response_data responses.ConfigResponse
+		response_data.Create(config_json)
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": config_json,
+			"data": response_data,
 		})
 	}
 }
@@ -94,7 +98,7 @@ func SaveConfigsHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": models.ConfigJson(config_form),
+			"data": responses.ConfigResponse(config_form),
 		})
 	}
 }

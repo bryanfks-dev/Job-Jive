@@ -33,14 +33,13 @@ Route::group(['prefix' => '/'], function () {
         ->name('user.attendance');
 
     // Employees route
-    Route::group(['prefix' => '/employees'], function () {
-        Route::get('/', [user\UsersController::class, 'index'])
-            ->name('user.employees');
+    Route::group(['prefix' => '/peoples'], function () {
+        Route::get('/', [user\PeoplesController::class, 'index'])
+            ->name('user.peoples');
 
-        Route::put('/update/{id}', [user\UsersController::class, 'update'])
-            ->where(['id' => '[1-9][0-9]*'])->name('users.update-employee');
+        Route::put('/update/{id}', [user\PeoplesController::class, 'update'])
+            ->where(['id' => '[1-9][0-9]*'])->name('user.peoples.update');
     });
-
 });
 
 // Admin routes

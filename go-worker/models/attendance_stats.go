@@ -3,10 +3,10 @@ package models
 import "db"
 
 type AttendanceStats struct {
-	UserID            int `json:"-"`
-	CurrentWeekHours  int `json:"current_week_hours"`
-	CurrentMonthHours int `json:"current_month_hours"`
-	AnnualLeaves      int `json:"annual_leaves"`
+	UserID            int
+	CurrentWeekHours  int
+	CurrentMonthHours int
+	AnnualLeaves      int
 }
 
 func (attendance_stats AttendanceStats) GetUsingUserId(user_id int) (AttendanceStats, error) {

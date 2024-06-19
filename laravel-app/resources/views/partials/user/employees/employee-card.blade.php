@@ -1,6 +1,6 @@
 <div class="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="flex justify-end px-4 pt-4">
-        <button id="dropdownButton-{{ $user['id'] }}" data-dropdown-toggle="dropdown-{{ $user['id'] }}"
+        <button id="dropdownButton-{{ $employee['id'] }}" data-dropdown-toggle="dropdown-{{ $employee['id'] }}"
             class="inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
             type="button">
 
@@ -11,16 +11,16 @@
             </svg>
         </button>
         <!-- Dropdown menu -->
-        <div id="dropdown-{{ $user['id'] }}"
+        <div id="dropdown-{{ $employee['id'] }}"
             class="z-10 hidden text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="py-2" aria-labelledby="dropdownButton-{{ $user['id'] }}">
+            <ul class="py-2" aria-labelledby="dropdownButton-{{ $employee['id'] }}">
                 {{-- <li>
                     <a href="#"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                         data-modal-target="feedback-modal" data-modal-toggle="feedback-modal">Feedback</a>
                 </li> --}}
                 <li>
-                    <a href="{{ route('user.attendance') }}"
+                    <a href=""
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
                         Log</a>
                 </li>
@@ -30,10 +30,10 @@
     </div>
     <div class="flex flex-col items-center justify-center pb-10">
         <img class="object-cover w-24 h-24 mb-3 rounded-full shadow-lg"
-            src="{{ url('storage/img/user_profile/' . $user['photo'])  }}" alt="Chinese man image" />
+            src="{{ asset('/storage/img/user_profile/' . $employee['photo']) }}" alt="Employee image" />
         <span
             class="mb-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800">Employee</span>
-        <h5 class="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">{{ $user['full_name'] }}</h5>
+        <h5 class="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">{{ $employee['full_name'] }}</h5>
         <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
 
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-500" width="1.2em" height="1.2em"
@@ -41,7 +41,7 @@
                 <path
                     d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m-.4 4.25l-7.07 4.42c-.32.2-.74.2-1.06 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44" />
             </svg>
-            <a href="mailto: {{ $user['email'] }}">{{ $user['email'] }}</a>
+            <a href="mailto: {{ $employee['email'] }}">{{ $employee['email'] }}</a>
         </span>
         <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 256 258">
@@ -62,15 +62,16 @@
                 <path fill="#fff"
                     d="M96.678 74.148c-2.386-5.303-4.897-5.41-7.166-5.503c-1.858-.08-3.982-.074-6.104-.074c-2.124 0-5.575.799-8.492 3.984c-2.92 3.188-11.148 10.892-11.148 26.561c0 15.67 11.413 30.813 13.004 32.94c1.593 2.123 22.033 35.307 54.405 48.073c26.904 10.609 32.379 8.499 38.218 7.967c5.84-.53 18.844-7.702 21.497-15.139c2.655-7.436 2.655-13.81 1.859-15.142c-.796-1.327-2.92-2.124-6.105-3.716c-3.186-1.593-18.844-9.298-21.763-10.361c-2.92-1.062-5.043-1.592-7.167 1.597c-2.124 3.184-8.223 10.356-10.082 12.48c-1.857 2.129-3.716 2.394-6.9.801c-3.187-1.598-13.444-4.957-25.613-15.806c-9.468-8.442-15.86-18.867-17.718-22.056c-1.858-3.184-.199-4.91 1.398-6.497c1.431-1.427 3.186-3.719 4.78-5.578c1.588-1.86 2.118-3.187 3.18-5.311c1.063-2.126.531-3.986-.264-5.579c-.798-1.593-6.987-17.343-9.819-23.64" />
             </svg>
-            <a href="https://wa.me/{{ $user['phone_number'] }}">{{ $user['phone_number'] }}</a>
+            <a href="https://wa.me/{{ $employee['phone_number'] }}">{{ $employee['phone_number'] }}</a>
         </span>
 
         <div class="flex mt-4 md:mt-6">
             <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer ms-2 focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                data-modal-target="update-modal-{{ $user['id'] }}" data-modal-toggle="update-modal-{{ $user['id'] }}">
+                data-modal-target="update-modal-{{ $employee['id'] }}"
+                data-modal-toggle="update-modal-{{ $employee['id'] }}">
                 Edit</div>
         </div>
 
-        @include("partials.user.employees.update-modal")
+        @include('partials.user.employees.update-modal')
     </div>
 </div>

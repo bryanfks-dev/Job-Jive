@@ -292,12 +292,12 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			log.Println("Error get user: ", err.Error())
-			
+
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
-			
+
 			return
 		}
 
@@ -342,6 +342,15 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error when fetching data
 		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+	
+				return
+			}
+
 			log.Panic("Error get user: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
@@ -364,7 +373,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Try update user credentials
 		if strings.TrimSpace(user_form.NewPassword) != "" {
-			hashed_pwd, err := 
+			hashed_pwd, err :=
 				bcrypt.GenerateFromPassword([]byte(user_form.NewPassword), 11)
 
 			// Ensure no error hashing new password
@@ -480,7 +489,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": models.User{
+			"data": responses.UserResponse{
 				Id:    id,
 				Photo: user.Photo,
 			},
@@ -489,16 +498,27 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
-
 	if r.Method == http.MethodGet {
-
 		postMu.Lock()
 		defer postMu.Unlock()
 
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
 
 		user, err :=
 			models.User{}.GetUsingId(int(token["id"].(float64)))

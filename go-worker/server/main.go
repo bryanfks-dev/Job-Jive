@@ -27,8 +27,8 @@ func initEndPoints() {
 	mux.Handle("/auth/admin/login",
 		auths.AuthenticationMiddlware(http.HandlerFunc(auths.AdminLoginHandler)))
 
-	// User
-	mux.Handle("/api/user/profile",
+	// User account related endpoints
+	mux.Handle("/api/users/me/profile",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserProfileHandler))))
 	mux.Handle("/api/user/motivation",
@@ -37,30 +37,30 @@ func initEndPoints() {
 	mux.Handle("/api/user/attend",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.AttendUserHandler))))
-	mux.Handle("/api/user/attendance",
+	mux.Handle("/api/users/me/attendance",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceHandler))))
-	mux.Handle("/api/user/attendance/today",
+	mux.Handle("/api/users/me/attendance/today",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceTodayHandler))))
-	mux.Handle("/api/user/attendance/stats",
+	mux.Handle("/api/users/me/attendance/stats",
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceStatsHandler))))
 
-	// Employees endpoints
+	// Admin users endpoints
 	mux.Handle("/api/users",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.GetUsersHandler))))
-	mux.Handle("/api/user/create",
+	mux.Handle("/api/users/create",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.CreateUserHandler))))
-	mux.Handle("/api/user/update/{id}",
+	mux.Handle("/api/users/update/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.UpdateUserHandler))))
-	mux.Handle("/api/user/delete/{id}",
+	mux.Handle("/api/users/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteUserHandler))))
-	mux.Handle("/api/user/search/{query}",
+	mux.Handle("/api/users/search/{query}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SearchUserHandler))))
 
@@ -68,16 +68,16 @@ func initEndPoints() {
 	mux.Handle("/api/departments",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.GetDepartmentsHandler))))
-	mux.Handle("/api/department/create",
+	mux.Handle("/api/departments/create",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.CreateDepartmentHandler))))
-	mux.Handle("/api/department/update/{id}",
+	mux.Handle("/api/departments/update/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.UpdateDepartmentHandler))))
-	mux.Handle("/api/department/delete/{id}",
+	mux.Handle("/api/departments/delete/{id}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.DeleteDepartmentHandler))))
-	mux.Handle("/api/department/search/{query}",
+	mux.Handle("/api/departments/search/{query}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SearchDepartmentHandler))))
 
@@ -88,16 +88,14 @@ func initEndPoints() {
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SaveConfigsHandler))))
 
-	// Manager Endpoints
-	mux.Handle("/api/manager/users",
+	// Department users Endpoints
+	mux.Handle("/api/users/me/department/users",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.GetEmployeesHandler))))
-	mux.Handle("/api/manager/update-user/{id}",
+			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentUsersHandler))))
+	mux.Handle("/api/users/me/department/users/update/{id}",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.UpdateEmployeeHandler))))
-	mux.Handle("/api/manager/departments",
-		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentsHandler))))
+			auths.UserMiddleware(auths.ManagerMiddleware(
+				http.HandlerFunc(apis.UpdateDeparmentUserHandler)))))
 
 	// Jobs endpoints
 }

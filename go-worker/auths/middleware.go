@@ -28,7 +28,7 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP Header
 		w.Header().Set("Content-Type", "application/json")
-		
+
 		// Get authorization header
 		auth_header := r.Header.Get("Authorization")
 
@@ -82,7 +82,7 @@ func AuthenticationMiddlware(next http.Handler) http.Handler {
 		}
 
 		// Claims user id from token
-		extract_token, err := 
+		extract_token, err :=
 			models.ClaimsToken(token)
 
 		// Ensure no error when claimming token
@@ -138,7 +138,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP Header
 		w.Header().Set("Content-Type", "application/json")
-		
+
 		jwt_claims, ok :=
 			r.Context().Value(TOKEN_KEY).(jwt.MapClaims)
 
@@ -234,6 +234,15 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
+			})
+
+			return
+		}
+
+		if user.DepartmentId == nil {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "forbidden",
 			})
 
 			return

@@ -6,13 +6,13 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"responses"
 	"time"
 
 	"auths"
 	"configs"
 	"forms"
 	"models"
+	"responses"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -27,6 +27,21 @@ func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
+
 		loc, err := configs.Timezone{}.GetTimeZone()
 
 		// Ensure no error get timezone location
@@ -40,8 +55,6 @@ func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		curr_date_time := time.Now().In(loc)
-
-		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
 
 		curr_month := int(curr_date_time.Month())
 
@@ -77,7 +90,20 @@ func GetUserAttendanceTodayHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
 
 		loc, err := configs.Timezone{}.GetTimeZone()
 
@@ -340,14 +366,18 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		response_data.Date = attend_form.Date
-		response_data.CheckOut = &attend_form.Time
+		// Assign new attendance time to old response
+		if check_type == CHECK_IN {
+			response_data.CheckIn = &attend_form.Time
+		} else {
+			response_data.CheckOut = &attend_form.Time
+		}
 
 		log.Printf("User `%s` just %s", user.FullName, check_type)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": attendance,
+			"data": response_data,
 		})
 	}
 }
@@ -360,7 +390,20 @@ func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 		// Set HTTP header
 		w.Header().Set("Content-Type", "application/json")
 
-		token := r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
 
 		user_id := int(token["id"].(float64))
 
@@ -379,9 +422,13 @@ func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var response_data responses.AttendanceStatsReponse
+
+		response_data.Create(stats)
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": stats,
+			"data": response_data,
 		})
 	}
 }

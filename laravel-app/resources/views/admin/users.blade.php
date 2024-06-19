@@ -82,7 +82,7 @@
             @endforeach
 
             <div class="p-4 mt-4">
-                {{ $users->withPath(url()->current())->links() }}
+                {{ $users->withPath(url()->current())->appends(['query' => request()->get('query')])->links() }}
             </div>
         </div>
     </div>

@@ -8,10 +8,13 @@ import (
 	"strconv"
 	"strings"
 
+	"auths"
 	"db"
 	"forms"
 	"models"
 	"responses"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
@@ -408,7 +411,7 @@ func DeleteDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
-			"data": models.Department{
+			"data": responses.DepartmentResponse{
 				Id: department.Id,
 			},
 		})
@@ -467,6 +470,208 @@ func SearchDepartmentHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			response_data = append(response_data, department_data)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
+func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
+
+		user_id := int(token["id"].(float64))
+		user, err := models.User{}.GetUsingId(user_id)
+
+		// Ensure no error get user
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+
+				return
+			}
+
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		if user.DepartmentId == nil {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "user not belongs to any department",
+			})
+
+			return
+		}
+
+		department, err :=
+			models.Department{}.GetUsingId(*user.DepartmentId)
+
+		// Ensure no error get user department
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid department id",
+				})
+
+				return
+			}
+
+			log.Panic("Error get department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Initialize response data
+		var response_data responses.DepartmentResponse
+
+		err = response_data.CreateUsers(department)
+
+		// Ensure no error create response
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
+func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPut {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil || id <= 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "Invalid user id",
+			})
+
+			return
+		}
+
+		req_json := json.NewDecoder(r.Body)
+
+		var salaryForm forms.SalaryForm
+
+		err = req_json.Decode(&salaryForm)
+
+		// Check if there is an error decoding the request body
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
+			})
+
+			return
+		}
+
+		// Retrieve the salary record associated with the id
+		salary, err :=
+			models.Salary{}.GetUsingUserId(id)
+
+		// Check if there is an error retrieving the salary record
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+
+				return
+			}
+
+			// If there is an error, log it and return a server error
+			log.Panic("Error get salary: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Update the initial and current values of the salary record
+		salary.Initial = salaryForm.Initial
+		salary.Current = salaryForm.Current
+
+		err = salary.Update()
+
+		// Check if there is an error updating the salary record
+		if err != nil {
+			log.Println("Error update salary:", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Create a SalaryResponse struct from the updated salary record
+		var response_data responses.SalaryResponse
+
+		err = response_data.Create(salary)
+
+		if err != nil {
+			// If there is an error, return a server error
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)

@@ -3,9 +3,9 @@ package models
 import "db"
 
 type Attendance struct {
-	UserId    int    `json:"user_id"`
-	Date_Time string `json:"date_time"`
-	Type      string `json:"type"`
+	UserId    int
+	Date_Time string
+	Type      string
 }
 
 func (attendance Attendance) GetCount(user_id int) /* (int, error) */ {

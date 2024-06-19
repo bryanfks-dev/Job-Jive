@@ -20,10 +20,12 @@ class DashboardController extends Controller
             ];
 
             $responseConfig =
-                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/configs');
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/configs');
 
             $responseTodayAttendance =
-                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/user/attendance/today');
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/attendance/today');
 
             if ($responseConfig->successful() && $responseTodayAttendance->successful()) {
                 // Decide next needed check type
@@ -44,8 +46,10 @@ class DashboardController extends Controller
                 $isLate = false;
 
                 if (isset($responseTodayAttendance['data']['check_in_time'])) {
-                    $dueTime = \Carbon\Carbon::parse($responseConfig['data']['check_in_time']);
-                    $checkInTime = \Carbon\Carbon::parse($responseTodayAttendance['data']['check_in_time']);
+                    $dueTime =
+                        \Carbon\Carbon::parse($responseConfig['data']['check_in_time']);
+                    $checkInTime =
+                        \Carbon\Carbon::parse($responseTodayAttendance['data']['check_in_time']);
 
                     $isLate = $dueTime->lt($checkInTime);
                 }

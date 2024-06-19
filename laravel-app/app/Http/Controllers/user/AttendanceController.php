@@ -18,33 +18,34 @@ class AttendanceController extends Controller
             ];
 
             $responseAttendance =
-                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/user/attendance');
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/attendance');
 
             $responseConfig =
-                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/configs');
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/configs');
 
             $responseAttendenceStats =
-                \Http::withHeaders($httpHeaders)->get(BackendServer::url() . '/api/user/attendance/stats');
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/attendance/stats');
 
-            $attendances = $responseAttendance['data'][0];
+            if ($responseAttendance->successful() && $responseConfig->successful()) {
+                $attendances = $responseAttendance['data'][0];
 
-            // Check for filter key
-            if ($request->has('month')) {
-                $param = trim($request->get('month'));
+                // Check for filter key
+                $param =
+                    trim($request->get('month', ''), ' ');
 
                 if (!empty($param)) {
-                    $param = intval($param);
-
                     $maxMonth = $attendances['month'];
 
                     // Validate param value, so index won't be out of bound
                     if ($param <= $maxMonth && $param >= $maxMonth - 2) {
-                        $attendances = $responseAttendance['data'][$maxMonth - $param];
+                        $attendances =
+                            $responseAttendance['data'][$maxMonth - $param];
                     }
                 }
-            }
 
-            if ($responseAttendance->successful() && $responseConfig->successful()) {
                 $attendances['records'] =
                     $this->paginate($attendances['records'] ?? [], 7);
 

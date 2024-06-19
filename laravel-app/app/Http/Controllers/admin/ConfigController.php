@@ -39,13 +39,14 @@ class ConfigController extends Controller
 
     public function save(Request $request)
     {
-        $validator = \Validator::make(request()->all(), [
-            'check_in_time' => ['required', 'date_format:H:i', 'before:' . $request['check_out_time']],
-            'check_out_time' => ['required', 'date_format:H:i', 'after:' . $request['check_in_time']],
-            'absence_quota' => ['required', 'integer'],
-            'daily_work_hours' => ['required', 'integer', 'lte:weekly_work_hours', 'min:1', 'max:24'],
-            'weekly_work_hours' => ['required', 'integer', 'gte:daily_work_hours', 'min:1', 'max:168']
-        ]);
+        $validator =
+            \Validator::make(request()->all(), [
+                'check_in_time' => ['required', 'date_format:H:i', 'before:' . $request['check_out_time']],
+                'check_out_time' => ['required', 'date_format:H:i', 'after:' . $request['check_in_time']],
+                'absence_quota' => ['required', 'integer'],
+                'daily_work_hours' => ['required', 'integer', 'lte:weekly_work_hours', 'min:1', 'max:24'],
+                'weekly_work_hours' => ['required', 'integer', 'gte:daily_work_hours', 'min:1', 'max:168']
+            ]);
 
         if ($validator->fails()) {
             return redirect()->back()

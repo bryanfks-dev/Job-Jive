@@ -7,9 +7,9 @@ import (
 )
 
 type Admin struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Id       int
+	Username string
+	Password string
 }
 
 func (admin Admin) GetUsingUsername(username string) (Admin, error) {

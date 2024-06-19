@@ -1,20 +1,24 @@
 package responses
 
 import (
-	"configs"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
+	"configs"
 	"db"
+	"models"
 )
 
 type AttendanceReponseWrapper struct {
+	UserId  int                     `json:"user_id"`
 	Month   int                     `json:"month"`
 	Records AttendanceResponseArray `json:"records"`
 }
 
 type AttendanceReponse struct {
+	UserId   int     `json:"user_id,omitempty"`
 	Date     string  `json:"date"`
 	CheckIn  *string `json:"check_in_time"`
 	CheckOut *string `json:"check_out_time"`
@@ -26,6 +30,8 @@ type (
 )
 
 func (attendance_response *AttendanceReponse) GetAttendanceOnDate(date string, user_id int) error {
+	attendance_response.UserId = user_id
+
 	stmt := "SELECT TIME(a1.Date_Time), TIME(a2.Date_Time) FROM `attendances` a1 LEFT JOIN `attendances` a2 ON DATE(a2.Date_Time) = DATE(a1.Date_Time) AND a2.User_ID = a1.User_ID AND a2.Type = 'Check-Out' WHERE a1.Type = 'Check-In' AND a1.User_ID = ? AND DATE(a1.Date_Time) = ?"
 
 	err := db.Conn.QueryRow(stmt, user_id, date).
@@ -90,6 +96,7 @@ func (attendance_wrappers *AttendanceReponseWrapperArray) Create(months []int, u
 			return err
 		}
 
+		curr_wrapper.UserId = user_id
 		curr_wrapper.Month = month
 		curr_wrapper.Records = attendance_responses
 	}
@@ -116,4 +123,17 @@ func (attendance_responses_array *AttendanceResponseArray) createRecord(month in
 	}
 
 	return nil
+}
+
+func (attendance_response *AttendanceReponse) CreateSingle(attendance models.Attendance) {
+	date_time := strings.Split(attendance.Date_Time, " ")
+
+	attendance_response.UserId = attendance.UserId
+	attendance_response.Date = date_time[0]
+
+	if attendance.Type == "Check-In" {
+		attendance_response.CheckIn = &date_time[1]
+	} else {
+		attendance_response.CheckOut = &date_time[1]
+	}
 }

@@ -24,7 +24,7 @@ class DepartmentsController extends Controller
             if (!empty($param)) {
                 $responseDepartment =
                     \Http::withHeaders($httpHeaders)
-                        ->get(BackendServer::url() . '/api/department/search/' . $param);
+                        ->get(BackendServer::url() . '/api/departments/search/' . $param);
             } else {
                 $responseDepartment =
                     \Http::withHeaders($httpHeaders)
@@ -64,9 +64,10 @@ class DepartmentsController extends Controller
 
     public function create(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'department_name' => ['required'],
-        ]);
+        $validator =
+            \Validator::make($request->all(), [
+                'department_name' => ['required'],
+            ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
@@ -83,7 +84,7 @@ class DepartmentsController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->post(BackendServer::url() . '/api/department/create', [
+                ])->post(BackendServer::url() . '/api/departments/create', [
                             'department_name' => $request['department_name'],
                         ]);
 
@@ -118,9 +119,10 @@ class DepartmentsController extends Controller
             return abort(404);
         }
 
-        $validator = \Validator::make($request->all(), [
-            'manager_id' => ['required'],
-        ]);
+        $validator =
+            \Validator::make($request->all(), [
+                'manager_id' => ['required'],
+            ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
@@ -137,7 +139,7 @@ class DepartmentsController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->put(BackendServer::url() . '/api/department/update/' . $id, [
+                ])->put(BackendServer::url() . '/api/departments/update/' . $id, [
                             'manager_id' => intval($request['manager_id']),
                         ]);
 
@@ -179,7 +181,7 @@ class DepartmentsController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Content-type' => 'application/json',
                     'Accept' => 'application/json',
-                ])->delete(BackendServer::url() . '/api/department/delete/' . $id);
+                ])->delete(BackendServer::url() . '/api/departments/delete/' . $id);
 
             if ($response->successful()) {
                 return redirect()->intended(route('admin.departments'));

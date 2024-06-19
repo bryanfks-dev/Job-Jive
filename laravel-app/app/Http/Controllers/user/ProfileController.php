@@ -16,7 +16,7 @@ class ProfileController extends Controller
                 \Http::withHeaders([
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Accept' => 'application/json'
-                ])->get(BackendServer::url() . '/api/user/profile');
+                ])->get(BackendServer::url() . '/api/users/me/profile');
 
             if ($response->successful()) {
                 return view('user.profile', [

@@ -5,8 +5,8 @@ import (
 )
 
 type DepartmentHead struct {
-	DepartmentId int  `json:"department_id"`
-	ManagerId    *int `json:"manager_id"`
+	DepartmentId int
+	ManagerId    *int
 }
 
 func (department_head DepartmentHead) Get() ([]DepartmentHead, error) {
