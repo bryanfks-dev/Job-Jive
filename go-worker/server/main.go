@@ -121,8 +121,6 @@ func initEndPoints() {
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(auths.ManagerMiddleware(
 				http.HandlerFunc(apis.AttendUserHandledByManagerHandler)))))
-
-	// Jobs endpoints
 }
 
 func loadConfig(config configs.ConfigInterfaces) {

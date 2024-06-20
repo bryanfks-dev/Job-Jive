@@ -35,10 +35,10 @@ func (attendance Attendance) GetAttendancePerWeek(user_id int) (int, error) {
 	stmt := `SELECT COUNT(*) FROM attendances WHERE User_ID = ? AND Type = 'Check-In' AND
 		DATE(Date_Time) >= ? AND DATE(Date_Time) <= ? AND TIME(Date_Time) > ?`
 
-	row := db.Conn.QueryRow(stmt, user_id, sevenDaysAgo.Format("2006-01-02"), now.Format("2006-01-02"), check_in_time)
+	count := 0
 
-	var count int
-	err = row.Scan(&count)
+	err =
+		db.Conn.QueryRow(stmt, user_id, sevenDaysAgo.Format(time.DateOnly), now.Format("2006-01-02"), check_in_time).Scan(&count)
 
 	return count, err
 }

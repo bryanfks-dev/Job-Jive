@@ -40,8 +40,6 @@ func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
 
 		user_id := int(token["id"].(float64))
 
-		// Do absence analysis codes here
-
 		count_per_week, err := models.Attendance{}.GetAttendancePerWeek(user_id)
 
 		if err != nil {
