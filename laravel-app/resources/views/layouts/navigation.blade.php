@@ -32,15 +32,16 @@
                     class="flex mx-3 text-sm bg-gray-800 rounded-full lg:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                     id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
                     <span class="sr-only">Open user menu</span>
-                    <img class="object-cover w-10 h-10 rounded-full" src="https://source.unsplash.com/v6771a4avV4"
-                        alt="user photo" />
+                    <img class="object-cover w-10 h-10 rounded-full"
+                        src="{{ asset('/storage/img/user_profile/' . $profile['photo']) }}" alt="user photo" />
                 </button>
                 <!-- Dropdown menu -->
                 <div class="z-40 hidden w-56 my-4 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
                     id="dropdown">
                     <div class="px-4 py-3">
-                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Aldo </span>
-                        <span class="block text-sm text-gray-900 truncate dark:text-white">Manager</span>
+                        <span
+                            class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $profile['full_name'] }}</span>
+                        <span class="block text-sm text-gray-900 truncate dark:text-white">{{ $profile['department']['name'] }} {{ $profile['as'] }}</span>
                     </div>
                     <ul class="py-1 text-gray-700 dark:text-gray-300" aria-labelledby="dropdown">
                         <li>

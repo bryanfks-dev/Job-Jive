@@ -12,7 +12,7 @@ class PeoplesController extends Controller
     public function index(Request $request)
     {
         try {
-            $response = null;
+            $responseDepartmentUsers = null;
 
             $httpHeaders = [
                 'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
@@ -22,33 +22,38 @@ class PeoplesController extends Controller
             $param = trim($request->get('query', ''), ' ');
 
             if (!empty($param)) {
-                $response =
+                $responseDepartmentUsers =
                     \Http::withHeaders($httpHeaders)
                         ->get(BackendServer::url() . '/api/users/me/department/users/search/' . $param);
             } else {
-                $response =
+                $responseDepartmentUsers =
                     \Http::withHeaders($httpHeaders)
                         ->get(BackendServer::url() . '/api/users/me/department/users');
             }
 
-            if ($response->successful()) {
+            $responseProfile =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/profile');
+
+            if ($responseDepartmentUsers->successful() && $responseProfile->successful()) {
                 $paginatedEmployees =
-                    $this->paginate($response['data']['employees'] ?? [], 9);
+                    $this->paginate($responseDepartmentUsers['data']['employees'] ?? [], 9);
 
                 return view('user.peoples', [
-                    'department_name' => $response['data']['name'],
-                    'manager' => $response['data']['manager'],
-                    'is_manager' => $response['data']['is_manager'],
+                    'department_name' => $responseDepartmentUsers['data']['name'],
+                    'manager' => $responseDepartmentUsers['data']['manager'],
+                    'is_manager' => $responseDepartmentUsers['data']['is_manager'],
                     'employees' => $paginatedEmployees,
+                    'profile' => $responseProfile['data']
                 ]);
-            } else if ($response->unauthorized()) {
+            } else if ($responseDepartmentUsers->unauthorized() || $responseProfile->unauthorized()) {
                 return redirect()->intended(route('user.login'));
             }
 
-            return abort($response->status());
+            return abort($responseDepartmentUsers->status());
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
-                return abort($response->status());
+                return abort($responseDepartmentUsers->status());
             }
 
             return abort(500);

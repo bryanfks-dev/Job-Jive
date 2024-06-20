@@ -29,7 +29,14 @@ class AttendanceController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/users/me/attendance/stats');
 
-            if ($responseAttendance->successful() && $responseConfig->successful()) {
+            $responseProfile =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/profile');
+
+            if (
+                $responseAttendance->successful() && $responseConfig->successful() &&
+                $responseProfile->successful()
+            ) {
                 $attendances = $responseAttendance['data'][0];
 
                 // Check for filter key
@@ -64,11 +71,18 @@ class AttendanceController extends Controller
                             ];
                         }, $responseAttendance['data']),
                     'check_in_time' => $responseAttendance['data'][0]['records'][0]['check_in_time'],
-                    'attendances' => $attendances
+                    'attendances' => $attendances,
+                    'profile' => $responseProfile['data']
                 ]);
-            } else if ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
+            } else if (
+                $responseAttendance->unauthorized() || $responseConfig->unauthorized()
+                || $responseProfile->unauthorized()
+            ) {
                 return redirect()->intended(route('user.login'));
-            } else if ($responseAttendance->serverError() || $responseConfig->serverError()) {
+            } else if (
+                $responseAttendance->serverError() || $responseConfig->serverError()
+                || $responseProfile->serverError()
+            ) {
                 return abort(500);
             }
 

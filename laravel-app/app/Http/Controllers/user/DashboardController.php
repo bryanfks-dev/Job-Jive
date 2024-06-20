@@ -61,7 +61,8 @@ class DashboardController extends Controller
 
                 if (
                     $responseConfig->successful() && $responseTodayAttendance->successful() &&
-                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests()) && $responseEmployeeAttendanceChart->successful() && $responseEmployeePeformance->successful()
+                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests()) && $responseEmployeeAttendanceChart->successful() && $responseEmployeePeformance->successful() &&
+                    $responseProfile->successful()
                 ) {
                     // Decide next needed check type
                     $neededCheckType = null;
@@ -105,23 +106,24 @@ class DashboardController extends Controller
                         'old_period' => (intval($param) !== 0 ? intval($param) : 3),
                         'employee_attendance_chart' => $responseEmployeeAttendanceChart['data'],
                         'employee_peformance' => $responseEmployeePeformance['data'] ?? [],
+                        'profile' => $responseProfile['data'],
                         'is_manager' => $isManager
                     ]);
                 } else if (
                     $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
-                    || $responseMotivation->unauthorized() || $responseEmployeeAttendanceChart->unauthorized() || $responseEmployeePeformance->unauthorized()
+                    || $responseMotivation->unauthorized() || $responseEmployeeAttendanceChart->unauthorized() || $responseEmployeePeformance->unauthorized() || $responseProfile->unauthorized()
                 ) {
                     return redirect()->intended(route('user.login'));
                 } else if (
                     $responseConfig->serverError() || $responseTodayAttendance->serverError()
-                    || $responseMotivation->serverError() || $responseEmployeeAttendanceChart->serverError() || $responseEmployeePeformance->serverError()
+                    || $responseMotivation->serverError() || $responseEmployeeAttendanceChart->serverError() || $responseEmployeePeformance->serverError() || $responseProfile->serverError()
                 ) {
                     return abort(500);
                 }
             } else {
                 if (
                     $responseConfig->successful() && $responseTodayAttendance->successful() &&
-                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests())
+                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests()) && $responseProfile->successful()
                 ) {
                     // Decide next needed check type
                     $neededCheckType = null;
@@ -166,12 +168,12 @@ class DashboardController extends Controller
                     ]);
                 } else if (
                     $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
-                    || $responseMotivation->unauthorized()
+                    || $responseMotivation->unauthorized() || $responseProfile->unauthorized()
                 ) {
                     return redirect()->intended(route('user.login'));
                 } else if (
                     $responseConfig->serverError() || $responseTodayAttendance->serverError()
-                    || $responseMotivation->serverError()
+                    || $responseMotivation->serverError() || $responseProfile->serverError()
                 ) {
                     return abort(500);
                 }
