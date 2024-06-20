@@ -52,7 +52,7 @@ class AttendanceController extends Controller
                 return view('user.attendance', [
                     'configs' => $responseConfig['data'],
                     'attendance_stats' => $responseAttendenceStats['data'],
-                    'old_month_id' => intval($request->get('month')),
+                    'old_month_id' => intval($param),
                     'months' =>
                         array_map(function ($v) {
                             return [

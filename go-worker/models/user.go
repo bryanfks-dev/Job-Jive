@@ -215,7 +215,7 @@ func (user User) Delete() error {
 }
 
 func (user User) Search(query string) ([]User, error) {
-	stmt := "SELECT u.* FROM `users` u LEFT JOIN `departments` d ON d.Department_ID = u.Department_ID WHERE CONCAT(u.Full_Name, '|', u.Email, '|', u.Phone_Number, '|', u.Date_of_Birth, '|', u.Gender, '|', d.Department_Name) REGEXP ?"
+	stmt := "SELECT u.* FROM `users` u LEFT JOIN `departments` d ON d.Department_ID = u.Department_ID WHERE CONCAT(u.Full_Name, '|', u.Email, '|', u.Phone_Number, '|', u.Date_of_Birth, '|', u.Gender, '|', COALESCE(d.Department_Name, '')) REGEXP ?"
 
 	row, err := db.Conn.Query(stmt, query)
 

@@ -17,6 +17,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const (
+	YESTERDAY  = 1
+	TODAY      = 2
+	LAST7DAYS  = 3
+	LAST30DAYS = 4
+	LAST90DAYS = 5
+)
+
 func GetDepartmentsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()
@@ -598,7 +606,7 @@ func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil || id <= 0 {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "Invalid user id",
 			})
 
@@ -670,7 +678,7 @@ func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error update salary:", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "server error",
 			})
 

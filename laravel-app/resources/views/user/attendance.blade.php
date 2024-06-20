@@ -169,6 +169,6 @@
 
         monthsSelector.addEventListener('change', (e) => {
             monthsForm.submit();
-        })
+        });
     </script>
 @endsection

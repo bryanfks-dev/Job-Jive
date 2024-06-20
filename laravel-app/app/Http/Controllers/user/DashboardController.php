@@ -19,6 +19,10 @@ class DashboardController extends Controller
                 'Accept' => 'application/json'
             ];
 
+            $responseProfile =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/profile');
+
             $responseConfig =
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/configs');
@@ -31,65 +35,146 @@ class DashboardController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/motivation');
 
-            $responseEmployeePeformance =
-                \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url() . '/api/users/me/department/users/attendance/stats');
+            $isManager = ($responseProfile['data']['as'] === 'Manager');
 
-            if (
-                $responseConfig->successful() && $responseTodayAttendance->successful() &&
-                ($responseMotivation->successful() || $responseMotivation->tooManyRequests())
-            ) {
-                // Decide next needed check type
-                $neededCheckType = null;
+            $responseEmployeePeformance = null;
+            $responseEmployeeAttendanceChart = null;
+
+            if ($isManager) {
+                $responseEmployeePeformance =
+                    \Http::withHeaders($httpHeaders)
+                        ->get(BackendServer::url() . '/api/users/me/department/users/attendance/stats');
+
+                $responseEmployeeAttendanceChart = null;
+
+                $param = trim($request->get('period', ''), ' ');
+
+                if (!empty($param)) {
+                    $responseEmployeeAttendanceChart =
+                        \Http::withHeaders($httpHeaders)
+                            ->get(BackendServer::url() . '/api/users/me/department/users/attendance/chart/' . $param);
+                } else {
+                    $responseEmployeeAttendanceChart =
+                        \Http::withHeaders($httpHeaders)
+                            ->get(BackendServer::url() . '/api/users/me/department/users/attendance/chart/3');
+                }
 
                 if (
-                    !isset($responseTodayAttendance['data']['check_in_time']) &&
-                    !isset($responseTodayAttendance['data']['check_out_time'])
+                    $responseConfig->successful() && $responseTodayAttendance->successful() &&
+                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests()) && $responseEmployeeAttendanceChart->successful() && $responseEmployeePeformance->successful()
                 ) {
-                    $neededCheckType = 'check_in';
+                    // Decide next needed check type
+                    $neededCheckType = null;
+
+                    if (
+                        !isset($responseTodayAttendance['data']['check_in_time']) &&
+                        !isset($responseTodayAttendance['data']['check_out_time'])
+                    ) {
+                        $neededCheckType = 'check_in';
+                    } else if (
+                        isset($responseTodayAttendance['data']['check_in_time']) &&
+                        !isset($responseTodayAttendance['data']['check_out_time'])
+                    ) {
+                        $neededCheckType = 'check_out';
+                    }
+
+                    $isLate = false;
+
+                    if (isset($responseTodayAttendance['data']['check_in_time'])) {
+                        $dueTime =
+                            \Carbon\Carbon::parse($responseConfig['data']['check_in_time']);
+                        $checkInTime =
+                            \Carbon\Carbon::parse($responseTodayAttendance['data']['check_in_time']);
+
+                        $isLate = $dueTime->lt($checkInTime);
+                    }
+
+                    $motivation = '';
+
+                    if (!$responseMotivation->tooManyRequests()) {
+                        $motivation = $responseMotivation['data']['motivation'];
+                    }
+
+                    return view('user.dashboard', [
+                        'configs' => $responseConfig['data'],
+                        'today_attendance' => [
+                            'needed_check_type' => $neededCheckType,
+                            'is_late' => $isLate
+                        ],
+                        'motivation' => $motivation,
+                        'old_period' => (intval($param) !== 0 ? intval($param) : 3),
+                        'employee_attendance_chart' => $responseEmployeeAttendanceChart['data'],
+                        'employee_peformance' => $responseEmployeePeformance['data'] ?? [],
+                        'is_manager' => $isManager
+                    ]);
                 } else if (
-                    isset($responseTodayAttendance['data']['check_in_time']) &&
-                    !isset($responseTodayAttendance['data']['check_out_time'])
+                    $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
+                    || $responseMotivation->unauthorized() || $responseEmployeeAttendanceChart->unauthorized() || $responseEmployeePeformance->unauthorized()
                 ) {
-                    $neededCheckType = 'check_out';
+                    return redirect()->intended(route('user.login'));
+                } else if (
+                    $responseConfig->serverError() || $responseTodayAttendance->serverError()
+                    || $responseMotivation->serverError() || $responseEmployeeAttendanceChart->serverError() || $responseEmployeePeformance->serverError()
+                ) {
+                    return abort(500);
                 }
+            } else {
+                if (
+                    $responseConfig->successful() && $responseTodayAttendance->successful() &&
+                    ($responseMotivation->successful() || $responseMotivation->tooManyRequests())
+                ) {
+                    // Decide next needed check type
+                    $neededCheckType = null;
 
-                $isLate = false;
+                    if (
+                        !isset($responseTodayAttendance['data']['check_in_time']) &&
+                        !isset($responseTodayAttendance['data']['check_out_time'])
+                    ) {
+                        $neededCheckType = 'check_in';
+                    } else if (
+                        isset($responseTodayAttendance['data']['check_in_time']) &&
+                        !isset($responseTodayAttendance['data']['check_out_time'])
+                    ) {
+                        $neededCheckType = 'check_out';
+                    }
 
-                if (isset($responseTodayAttendance['data']['check_in_time'])) {
-                    $dueTime =
-                        \Carbon\Carbon::parse($responseConfig['data']['check_in_time']);
-                    $checkInTime =
-                        \Carbon\Carbon::parse($responseTodayAttendance['data']['check_in_time']);
+                    $isLate = false;
 
-                    $isLate = $dueTime->lt($checkInTime);
+                    if (isset($responseTodayAttendance['data']['check_in_time'])) {
+                        $dueTime =
+                            \Carbon\Carbon::parse($responseConfig['data']['check_in_time']);
+                        $checkInTime =
+                            \Carbon\Carbon::parse($responseTodayAttendance['data']['check_in_time']);
+
+                        $isLate = $dueTime->lt($checkInTime);
+                    }
+
+                    $motivation = '';
+
+                    if (!$responseMotivation->tooManyRequests()) {
+                        $motivation = $responseMotivation['data']['motivation'];
+                    }
+
+                    return view('user.dashboard', [
+                        'configs' => $responseConfig['data'],
+                        'today_attendance' => [
+                            'needed_check_type' => $neededCheckType,
+                            'is_late' => $isLate
+                        ],
+                        'motivation' => $motivation,
+                        'is_manager' => $isManager
+                    ]);
+                } else if (
+                    $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
+                    || $responseMotivation->unauthorized()
+                ) {
+                    return redirect()->intended(route('user.login'));
+                } else if (
+                    $responseConfig->serverError() || $responseTodayAttendance->serverError()
+                    || $responseMotivation->serverError()
+                ) {
+                    return abort(500);
                 }
-
-                $motivation = '';
-
-                if (!$responseMotivation->tooManyRequests()) {
-                    $motivation = $responseMotivation['data']['motivation'];
-                }
-
-                return view('user.dashboard', [
-                    'configs' => $responseConfig['data'],
-                    'today_attendance' => [
-                        'needed_check_type' => $neededCheckType,
-                        'is_late' => $isLate
-                    ],
-                    'motivation' => $motivation,
-                    'employee_peformance' => $responseEmployeePeformance['data'] ?? []
-                ]);
-            } else if (
-                $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()
-                || $responseMotivation->unauthorized()
-            ) {
-                return redirect()->intended(route('user.login'));
-            } else if (
-                $responseConfig->serverError() || $responseTodayAttendance->serverError()
-                || $responseMotivation->serverError()
-            ) {
-                return abort(500);
             }
 
             return abort($responseTodayAttendance->status());

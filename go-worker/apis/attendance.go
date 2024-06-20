@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"auths"
@@ -433,7 +434,7 @@ func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetDepartmentUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
+func GetEmployeeAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()
 		defer postMu.Unlock()
@@ -484,7 +485,7 @@ func GetDepartmentUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
 		today := time.Now().In(loc)
 
 		best_response_data, err :=
-			responses.DepartmentUserStatsResponse{}.GetBestDepartmentUserStats(today, *user.DepartmentId)
+			responses.DepartmentUserStatsResponse{}.GetBestDepartmentUserStats(today, *user.DepartmentId, user.Id)
 
 		// Ensure no error get department
 		if err != nil {
@@ -499,7 +500,7 @@ func GetDepartmentUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		worst_response_data, err :=
-			responses.DepartmentUserStatsResponse{}.GetWorstDepartmentUserStats(today, *user.DepartmentId)
+			responses.DepartmentUserStatsResponse{}.GetWorstDepartmentUserStats(today, *user.DepartmentId, user.Id)
 
 		// Ensure no error get department worst user attendance
 		if err != nil {
@@ -519,6 +520,127 @@ func GetDepartmentUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
 				BestUsersAttendance:  best_response_data,
 				WorstUsersAttendance: worst_response_data,
 			},
+		})
+	}
+}
+
+func GetEmployeeAttendanceChartHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		period, err := strconv.Atoi(r.PathValue("period"))
+
+		if err != nil || period <= 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "Invalid user id",
+			})
+
+			return
+		}
+
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
+
+		user, err := models.User{}.GetUsingId(int(token["id"].(float64)))
+
+		// Ensure no error fetch user data
+		if err != nil {
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		loc, err := configs.Timezone{}.GetTimeZone()
+
+		// Ensure no error get timezone location
+		if err != nil {
+			log.Panic("Error get timezone location: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		today := time.Now().In(loc)
+
+		periods := map[int]map[string]any{
+			1: {
+				"time": today.AddDate(0, 0, -1).Format(time.DateOnly),
+				"days": 1,
+			},
+			2: {
+				"time": today.Format(time.DateOnly),
+				"days": 1,
+			},
+			3: {
+				"time": today.AddDate(0, 0, -7).Format(time.DateOnly),
+				"days": 7,
+			},
+			4: {
+				"time": today.AddDate(0, 0, -30).Format(time.DateOnly),
+				"days": 30,
+			},
+			5: {
+				"time": today.AddDate(0, 0, -90).Format(time.DateOnly),
+				"days": 90,
+			},
+		}
+
+		var response_data responses.DepartmentUserChartResponse
+
+		var employee_count int
+
+		if period >= 1 && period <= 2 {
+			employee_count, err =
+				response_data.GetDepartmentUsersAttendance(periods[period]["time"].(string), *user.DepartmentId, user.Id)
+		} else {
+			employee_count, err =
+				response_data.GetDepartmentUsersAttendanceBetween(periods[period]["time"].(string), periods[2]["time"].(string), *user.DepartmentId, user.Id)
+		}
+
+		// Ensure no error get department user attendance in a period
+		if err != nil {
+			log.Panic("Error get employee attendance chart in a period: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		response_data.AbsenceCount =
+			(employee_count * periods[period]["days"].(int)) - response_data.AttendCount
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
 		})
 	}
 }

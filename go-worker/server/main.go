@@ -50,9 +50,14 @@ func initEndPoints() {
 			auths.UserMiddleware(http.HandlerFunc(apis.GetUserAttendanceStatsHandler))))
 
 	// Attendance stats related
+	mux.Handle("/api/users/me/department/users/attendance/chart/{period}",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(
+				auths.ManagerMiddleware(http.HandlerFunc(apis.GetEmployeeAttendanceChartHandler)))))
 	mux.Handle("/api/users/me/department/users/attendance/stats",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentUsersStatsHandler))))
+			auths.UserMiddleware(
+				auths.ManagerMiddleware(http.HandlerFunc(apis.GetEmployeeAttendanceStatsHandler)))))
 
 	// Admin users endpoints
 	mux.Handle("/api/users",
