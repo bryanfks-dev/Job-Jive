@@ -151,10 +151,10 @@
 
                     let diff = (timeDiff / 3600000).toFixed(1);
 
-                    diff = Math.min(Math.max(diff, 0), obj.max);
+                    diff = Math.min(Math.max(diff, 0), today.max);
 
                     obj.span.textContent = `${obj.curr + diff} / ${obj.max} ${obj.unit}`;
-                    obj.bar.style.width = `${(obj.curr + diff / obj.max) * 100}%`;
+                    obj.bar.style.width = `${((obj.curr + diff) / obj.max) * 100}%`;
                 }
             }
 

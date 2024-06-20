@@ -35,7 +35,13 @@ class DashboardController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/motivation');
 
-            $isManager = ($responseProfile['data']['as'] === 'Manager');
+            if ($responseProfile->forbidden()) {
+                return abort($responseProfile->status());
+            } else if ($responseProfile->unauthorized()) {
+                return redirect()->intended(route('user.login'));
+            } else {
+                $isManager = ($responseProfile['data']['as'] === 'Manager');
+            }
 
             $responseEmployeePeformance = null;
             $responseEmployeeAttendanceChart = null;

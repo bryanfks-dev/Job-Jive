@@ -436,6 +436,51 @@ func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetUserAttendanceStatsByIdHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		stats, err :=
+			models.AttendanceStats{}.GetUsingUserId(id)
+
+		// Ensure no error get attendance stats
+		if err != nil {
+			log.Panic("Error get attendance stats: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		var response_data responses.AttendanceStatsReponse
+
+		response_data.Create(stats)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
 func GetEmployeeAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		postMu.Lock()

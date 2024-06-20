@@ -1,7 +1,6 @@
 package apis
 
 import (
-	"configs"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"auths"
+	"configs"
 	"db"
 	"forms"
 	"models"
@@ -584,11 +584,6 @@ func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		is_manager :=
-			(response_data.Manager != nil && user_id == response_data.Manager.Id)
-
-		response_data.IsManager = &is_manager
-
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,
@@ -807,11 +802,6 @@ func SearchEmployeesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		is_manager :=
-			(response_data.Manager != nil && user_id == response_data.Manager.Id)
-
-		response_data.IsManager = &is_manager
-
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
 			"data": response_data,
@@ -854,6 +844,29 @@ func AttendUserHandledByManagerHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		attend_form.Sanitize()
+
+		// Validate remaining annual leaves
+		attendance_stats, err :=
+			models.AttendanceStats{}.GetUsingUserId(id)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Make sure user annual leaves cannot updated beyond 0
+		if attendance_stats.AnnualLeaves == 0 {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "user annual leaves already reach maximum amount",
+			})
+
+			return
+		}
 
 		var response_data responses.AttendanceReponse
 

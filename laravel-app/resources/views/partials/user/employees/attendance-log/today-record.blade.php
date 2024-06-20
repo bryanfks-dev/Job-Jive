@@ -60,7 +60,6 @@
                 <input type="hidden" id="user_id" name="user_id" value="{{ $employee }}">
                 <input type="hidden" id="check_in_time" name="check_in_time"
                     value="{{ date('Y-m-d ', strtotime($record['date'])) . $configs['check_in_time'] . ':00' }}">
-
                 <input type="hidden" id="check_out_time" name="check_out_time"
                     value="{{ date('Y-m-d ', strtotime($record['date'])) . $configs['check_out_time'] . ':00' }}">
                 <button type="submit"

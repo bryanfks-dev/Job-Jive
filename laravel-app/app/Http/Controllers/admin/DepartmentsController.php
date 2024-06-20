@@ -113,8 +113,6 @@ class DepartmentsController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $id = intval($id);
-
         if ($id <= 0) {
             return abort(404);
         }
@@ -169,8 +167,6 @@ class DepartmentsController extends Controller
 
     public function delete(Request $request, int $id)
     {
-        $id = intval($id);
-
         if ($id <= 0) {
             return abort(404);
         }

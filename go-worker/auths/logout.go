@@ -1,5 +1,0 @@
-package auths
-
-func LogoutHandler() {
-
-}

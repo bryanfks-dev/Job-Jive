@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\BackendServer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -18,7 +17,7 @@ class PeoplesController extends Controller
             $responseDepartmentUsers = null;
 
             $httpHeaders = [
-                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                 'Accept' => 'application/json',
             ];
 
@@ -27,11 +26,11 @@ class PeoplesController extends Controller
             if (!empty($param)) {
                 $responseDepartmentUsers =
                     \Http::withHeaders($httpHeaders)
-                        ->get(BackendServer::url().'/api/users/me/department/users/search/'.$param);
+                        ->get(BackendServer::url() . '/api/users/me/department/users/search/' . $param);
             } else {
                 $responseDepartmentUsers =
                     \Http::withHeaders($httpHeaders)
-                        ->get(BackendServer::url().'/api/users/me/department/users');
+                        ->get(BackendServer::url() . '/api/users/me/department/users');
             }
 
             $responseProfile =
@@ -45,7 +44,7 @@ class PeoplesController extends Controller
                 return view('user.peoples', [
                     'department_name' => $responseDepartmentUsers['data']['name'],
                     'manager' => $responseDepartmentUsers['data']['manager'],
-                    'is_manager' => $responseDepartmentUsers['data']['is_manager'],
+                    'is_manager' => ($responseProfile['data']['as'] === 'Manager'),
                     'employees' => $paginatedEmployees,
                     'profile' => $responseProfile['data']
                 ]);
@@ -65,8 +64,6 @@ class PeoplesController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $id = intval($id);
-
         if ($id <= 0) {
             return abort(404);
         }
@@ -78,7 +75,7 @@ class PeoplesController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
-                'update-error-'.$id => $validator->errors()->first(),
+                'update-error-' . $id => $validator->errors()->first(),
             ]);
         }
 
@@ -86,16 +83,14 @@ class PeoplesController extends Controller
             $initial_salary = floatval(str_replace('.', '', $request->input('initial_salary')));
             $current_salary = floatval(str_replace('.', '', $request->input('current_salary')));
 
-            // dd($request->all());
-
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                 'Content-type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->put(BackendServer::url().'/api/users/me/department/users/update/'.$id, [
-                'initial_salary' => $initial_salary,
-                'current_salary' => $current_salary,
-            ]);
+            ])->put(BackendServer::url() . '/api/users/me/department/users/' . $id . '/update/salary', [
+                        'initial_salary' => $initial_salary,
+                        'current_salary' => $current_salary,
+                    ]);
 
             if ($response->successful()) {
                 return redirect()->back()
@@ -111,22 +106,17 @@ class PeoplesController extends Controller
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('user.login'));
             } else {
-                Log::error('Failed to update employee salary', [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                ]);
-
                 return redirect()->intended(route('user.peoples'))->withErrors([
-                    'update-error-'.$id => $response['error'] ?? 'An error occurred',
+                    'update-error-' . $id => $response['error'] ?? 'An error occurred',
                 ])->withInput([
-                    'initial_salary' => $request['initial_salary'],
-                    'current_salary' => $request['current_salary'],
-                ]);
+                            'initial_salary' => $request['initial_salary'],
+                            'current_salary' => $request['current_salary'],
+                        ]);
             }
         } catch (\Exception $e) {
-            Log::error('Exception while updating employee salary', [
-                'error' => $e->getMessage(),
-            ]);
+            if ($e instanceof HttpException) {
+                return abort($response->status());
+            }
 
             return abort(500);
         }
@@ -136,34 +126,37 @@ class PeoplesController extends Controller
     {
         try {
             $httpHeaders = [
-                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                 'Accept' => 'application/json',
             ];
 
             $responseAttendance =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url().'/api/users/me/department/users/employee-attendance/'.$id);
+                    ->get(BackendServer::url() . '/api/users/me/department/users/' . $id . '/attendance/data');
 
             $responseConfig =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url().'/api/configs');
+                    ->get(BackendServer::url() . '/api/configs');
 
             $responseAttendenceStats =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url().'/api/users/me/attendance/stats');
+                    ->get(BackendServer::url() . '/api/users/' . $id . '/attendance/stats');
 
-            $responseManager =
-             \Http::withHeaders($httpHeaders)
-                 ->get(BackendServer::url().'/api/users/me/department/users');
+            $responseProfile =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/profile');
 
-            if ($responseAttendance->successful() && $responseConfig->successful()) {
+            if (
+                $responseAttendance->successful() && $responseConfig->successful() &&
+                $responseAttendenceStats->successful() && $responseProfile->successful()
+            ) {
                 $attendances = $responseAttendance['data'][0];
 
                 // Check for filter key
                 $param =
                     trim($request->get('month', ''), ' ');
 
-                if (! empty($param)) {
+                if (!empty($param)) {
                     $maxMonth = $attendances['month'];
 
                     // Validate param value, so index won't be out of bound
@@ -175,7 +168,6 @@ class PeoplesController extends Controller
 
                 $attendances['records'] =
                     $this->paginate($attendances['records'] ?? [], 7);
-                // dd($responseEmployees['data']['employees']);
 
                 return view('user.employees.attendance', [
                     'configs' => $responseConfig['data'],
@@ -192,12 +184,19 @@ class PeoplesController extends Controller
                     }, $responseAttendance['data']),
                     'check_in_time' => $responseAttendance['data'][0]['records'][0]['check_in_time'],
                     'attendances' => $attendances,
-                    'is_manager' => $responseManager['data']['is_manager'],
+                    'is_manager' => ($responseProfile['data']['as'] === 'Manager'),
                     'employee' => $id,
+                    'profile' => $responseProfile['data']
                 ]);
-            } elseif ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
+            } else if (
+                $responseAttendance->unauthorized() || $responseConfig->unauthorized()
+                || $responseAttendenceStats->unauthorized() || $responseProfile->unauthorized()
+            ) {
                 return redirect()->intended(route('user.login'));
-            } elseif ($responseAttendance->serverError() || $responseConfig->serverError()) {
+            } else if (
+                $responseAttendance->serverError() || $responseConfig->serverError()
+                || $responseAttendenceStats->serverError() || $responseProfile->serverError()
+            ) {
                 return abort(500);
             }
 
@@ -209,25 +208,30 @@ class PeoplesController extends Controller
 
             return abort(500);
         }
-
     }
 
     public function updateAttendance(Request $request, int $id)
     {
+        if ($id <= 0) {
+            return abort(404);
+        }
+
         try {
+            $response =
+                \Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ])->post(BackendServer::url() . '/api/users/me/department/users/' . $id . '/attendance/update', [
+                            'user_id' => $request['user_id'],
+                            'check_in_time' => $request['check_in_time'],
+                            'check_out_time' => $request['check_out_time'],
+                        ]);
 
-            $response = \Http::withHeaders([
-                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ])->post(BackendServer::url().'/api/users/me/department/users/update-employee-attendance/'.$id, [
-                'user_id' => $request['user_id'],
-                'check_in_time' => $request['check_in_time'],
-                'check_out_time' => $request['check_out_time'],
-            ]);
-
-            if ($response->successful()) {
+            if ($response->successful() || $response->unprocessableEntity()) {
                 return redirect()->intended(route('user.peoples.attendance', $id));
+            } else if ($response->unauthorized()) {
+                return redirect()->intended(route('user.login'));
             }
 
             return abort($response->status());

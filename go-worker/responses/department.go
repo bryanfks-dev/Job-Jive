@@ -9,7 +9,6 @@ type DepartmentResponse struct {
 	Id        int             `json:"id"`
 	Name      string          `json:"name,omitempty"`
 	Manager   *UserResponse   `json:"manager"`
-	IsManager *bool           `json:"is_manager,omitempty"`
 	Employees *[]UserResponse `json:"employees,omitempty"`
 }
 
