@@ -210,8 +210,7 @@ func main() {
 	c.AddFunc("@monthly", resetAttendanceStatsMonthly)
 	c.AddFunc("@yearly", resetAttendanceStatsYearly)
 	c.AddFunc("@monthly", resetCurrentSalary)
-	// c.AddFunc("0 59 23 * * *", subCurrentSalary)
-	c.AddFunc("@every 1m", subCurrentSalary)
+	c.AddFunc("0 59 23 * * *", subCurrentSalary)
 
 	fmt.Println("Start cron job")
 
