@@ -807,3 +807,12 @@ func SearchEmployeesHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
+
+func GetDepartmentsUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		
+	}
+}

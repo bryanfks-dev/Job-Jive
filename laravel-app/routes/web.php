@@ -37,6 +37,9 @@ Route::group(['prefix' => '/'], function () {
         Route::get('/', [user\PeoplesController::class, 'index'])
             ->name('user.peoples');
 
+        Route::put('/{id}/attendance', [user\PeoplesController::class, 'attendance'])
+            ->where(['id' => '[1-9][0-9]*'])->name('user.peoples.attendance');
+
         Route::put('/update/{id}', [user\PeoplesController::class, 'update'])
             ->where(['id' => '[1-9][0-9]*'])->name('user.peoples.update');
     });

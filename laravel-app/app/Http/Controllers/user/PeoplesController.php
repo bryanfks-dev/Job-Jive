@@ -114,4 +114,19 @@ class PeoplesController extends Controller
             return abort(500);
         }
     }
+
+    public function attendance(Request $request, int $id)
+    {
+        $id = intval($id);
+
+        if ($id <= 0) {
+            return abort(404);
+        }
+
+        try {
+
+        } catch (\Exception $e) {
+
+        }
+    }
 }
