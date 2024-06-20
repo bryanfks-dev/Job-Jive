@@ -98,6 +98,9 @@ func initEndPoints() {
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(auths.ManagerMiddleware(
 				http.HandlerFunc(apis.UpdateDeparmentUserHandler)))))
+	mux.Handle("/api/users/me/department/users/search/{query}",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(http.HandlerFunc(apis.SearchEmployeesHandler))))
 
 	// Jobs endpoints
 }

@@ -251,3 +251,41 @@ func (user User) Search(query string) ([]User, error) {
 
 	return users, nil
 }
+
+func (user User) SearchDepartmentEmployee(query string, department_id int, manager_id int) ([]User, error) {
+	stmt := "SELECT * FROM `users` WHERE CONCAT(Full_Name, '|', Email, '|', Phone_Number, '|', Gender) REGEXP ? AND Department_ID = ? AND User_ID <> ?"
+
+	row, err := db.Conn.Query(stmt, query, department_id, manager_id)
+
+	// Ensure no error get user data
+	if err != nil {
+		return []User{}, err
+	}
+
+	defer row.Close()
+
+	var users []User
+
+	for row.Next() {
+		err := row.Scan(&user.Id,
+			&user.FullName,
+			&user.Email,
+			&user.Password,
+			&user.DateOfBirth,
+			&user.Address,
+			&user.NIK,
+			&user.Photo,
+			&user.Gender,
+			&user.PhoneNumber,
+			&user.DepartmentId,
+			&user.FirstLogin)
+
+		if err != nil {
+			return []User{}, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

@@ -574,9 +574,9 @@ func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		is_manager := 
+		is_manager :=
 			(response_data.Manager != nil && user_id == response_data.Manager.Id)
-		
+
 		response_data.IsManager = &is_manager
 
 		w.WriteHeader(http.StatusOK)
@@ -616,6 +616,18 @@ func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]any{
 				"error": "bad request",
+			})
+
+			return
+		}
+
+		valid, err := salaryForm.Validate()
+
+		// Ensure form values are valid
+		if !valid {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": err.Error(),
 			})
 
 			return
@@ -678,6 +690,116 @@ func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 			})
 			return
 		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
+func SearchEmployeesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set the content type of the response to application/json
+		w.Header().Set("Content-Type", "application/json")
+
+		// Retrieve value from url
+		query := strings.TrimSpace(r.PathValue("query"))
+
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
+
+		user_id := int(token["id"].(float64))
+		user, err := models.User{}.GetUsingId(user_id)
+
+		// Ensure no error get user
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+
+				return
+			}
+
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		if user.DepartmentId == nil {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "user not belongs to any department",
+			})
+
+			return
+		}
+
+		department, err :=
+			models.Department{}.GetUsingId(*user.DepartmentId)
+
+		// Ensure no error get user department
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid department id",
+				})
+
+				return
+			}
+
+			log.Panic("Error get department: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		// Initialize response data
+		var response_data responses.DepartmentResponse
+
+		err = response_data.CreateUsersSearch(query, department)
+
+		// Ensure no error create response
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		is_manager :=
+			(response_data.Manager != nil && user_id == response_data.Manager.Id)
+
+		response_data.IsManager = &is_manager
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{
