@@ -19,7 +19,11 @@
                     </path>
                 </svg>
             @endif
-            <span class="font-medium">Check-In</span>
+            <div class="flex flex-col">
+                <span class="font-medium">Check-In</span>
+                <span
+                    class="text-xs font-medium text-blue-600 dark:text-blue-500">{{ $record['check_in_time'] ?? '-' }}</span>
+            </div>
         </li>
         <li class="items-center block p-3 sm:flex">
             @if (isset($record['check_out_time']))
@@ -37,7 +41,11 @@
                     </path>
                 </svg>
             @endif
-            <span class="font-medium text-gray-900 dark:text-white">Check-Out</span>
+            <div class="flex flex-col">
+                <span class="font-medium">Check-In</span>
+                <span
+                    class="text-xs font-medium text-blue-600 dark:text-blue-500">{{ $record['check_out_time'] ?? '-' }}</span>
+            </div>
         </li>
     </ol>
 </div>
