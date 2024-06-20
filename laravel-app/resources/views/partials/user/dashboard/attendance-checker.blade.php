@@ -6,8 +6,8 @@
             @csrf
             @if ($today_attendance['needed_check_type'] === 'check_in')
                 {{-- Check-in --}}
-                <button type="submit"
-                    class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-yellow-400 rounded-xl sm:rounded-lg hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <button type="submit" id="check-in-btn" disabled
+                    class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-yellow-500 rounded-xl sm:rounded-lg hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     <div class="text-left">
                         <div>Check In</div>
                         <div class="text-xs font-normal" id="time">00:00:00</div>
@@ -20,58 +20,30 @@
             @else
                 @if ($today_attendance['is_late'])
                     {{-- Late check in --}}
-                    @if (!isset($today_attendance['needed_check_type']))
-                        <button type="submit" id="check-out-btn" disabled
-                            class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-red-800 rounded-xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
-                                <path fill="currentColor"
-                                    d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
-                            </svg>
-                            <div class="text-left">
-                                <div>Check Out</div>
-                                <div class="text-xs font-normal">Late</div>
-                            </div>
-                        </button>
-                    @else
-                        <button type="submit" id="check-out-btn"
-                            class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-red-700 hover:bg-red-800 rounded-xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
-                                <path fill="currentColor"
-                                    d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
-                            </svg>
-                            <div class="text-left">
-                                <div>Check Out</div>
-                                <div class="text-xs font-normal">Late</div>
-                            </div>
-                        </button>
-                    @endif
+                    <button type="submit" id="check-out-btn" disabled
+                        class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-red-800 hover:bg-red-800 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
+                        </svg>
+                        <div class="text-left">
+                            <div>Check Out</div>
+                            <div class="text-xs font-normal">Late</div>
+                        </div>
+                    </button>
                 @else
                     {{-- On time check in --}}
-                    @if (!isset($today_attendance['needed_check_type']))
-                        <button type="submit" id="check-out-btn" disabled
-                            class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-green-600 rounded-xl ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
-                                <path fill="currentColor"
-                                    d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
-                            </svg>
-                            <div class="text-left">
-                                <div>Check Out</div>
-                                <div class="text-xs font-normal">On-Time</div>
-                            </div>
-                        </button>
-                    @else
-                        <button type="submit" id="check-out-btn"
-                            class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-green-500 hover:bg-green-600 rounded-xl ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
-                                <path fill="currentColor"
-                                    d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
-                            </svg>
-                            <div class="text-left">
-                                <div>Check Out</div>
-                                <div class="text-xs font-normal">On-Time</div>
-                            </div>
-                        </button>
-                    @endif
+                    <button type="submit" id="check-out-btn" disabled
+                        class="gap-3 inline-flex items-center w-full justify-between sm:justify-normal sm:w-auto px-6 py-3 text-sm font-medium text-center text-white bg-green-800 hover:bg-green-800 rounded-xl ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="2.5em" viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M3 2.75C3 1.784 3.784 1 4.75 1h6.5c.966 0 1.75.784 1.75 1.75v3.457A5.5 5.5 0 0 0 7.257 15H4.75A1.75 1.75 0 0 1 3 13.25zM6 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m10 2.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-6.853-.354l-.003.003a.5.5 0 0 0-.144.348v.006a.5.5 0 0 0 .146.35l2 2a.5.5 0 0 0 .708-.707L10.707 12H13.5a.5.5 0 0 0 0-1h-2.793l1.147-1.146a.5.5 0 0 0-.708-.708z" />
+                        </svg>
+                        <div class="text-left">
+                            <div>Check Out</div>
+                            <div class="text-xs font-normal">On-Time</div>
+                        </div>
+                    </button>
                 @endif
             @endif
         </form>
@@ -108,8 +80,14 @@
 @if ($today_attendance['needed_check_type'] === 'check_in')
     <script type="module">
         // Clock script
+        const checkInBtn = document.querySelector('#check-in-btn');
+
         const time = document.querySelector('#time');
+        const dumyDate = "2024-01-02";
         const tz = '{{ Config::get('app.timezone') }}';
+        const checkInTime = new Date(`${dumyDate} {{ $configs['check_in_time'] }}`);
+        const minCheckInTime =
+            new Date(checkInTime.getTime() - {{ $configs['min_check_in_minutes'] }} * 60000);
 
         (function init() {
             const currTime = new Date().toLocaleString('en-GB', {
@@ -119,6 +97,14 @@
                 second: '2-digit',
                 hour12: false
             });
+
+            const parsedCurrTime = new Date(`${dumyDate} ${currTime}`);
+
+            // Enable check in time
+            if (parsedCurrTime >= minCheckInTime) {
+                checkInBtn.disabled = false;
+                checkInBtn.classList.replace('bg-yellow-500', 'bg-yellow-400');
+            }
 
             // Display date & time
             time.textContent = currTime;
@@ -133,8 +119,9 @@
 
         const tz = '{{ Config::get('app.timezone') }}';
         const dumyDate = '2024-01-02';
-
-        const minCheckOutTime = new Date(`${dumyDate} {{ $configs['check_out_time'] }}`);
+        const checkOutTime = new Date(`${dumyDate} {{ $configs['check_out_time'] }}`);
+        const maxCheckOutTime =
+            new Date(checkOutTime.getTime() + {{ $configs['max_check_out_minutes'] }} * 60000);
 
         (function init() {
             let currTime = new Date().toLocaleString('en-GB', {
@@ -148,8 +135,14 @@
             currTime = new Date(`${dumyDate} ${currTime}`);
 
             // Prevent user to check out before check out time
-            if (currTime < minCheckOutTime) {
-                checkOutBtn.disabled = true;
+            if (currTime > checkOutTime && currTime <= maxCheckOutTime) {
+                checkOutBtn.disabled = false;
+
+                if (checkOutBtn.classList.contains('bg-red-800')) {
+                    checkOutBtn.classList.replace('bg-red-800', 'bg-red-500');
+                } else {
+                    checkOutBtn.classList.replace('bg-green-800', 'bg-green-500');
+                }
             }
 
             setTimeout(init, 1000);

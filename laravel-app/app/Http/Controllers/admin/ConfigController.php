@@ -41,11 +41,14 @@ class ConfigController extends Controller
     {
         $validator =
             \Validator::make(request()->all(), [
-                'check_in_time' => ['required', 'date_format:H:i', 'before:' . $request['check_out_time']],
-                'check_out_time' => ['required', 'date_format:H:i', 'after:' . $request['check_in_time']],
-                'absence_quota' => ['required', 'integer'],
+                'check_in_time' => ['required', 'date_format:H:i', 'before:check_out_time'],
+                'check_out_time' => ['required', 'date_format:H:i', 'after:check_in_time'],
+                'min_check_in_minutes' => ['required', 'integer', 'min:1', 'max:1440'], // 1440 is 24 * 60, which means total minutes in a day
+                'max_check_out_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
+                'absence_quota' => ['required', 'integer', 'min:0'],
                 'daily_work_hours' => ['required', 'integer', 'lte:weekly_work_hours', 'min:1', 'max:24'],
-                'weekly_work_hours' => ['required', 'integer', 'gte:daily_work_hours', 'min:1', 'max:168']
+                'weekly_work_hours' => ['required', 'integer', 'gte:daily_work_hours', 'min:1', 'max:168'],
+                'deduction_amounts' => ['required', 'integer', 'min:0']
             ]);
 
         if ($validator->fails()) {
@@ -54,9 +57,12 @@ class ConfigController extends Controller
                 ->withInput([
                     'check_in_time' => $request['check_in_time'],
                     'check_out_time' => $request['check_out_time'],
+                    'min_check_in_minutes' => $request['min_check_in_minutes'],
+                    'max_check_out_minutes' => $request['max_check_out_minutes'],
                     'absence_quota' => $request['absence_quota'],
                     'daily_work_hours' => $request['daily_work_hours'],
-                    'weekly_work_hours' => $request['weekly_work_hours']
+                    'weekly_work_hours' => $request['weekly_work_hours'],
+                    'deduction_amounts' => $request['deduction_ammounts']
                 ]);
         }
 
@@ -69,9 +75,12 @@ class ConfigController extends Controller
                 ])->put(BackendServer::url() . '/api/configs/save', [
                             'check_in_time' => $request['check_in_time'],
                             'check_out_time' => $request['check_out_time'],
+                            'min_check_in_minutes' => intval($request['min_check_in_minutes']),
+                            'max_check_out_minutes' => intval($request['max_check_out_minutes']),
                             'absence_quota' => intval($request['absence_quota']),
                             'daily_work_hours' => intval($request['daily_work_hours']),
-                            'weekly_work_hours' => intval($request['weekly_work_hours'])
+                            'weekly_work_hours' => intval($request['weekly_work_hours']),
+                            'deduction_amounts' => intval($request['deduction_ammounts'])
                         ]);
 
             if ($response->successful()) {
@@ -82,9 +91,12 @@ class ConfigController extends Controller
                     ->withInput([
                         'check_in_time' => $request['check_in_time'],
                         'check_out_time' => $request['check_out_time'],
+                        'min_check_in_minutes' => $request['min_check_in_minutes'],
+                        'max_check_out_minutes' => $request['max_check_out_minutes'],
                         'absence_quota' => $request['absence_quota'],
                         'daily_work_hours' => $request['daily_work_hours'],
-                        'weekly_work_hours' => $request['weekly_work_hours']
+                        'weekly_work_hours' => $request['weekly_work_hours'],
+                        'deduction_amounts' => $request['deduction_ammounts']
                     ]);
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('admin.login'));

@@ -64,7 +64,7 @@ class DashboardController extends Controller
                 $motivation = "";
 
                 if ($responseMotivation->tooManyRequests()) {
-                    $motivation = "Too many request, please try again for a few moments to generate motivation.";
+                    $motivation = "Too many request, please try again a few moments to generate motivation.";
                 } else {
                     $motivation = $responseMotivation['data']['motivation'];
                 }

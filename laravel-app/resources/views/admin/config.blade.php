@@ -6,12 +6,13 @@
         @method('PUT')
         <div class="grid gap-4 mb-2 grid-cols-2">
             <div class="col-span-2 sm:col-span-1">
-                <label for="checkin_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label for="check_in_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Check-In Time</label>
                 <input type="time" name="check_in_time" id="check_in_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales"
-                    value="{{ empty(old('check_in_time')) ? $configs['check_in_time'] : old('check_in_time') }}" required="">
+                    value="{{ empty(old('check_in_time')) ? $configs['check_in_time'] : old('check_in_time') }}"
+                    required="" min="00:00" max="23:59">
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="check_out_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -19,15 +20,34 @@
                 <input type="time" name="check_out_time" id="check_out_time"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="ex. Sales"
-                    value="{{ empty(old('check_out_time')) ? $configs['check_out_time'] : old('check_out_time') }}" required="">
+                    value="{{ empty(old('check_out_time')) ? $configs['check_out_time'] : old('check_out_time') }}"
+                    required="" min="00:00" max="23:59">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="min_check_in_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Minimum Check-In Time (In Minutes)</label>
+                <input type="number" name="min_check_in_minutes" id="min_check_in_minutes"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="ex. 45"
+                    value="{{ empty(old('min_check_in_minutes')) ? $configs['min_check_in_minutes'] : old('min_check_in_minutes') }}"
+                    required="" min="1" max="1440">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="max_check_out_time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Maximum Check-Out Time (In Minutes)</label>
+                <input type="number" name="max_check_out_minutes" id="max_check_out_minutes"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="ex. 45"
+                    value="{{ empty(old('max_check_out_minutes')) ? $configs['max_check_out_minutes'] : old('max_check_out_minutes') }}"
+                    required="" min="1" max="1440">
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="absence_quota" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Absence Quota</label>
                 <input type="number" name="absence_quota" id="absence_quota"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value="{{ empty(old('absence_quota')) ? $configs['absence_quota'] : old('absence_quota') }}" required=""
-                    min="1">
+                    value="{{ empty(old('absence_quota')) ? $configs['absence_quota'] : old('absence_quota') }}"
+                    required="" min="1">
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="daily_work_hours" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -44,6 +64,15 @@
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     value="{{ empty(old('weekly_work_hours')) ? $configs['weekly_work_hours'] : old('daily_work_hours') }}"
                     required="" min="1" max="168">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="deduction_amounts" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Deduction Amounts</label>
+                <input type="number" name="deduction_amounts" id="deduction_amounts"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="ex. 45"
+                    value="{{ empty(old('deduction_amounts')) ? $configs['deduction_amounts'] : old('deduction_amounts') }}" min="0"
+                    required="">
             </div>
         </div>
 
