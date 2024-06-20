@@ -13,9 +13,19 @@ type AttendForm struct {
 	Time string `json:"time"`
 }
 
+type AttendFormByManager struct {
+	CheckIn  string `json:"check_in_time"`
+	CheckOut string `json:"check_out_time"`
+}
+
 var (
 	ErrTimeNotSync = errors.New("client and server time are not sync")
 )
+
+func (attend_form *AttendFormByManager) Sanitize() {
+	attend_form.CheckIn = strings.TrimSpace(attend_form.CheckIn)
+	attend_form.CheckOut = strings.TrimSpace(attend_form.CheckOut)
+}
 
 func (attend_form *AttendForm) Sanitize() {
 	attend_form.Date = strings.TrimSpace(attend_form.Date)

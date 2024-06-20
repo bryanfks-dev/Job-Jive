@@ -1,10 +1,13 @@
 package forms
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 type SalaryForm struct {
-	Initial float64 `json:"initial"`
-	Current float64 `json:"current"`
+	Initial float64 `json:"initial_salary"`
+	Current float64 `json:"current_salary"`
 }
 
 var (
@@ -14,6 +17,7 @@ var (
 
 func (salary_form SalaryForm) Validate() (bool, error) {
 	if salary_form.Initial <= 0 {
+		log.Print(salary_form.Initial)
 		return false, ErrInvalidInitialSalary
 	}
 

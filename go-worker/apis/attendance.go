@@ -160,6 +160,8 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		var attend_form forms.AttendForm
 
+		log.Println(attend_form)
+
 		err := req_json.Decode(&attend_form)
 
 		if err != nil {
@@ -172,6 +174,8 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		attend_form.Sanitize()
+
+		log.Println(attend_form)
 
 		valid, err := attend_form.Validate()
 

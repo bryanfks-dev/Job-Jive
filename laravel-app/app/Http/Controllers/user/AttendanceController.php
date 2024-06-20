@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\user;
 
-use Illuminate\Http\Request;
-use App\Models\BackendServer;
 use App\Http\Controllers\Controller;
+use App\Models\BackendServer;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AttendanceController extends Controller
@@ -13,21 +13,21 @@ class AttendanceController extends Controller
     {
         try {
             $httpHeaders = [
-                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
-                'Accept' => 'application/json'
+                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
+                'Accept' => 'application/json',
             ];
 
             $responseAttendance =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url() . '/api/users/me/attendance');
+                    ->get(BackendServer::url().'/api/users/me/attendance');
 
             $responseConfig =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url() . '/api/configs');
+                    ->get(BackendServer::url().'/api/configs');
 
             $responseAttendenceStats =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url() . '/api/users/me/attendance/stats');
+                    ->get(BackendServer::url().'/api/users/me/attendance/stats');
 
             if ($responseAttendance->successful() && $responseConfig->successful()) {
                 $attendances = $responseAttendance['data'][0];
@@ -36,7 +36,7 @@ class AttendanceController extends Controller
                 $param =
                     trim($request->get('month', ''), ' ');
 
-                if (!empty($param)) {
+                if (! empty($param)) {
                     $maxMonth = $attendances['month'];
 
                     // Validate param value, so index won't be out of bound
@@ -53,22 +53,21 @@ class AttendanceController extends Controller
                     'configs' => $responseConfig['data'],
                     'attendance_stats' => $responseAttendenceStats['data'],
                     'old_month_id' => intval($request->get('month')),
-                    'months' =>
-                        array_map(function ($v) {
-                            return [
-                                'id' => $v['month'],
-                                'name' => date(
-                                    'F',
-                                    mktime(0, 0, 0, $v['month'], 1)
-                                )
-                            ];
-                        }, $responseAttendance['data']),
+                    'months' => array_map(function ($v) {
+                        return [
+                            'id' => $v['month'],
+                            'name' => date(
+                                'F',
+                                mktime(0, 0, 0, $v['month'], 1)
+                            ),
+                        ];
+                    }, $responseAttendance['data']),
                     'check_in_time' => $responseAttendance['data'][0]['records'][0]['check_in_time'],
-                    'attendances' => $attendances
+                    'attendances' => $attendances,
                 ]);
-            } else if ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
+            } elseif ($responseAttendance->unauthorized() || $responseConfig->unauthorized()) {
                 return redirect()->intended(route('user.login'));
-            } else if ($responseAttendance->serverError() || $responseConfig->serverError()) {
+            } elseif ($responseAttendance->serverError() || $responseConfig->serverError()) {
                 return abort(500);
             }
 
@@ -89,13 +88,13 @@ class AttendanceController extends Controller
                 \Carbon\Carbon::now(config('app.timezone'));
 
             $response = \Http::withHeaders([
-                'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
+                'Authorization' => 'Bearer '.$request->cookie('auth_token'),
                 'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ])->post(BackendServer::url() . '/api/user/attend', [
-                        'date' => $dateTime->format('Y-m-d'),
-                        'time' => $dateTime->format('H:i:s')
-                    ]);
+                'Content-Type' => 'application/json',
+            ])->post(BackendServer::url().'/api/user/attend', [
+                'date' => $dateTime->format('Y-m-d'),
+                'time' => $dateTime->format('H:i:s'),
+            ]);
 
             if ($response->successful()) {
                 return redirect()->intended(route('user.dashboard'));

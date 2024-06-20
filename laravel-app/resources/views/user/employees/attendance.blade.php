@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="antialiased bg-gray-50 dark:bg-gray-900">
-
     <!-- Attendance -->
     <div
         class="p-5 mb-4 bg-white border border-gray-200 divide-y rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 divider-gray-200 dark:divide-gray-700">
@@ -91,9 +90,9 @@
             <div>
                 @foreach ($attendances['records'] as $record)
                 @if (date('Y-m-d') === $record['date'])
-                @include('partials.user.attendance.today-record')
+                @include('partials.user.employees.attendance-log.today-record')
                 @else
-                @include('partials.user.attendance.regular-record')
+                @include('partials.user.employees.attendance-log.regular-record')
                 @endif
                 @endforeach
             </div>

@@ -4,8 +4,8 @@ import "db"
 
 type Salary struct {
 	UserId  int     `json:"-"`
-	Initial float64 `json:"initial"`
-	Current float64 `json:"current"`
+	Initial float64 `json:"initial_salary"`
+	Current float64 `json:"current_salary"`
 }
 
 func (salary Salary) GetUsingUserId(user_id int) (Salary, error) {

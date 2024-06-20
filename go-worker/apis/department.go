@@ -1,12 +1,14 @@
 package apis
 
 import (
+	"configs"
 	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"auths"
 	"db"
@@ -657,6 +659,7 @@ func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 			})
 
 			return
+
 		}
 
 		// Update the initial and current values of the salary record
@@ -813,6 +816,206 @@ func GetDepartmentsUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
 		postMu.Lock()
 		defer postMu.Unlock()
 
-		
+	}
+}
+
+func AttendUserHandledByManagerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+		// Ensure user provide a valid record id
+		if err != nil || id <= 0 {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "invalid employee id",
+			})
+			return
+		}
+
+		// Decode json to struct
+		req_json := json.NewDecoder(r.Body)
+
+		var attend_form forms.AttendFormByManager
+
+		if err := req_json.Decode(&attend_form); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "bad request",
+			})
+
+			return
+		}
+
+		attend_form.Sanitize()
+
+		var response_data responses.AttendanceReponse
+
+		// Check whether new attendance is valid
+		if response_data.CheckIn != nil && response_data.CheckOut != nil {
+			w.WriteHeader(http.StatusAlreadyReported)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "already reported",
+			})
+
+			return
+		}
+
+		user, err :=
+			models.User{}.GetUsingId(id)
+
+		// Ensure no error fetching user data
+		if err != nil {
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		attendance_check_in := models.Attendance{
+			UserId:    id,
+			Date_Time: attend_form.CheckIn,
+			Type:      "Check-In",
+		}
+		err = attendance_check_in.Insert()
+
+		// Ensure no error insert attendance
+		if err != nil {
+			log.Panic("Error insert attendance: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		attendance_check_out := models.Attendance{
+			UserId:    id,
+			Date_Time: attend_form.CheckOut,
+			Type:      "Check-Out",
+		}
+
+		err = attendance_check_out.Insert()
+
+		// Ensure no error insert attendance
+		if err != nil {
+			log.Panic("Error insert attendance: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		reduced_annual_leave := models.AttendanceStats{}.UpdateAnnualLeaves(id)
+
+		if reduced_annual_leave != nil {
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		log.Printf("User `%s` reduced annual leave", user.FullName)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
+	}
+}
+
+func GetEmployeeAttendanceHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		// Ensure user provide a valid record id
+		if err != nil || id <= 0 {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "invalid employee id",
+			})
+
+			return
+		}
+
+		_, err = models.User{}.GetUsingId(id)
+
+		// Ensure no error fetching user using id
+		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "invalid user id",
+				})
+
+				return
+			}
+
+			log.Println("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		loc, err := configs.Timezone{}.GetTimeZone()
+
+		// Ensure no error get timezone location
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		curr_date_time := time.Now().In(loc)
+
+		curr_month := int(curr_date_time.Month())
+
+		// Create month
+		months := [3]int{curr_month, curr_month - 1, curr_month - 2}
+
+		var response_data responses.AttendanceReponseWrapperArray
+
+		err = response_data.Create(months[:], int(id))
+
+		// Ensure no error creating response
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": response_data,
+		})
 	}
 }

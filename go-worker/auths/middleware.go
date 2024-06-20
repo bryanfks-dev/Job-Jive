@@ -251,7 +251,6 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 		// Check for specific user role, either manager or employee
 		department_head, err :=
 			models.DepartmentHead{}.GetUsingDepartmentId(*user.DepartmentId)
-
 		// Ensure no error when getting department head data
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -278,7 +277,7 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 		is_manager := false
 
 		if department_head.ManagerId != nil {
-			if department_head.ManagerId == &user.Id {
+			if *department_head.ManagerId == user.Id {
 				is_manager = true
 			}
 		}
