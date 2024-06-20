@@ -18,7 +18,7 @@ class ConfigController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('auth_token'),
                     'Accept' => 'application/json'
                 ])->get(BackendServer::url() . '/api/configs');
-
+                    
             if ($response->successful()) {
                 return view('admin.config', [
                     'configs' => $response['data']
