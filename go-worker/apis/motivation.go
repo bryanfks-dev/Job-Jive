@@ -3,6 +3,7 @@ package apis
 import (
 	"encoding/json"
 	"log"
+	"models"
 	"net/http"
 	"regexp"
 	"strings"
@@ -41,9 +42,37 @@ func GetUserMotivation(w http.ResponseWriter, r *http.Request) {
 
 		// Do absence analysis codes here
 
-		promt := "give me a single motivation for my work, i have a bad day right now :("
+		count_per_week, err := models.Attendance{}.GetAttendancePerWeek(user_id)
 
-		motivation, err := ai.GeminiGenerate(promt)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		user, err := models.User{}.GetUsingId(user_id)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		var prompt string
+
+		if count_per_week >= 3 {
+			prompt = user.FullName + " is my name, give me strong motivation or entertaining words because I'm often late at work. Please say my name on it, give me short sentences."
+		} else {
+			prompt = user.FullName + " is my name, give me words of encouragement for working hard because I've never been late. Please say my name on it."
+		}
+
+		motivation, err := ai.GeminiGenerate(prompt)
 
 		// Ensure no error promting to gemini
 		if err != nil {
