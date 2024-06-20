@@ -20,7 +20,7 @@
                     </svg>
                     <span class="sr-only">Toggle sidebar</span>
                 </button>
-                <a href="#" class="items-center justify-between hidden mr-4 lg:flex">
+                <a href="{{ route('user.dashboard') }}" class="items-center justify-between hidden mr-4 lg:flex">
                     <img src="{{ asset('/img/logo.svg') }}" class="h-8 mr-3" alt="Job Jive Logo" />
                     <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Job Jive</span>
                 </a>
