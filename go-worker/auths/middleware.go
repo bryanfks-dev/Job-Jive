@@ -264,7 +264,7 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 			}
 
 			// Other errors
-			log.Panic("Error get department: ", err.Error())
+			log.Panic("Error get department head: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{
@@ -278,7 +278,7 @@ func userRoleMiddleware(role string, next http.Handler) http.Handler {
 		is_manager := false
 
 		if department_head.ManagerId != nil {
-			if department_head.ManagerId == &user.Id {
+			if *department_head.ManagerId == user.Id {
 				is_manager = true
 			}
 		}

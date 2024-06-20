@@ -12,13 +12,13 @@
                         d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z" />
                 </svg>
                 <blockquote>
-                    @if ($motivation['success_generated'])
+                    @if (!empty($motivation))
                         <p class="text-2xl italic font-semibold text-gray-900 dark:text-white">
-                            {{ $motivation['content'] }}
+                            {{ $motivation }}
                         </p>
                     @else
-                        <p class="text-2xl italic font-semibold text-gray-300 dark:text-white">
-                            {{ $motivation['content'] }}
+                        <p class="text-2xl italic font-semibold text-gray-700 dark:text-white">
+                            Too many request, please try again a few moments to generate motivation.
                         </p>
                     @endif
                 </blockquote>
@@ -183,58 +183,15 @@
                     </thead>
                     <tr class="h-4"></tr>
                     <tbody>
-                        {{-- Empty State --}}
-                        <tr class="h-5"></tr>
-                        <tr class= "dark:bg-gray-800 dark:border-none">
-                            <td class="text-center" colspan="4">No employee yet</td>
-                        </tr>
-                        <tr class="h-5"></tr>
-
-                        {{-- Employees --}}
-                        <tr>
-                            <th class="font-medium py-1">
-                                1
-                            </th>
-                            <th class="font-medium py-1">
-                                Aldo Arista
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">90</span>/<span class="text-red-500">10</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">98.4%</span>
-                            </th>
-                        </tr>
-
-                        <tr>
-                            <th class="font-medium py-1">
-                                2
-                            </th>
-                            <th class="font-medium py-1">
-                                Budi Wahyu
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">89</span>/<span class="text-red-500">11</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">96.7%</span>
-                            </th>
-                        </tr>
-
-                        <tr>
-                            <th class="font-medium py-1">
-                                3
-                            </th>
-                            <th class="font-medium py-1">
-                                Clara
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">88</span>/<span class="text-red-500">12</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">95.6%</span>
-                            </th>
-                        </tr>
+                        @forelse ($employee_peformance['best_users_attendance'] ?? [] as $index => $employee)
+                            @include('partials.user.dashboard.employee_peformance_record')
+                        @empty
+                            <tr class="h-5"></tr>
+                            <tr class= "dark:bg-gray-800 dark:border-none">
+                                <td class="text-center" colspan="4">No employees</td>
+                            </tr>
+                            <tr class="h-5"></tr>
+                        @endforelse
                     </tbody>
                 </table>
 
@@ -270,58 +227,15 @@
                     </thead>
                     <tr class="h-4"></tr>
                     <tbody>
-                        {{-- Empty State --}}
-                        <tr class="h-5"></tr>
-                        <tr class= "dark:bg-gray-800 dark:border-none">
-                            <td class="text-center" colspan="4">No employee yet</td>
-                        </tr>
-                        <tr class="h-5"></tr>
-
-                        {{-- Employees --}}
-                        <tr>
-                            <th class="font-medium py-1">
-                                1
-                            </th>
-                            <th class="font-medium py-1">
-                                Aldo Arista
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">90</span>/<span class="text-red-500">10</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">98.4%</span>
-                            </th>
-                        </tr>
-
-                        <tr>
-                            <th class="font-medium py-1">
-                                2
-                            </th>
-                            <th class="font-medium py-1">
-                                Budi Wahyu
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">89</span>/<span class="text-red-500">11</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">96.7%</span>
-                            </th>
-                        </tr>
-
-                        <tr>
-                            <th class="font-medium py-1">
-                                3
-                            </th>
-                            <th class="font-medium py-1">
-                                Clara
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">88</span>/<span class="text-red-500">12</span>
-                            </th>
-                            <th class="font-medium py-1">
-                                <span class="text-green-500">95.6%</span>
-                            </th>
-                        </tr>
+                        @forelse ($employee_peformance['worst_users_attendance'] ?? [] as $index => $employee)
+                            @include('partials.user.dashboard.employee_peformance_record')
+                        @empty
+                            <tr class="h-5"></tr>
+                            <tr class= "dark:bg-gray-800 dark:border-none">
+                                <td class="text-center" colspan="4">No employees</td>
+                            </tr>
+                            <tr class="h-5"></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

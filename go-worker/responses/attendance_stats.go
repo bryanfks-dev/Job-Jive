@@ -4,9 +4,9 @@ import "models"
 
 type AttendanceStatsReponse struct {
 	UserId            int `json:"user_id"`
-	CurrentWeekHours  int    `json:"current_week_hours"`
-	CurrentMonthHours int    `json:"current_month_hours"`
-	AnnualLeaves      int    `json:"annual_leaves"`
+	CurrentWeekHours  int `json:"current_week_hours"`
+	CurrentMonthHours int `json:"current_month_hours"`
+	AnnualLeaves      int `json:"annual_leaves"`
 }
 
 func (attendance_stats_response *AttendanceStatsReponse) Create(attendance_stats models.AttendanceStats) {

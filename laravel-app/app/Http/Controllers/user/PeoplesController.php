@@ -95,9 +95,10 @@ class PeoplesController extends Controller
                 return redirect()->back()
                     ->with('update-success-' . $id, 'Salary updated successfully');
             } else if ($response->badRequest()) {
-                return redirect()->intended(route('user.employees'))->withErrors([
-                    'update-error-' . $id => $response['error']
-                ])->withInput([
+                return redirect()->intended(route('user.employees'))
+                    ->withErrors([
+                        'update-error-' . $id => $response['error']
+                    ])->withInput([
                             'initial_salary' => $request['initial_salary'],
                             'current_salary' => $request['current_salary'],
                         ]);

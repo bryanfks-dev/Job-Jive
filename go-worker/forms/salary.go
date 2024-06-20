@@ -3,8 +3,8 @@ package forms
 import "errors"
 
 type SalaryForm struct {
-	Initial float64 `json:"initial"`
-	Current float64 `json:"current"`
+	Initial float64 `json:"initial_salary"`
+	Current float64 `json:"current_salary"`
 }
 
 var (

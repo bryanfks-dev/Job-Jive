@@ -31,6 +31,10 @@ class DashboardController extends Controller
                 \Http::withHeaders($httpHeaders)
                     ->get(BackendServer::url() . '/api/motivation');
 
+            $responseEmployeePeformance =
+                \Http::withHeaders($httpHeaders)
+                    ->get(BackendServer::url() . '/api/users/me/department/users/attendance/stats');
+
             if (
                 $responseConfig->successful() && $responseTodayAttendance->successful() &&
                 ($responseMotivation->successful() || $responseMotivation->tooManyRequests())
@@ -61,11 +65,9 @@ class DashboardController extends Controller
                     $isLate = $dueTime->lt($checkInTime);
                 }
 
-                $motivation = "";
+                $motivation = '';
 
-                if ($responseMotivation->tooManyRequests()) {
-                    $motivation = "Too many request, please try again a few moments to generate motivation.";
-                } else {
+                if (!$responseMotivation->tooManyRequests()) {
                     $motivation = $responseMotivation['data']['motivation'];
                 }
 
@@ -75,10 +77,8 @@ class DashboardController extends Controller
                         'needed_check_type' => $neededCheckType,
                         'is_late' => $isLate
                     ],
-                    'motivation' => [
-                        'success_generated' => !$responseMotivation->tooManyRequests(),
-                        'content' => $motivation
-                    ]
+                    'motivation' => $motivation,
+                    'employee_peformance' => $responseEmployeePeformance['data'] ?? []
                 ]);
             } else if (
                 $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()

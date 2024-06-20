@@ -52,7 +52,7 @@ func initEndPoints() {
 	// Attendance stats related
 	mux.Handle("/api/users/me/department/users/attendance/stats",
 		auths.AuthenticationMiddlware(
-			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentsUsersStatsHandler))))
+			auths.UserMiddleware(http.HandlerFunc(apis.GetDepartmentUsersStatsHandler))))
 
 	// Admin users endpoints
 	mux.Handle("/api/users",

@@ -432,3 +432,93 @@ func GetUserAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
+
+func GetDepartmentUsersStatsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		token, ok :=
+			r.Context().Value(auths.TOKEN_KEY).(jwt.MapClaims)
+
+		// Ensure token extract from request
+		if !ok {
+			log.Panic("ERROR get token from context")
+
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "token not found",
+			})
+
+			return
+		}
+
+		user, err := models.User{}.GetUsingId(int(token["id"].(float64)))
+
+		// Ensure no error fetch user data
+		if err != nil {
+			log.Panic("Error get user: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		loc, err := configs.Timezone{}.GetTimeZone()
+
+		// Ensure no error get timezone location
+		if err != nil {
+			log.Panic("Error get timezone location: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		today := time.Now().In(loc)
+
+		best_response_data, err :=
+			responses.DepartmentUserStatsResponse{}.GetBestDepartmentUserStats(today, *user.DepartmentId)
+
+		// Ensure no error get department
+		if err != nil {
+			log.Panic("Error get department best user attendance: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		worst_response_data, err :=
+			responses.DepartmentUserStatsResponse{}.GetWorstDepartmentUserStats(today, *user.DepartmentId)
+
+		// Ensure no error get department worst user attendance
+		if err != nil {
+			log.Panic("Error get department best user attendance: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": responses.DepartmentUserStatsWrapperResponse{
+				BestUsersAttendance:  best_response_data,
+				WorstUsersAttendance: worst_response_data,
+			},
+		})
+	}
+}
