@@ -1,35 +1,39 @@
 <div class="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    @if ($is_manager)
-    @endif
-    <div class="flex justify-end px-4 pt-4">
-        <button id="dropdownButton-{{ $employee['id'] }}" data-dropdown-toggle="dropdown-{{ $employee['id'] }}"
-            class="inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
-            type="button">
-
-            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                viewBox="0 0 16 3">
-                <path
-                    d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-            </svg>
-        </button>
-        <!-- Dropdown menu -->
-        <div id="dropdown-{{ $employee['id'] }}"
-            class="z-10 hidden text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-            <ul class="py-2" aria-labelledby="dropdownButton-{{ $employee['id'] }}">
-                <li>
-                    <a href=""
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
-                        Log</a>
-                </li>
-            </ul>
+    @if (!$is_manager)
+        <div class="pt-10">
         </div>
-    </div>
+    @endif
+    @if ($is_manager)
+        <div class="flex justify-end px-4 pt-4">
+            <button id="dropdownButton-{{ $employee['id'] }}" data-dropdown-toggle="dropdown-{{ $employee['id'] }}"
+                class="inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
+                type="button">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 16 3">
+                    <path
+                        d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+                </svg>
+            </button>
+            <!-- Dropdown menu -->
+            <div id="dropdown-{{ $employee['id'] }}"
+                class="z-10 hidden text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                <ul class="py-2" aria-labelledby="dropdownButton-{{ $employee['id'] }}">
+                    <li>
+                        <a href="{{ route('user.peoples.attendance', ['id' => $employee['id']]) }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Attendance
+                            Log</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    @endif
     <div class="flex flex-col items-center justify-center pb-10">
         <img class="object-cover w-24 h-24 mb-3 rounded-full"
             src="{{ asset('/storage/img/user_profile/' . $employee['photo']) }}" alt="Employee image" />
         <span
             class="mb-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-800">Employee</span>
-        <h5 class="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">{{ $employee['full_name'] }}</h5>
+        <h5 class="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">{{ $employee['full_name'] }}
+        </h5>
         <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
 
             <svg xmlns="http://www.w3.org/2000/svg" class="fill-blue-500" width="1.2em" height="1.2em"
@@ -67,7 +71,6 @@
                     data-modal-toggle="update-modal-{{ $employee['id'] }}">
                     Edit</div>
             </div>
-
             @include('partials.user.employees.update-modal')
         @endif
     </div>

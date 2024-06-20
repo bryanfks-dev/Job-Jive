@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="antialiased bg-gray-50 dark:bg-gray-900">
-
         <!-- Attendance -->
         <div
             class="p-5 mb-4 bg-white border border-gray-200 divide-y rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 divider-gray-200 dark:divide-gray-700">
@@ -69,7 +68,6 @@
                 </div>
             </div>
         </div>
-
         <!-- History -->
         <div
             class="p-5 mb-4 bg-white border border-gray-200 divide-y rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 divider-gray-200 dark:divide-gray-700">
@@ -82,7 +80,8 @@
                         <select id="months-selector" name="month"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-pointer">
                             @foreach ($months as $month)
-                                <option value="{{ $month['id'] }}" {{ $old_month_id === $month['id'] ? 'selected' : '' }}>
+                                <option value="{{ $month['id'] }}"
+                                    {{ $old_month_id === $month['id'] ? 'selected' : '' }}>
                                     {{ $month['name'] }}</option>
                             @endforeach
                         </select>
@@ -91,13 +90,12 @@
                 <div>
                     @foreach ($attendances['records'] as $record)
                         @if (date('Y-m-d') === $record['date'])
-                            @include('partials.user.attendance.today-record')
+                            @include('partials.user.employees.attendance-log.today-record')
                         @else
-                            @include('partials.user.attendance.regular-record')
+                            @include('partials.user.employees.attendance-log.regular-record')
                         @endif
                     @endforeach
                 </div>
-
                 <!-- Pagination -->
                 <div class="p-4 mt-4">
                     {{ $attendances['records']->withPath(url()->current())->appends(['month' => request()->get('month')])->links() }}
@@ -176,6 +174,6 @@
 
         monthsSelector.addEventListener('change', (e) => {
             monthsForm.submit();
-        });
+        })
     </script>
 @endsection

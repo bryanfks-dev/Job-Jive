@@ -164,7 +164,8 @@
     const salaryInput = document.querySelectorAll('.salary-input');
 
     [...salaryInput].forEach((ele) => {
-        ele.addEventListener('change', (e) => {
+        formatSalaryInput(ele);
+        ele.addEventListener('input', (e) => {
             formatSalaryInput(ele);
         });
     });

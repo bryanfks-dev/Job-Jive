@@ -174,6 +174,8 @@ func AttendUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		attend_form.Sanitize()
 
+		log.Println(attend_form)
+
 		valid, err := attend_form.Validate()
 
 		if !valid {

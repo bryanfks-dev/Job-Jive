@@ -48,4 +48,20 @@
             </div>
         </li>
     </ol>
+    @if (!isset($record['check_in_time']) && $is_manager)
+        <form method="POST" action="{{ route('user.peoples.attendance.update', ['id' => $employee]) }}">
+            @csrf
+            <ol class="flex flex-wrap pt-4 mt-3 text-gray-900 md:gap-6 dark:text-white">
+                <input type="hidden" id="user_id" name="user_id" value="{{ $employee }}">
+                <input type="hidden" id="check_in_time" name="check_in_time"
+                    value="{{ date('Y-m-d ', strtotime($record['date'])) . $configs['check_in_time'] . ':00' }}">
+
+                <input type="hidden" id="check_out_time" name="check_out_time"
+                    value="{{ date('Y-m-d ', strtotime($record['date'])) . $configs['check_out_time'] . ':00' }}">
+                <button type="submit"
+                    class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">
+                    Annual Leave</button>
+            </ol>
+        </form>
+    @endif
 </div>

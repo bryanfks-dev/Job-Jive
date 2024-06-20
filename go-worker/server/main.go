@@ -112,6 +112,16 @@ func initEndPoints() {
 		auths.AuthenticationMiddlware(
 			auths.UserMiddleware(http.HandlerFunc(apis.SearchEmployeesHandler))))
 
+	// Department users attendance for manager Endpoints
+	mux.Handle("/api/users/me/department/users/{id}/attendance/",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(auths.ManagerMiddleware(
+				http.HandlerFunc(apis.GetEmployeeAttendanceHandler)))))
+	mux.Handle("/api/users/me/department/users/{id}/attendance/update",
+		auths.AuthenticationMiddlware(
+			auths.UserMiddleware(auths.ManagerMiddleware(
+				http.HandlerFunc(apis.AttendUserHandledByManagerHandler)))))
+
 	// Jobs endpoints
 }
 

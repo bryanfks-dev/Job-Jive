@@ -3,9 +3,9 @@ package models
 import "db"
 
 type Salary struct {
-	UserId  int     `json:"-"`
-	Initial float64 `json:"initial"`
-	Current float64 `json:"current"`
+	UserId  int
+	Initial float64
+	Current float64
 }
 
 func (salary Salary) GetUsingUserId(user_id int) (Salary, error) {
