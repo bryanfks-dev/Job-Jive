@@ -59,8 +59,11 @@ func GetUserAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 
 		curr_month := int(curr_date_time.Month())
 
+		getPrevMonth :=
+			func(s int, n int) int { return ((s-n-1)+12)%12 + 1 }
+
 		// Create month
-		months := [3]int{curr_month, curr_month - 1, curr_month - 2}
+		months := [3]int{curr_month, getPrevMonth(curr_month, 1), getPrevMonth(curr_month, 2)}
 
 		var response_data responses.AttendanceReponseWrapperArray
 

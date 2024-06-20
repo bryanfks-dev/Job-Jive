@@ -85,7 +85,7 @@ func (attendace_response_array *AttendanceResponseArray) GetAttendaceUsingMonth(
 
 func (attendance_wrappers *AttendanceReponseWrapperArray) Create(months []int, user_id int) error {
 	for idx, month := range months {
-		curr_wrapper := &(*attendance_wrappers)[idx]
+		curr_wrapper := &attendance_wrappers[idx]
 
 		var attendance_responses AttendanceResponseArray
 
