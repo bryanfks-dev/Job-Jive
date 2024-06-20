@@ -12,8 +12,9 @@ In this application, we developed five main features:
 
 1. **Authentication and Authorization**: Secure login and role-based access control for manager and staff accounts.
 2. **Employee Attendance Tracking**: Efficiently track employee attendance and manage records.
-4. **Employee Data Management**: Store and manage employee biodata, job details, and other relevant information.
-5. **Chart & Stats**: Visualize data and metrics through interactive charts for better decision-making.
+3. **Employee Data Management**: Store and manage employee biodata, job details, and other relevant information.
+4. **Chart & Stats**: Visualize data and metrics through interactive charts for better decision-making.
+5. **Motivation Letter Generate by AI**:AI generating personalized motivation letters.
 
 ## Technologies Used
 
