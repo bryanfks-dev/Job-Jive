@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\BackendServer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PeoplesController extends Controller
@@ -70,15 +69,18 @@ class PeoplesController extends Controller
             return abort(404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'initial_salary' => ['required', 'min:1'],
-            'current_salary' => ['required', 'min:1'],
+        $validator = \Validator::make($request->all(), [
+            'initial_salary' => ['required', 'min:0'],
+            'current_salary' => ['required', 'min:0'],
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors([
                 'update-error-' . $id => $validator->errors()->first(),
-            ]);
+            ])->withInput([
+                        'initial_salary' => $request['initial_salary'],
+                        'current_salary' => $request['current_salary'],
+                    ]);
         }
 
         try {
@@ -98,7 +100,7 @@ class PeoplesController extends Controller
                 return redirect()->back()
                     ->with('update-success-' . $id, 'Salary updated successfully');
             } else if ($response->badRequest()) {
-                return redirect()->intended(route('user.employees'))
+                return redirect()->back()
                     ->withErrors([
                         'update-error-' . $id => $response['error']
                     ])->withInput([
@@ -108,7 +110,7 @@ class PeoplesController extends Controller
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('user.login'));
             } else {
-                return redirect()->intended(route('user.peoples'))->withErrors([
+                return redirect()->back()->withErrors([
                     'update-error-' . $id => $response['error'] ?? 'An error occurred',
                 ])->withInput([
                             'initial_salary' => $request['initial_salary'],
