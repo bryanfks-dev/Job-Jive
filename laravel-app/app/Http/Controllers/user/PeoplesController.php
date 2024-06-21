@@ -45,6 +45,8 @@ class PeoplesController extends Controller
                     'department_name' => $responseDepartmentUsers['data']['name'],
                     'manager' => $responseDepartmentUsers['data']['manager'],
                     'is_manager' => ($responseProfile['data']['as'] === 'Manager'),
+                    'people_counts' => count($responseDepartmentUsers['data']['employees'] ?? []) +
+                        (isset($responseDepartmentUsers['data']['manager']) ? 1 : 0),
                     'employees' => $paginatedEmployees,
                     'profile' => $responseProfile['data']
                 ]);
