@@ -102,7 +102,7 @@
                                 required>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department['id'] }}"
-                                        {{ $department['name'] == (empty(old('department_id')) ? $user['department'] : old('department_id')) ? 'selected' : '' }}>
+                                        {{ $department['id'] == (isset($user['department']) ? $user['department']['id'] : old('department_id')) ? 'selected' : '' }}>
                                         {{ $department['name'] }}</option>
                                 @endforeach
                             </select>
