@@ -685,9 +685,7 @@ func GetEmployeeAttendanceChartHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		response_data.AbsenceCount =
-			int(math.Max(
-				float64((employee_count*periods[period]["days"].(int))-response_data.AttendCount), float64(0)))
+		response_data.AbsenceCount = (employee_count * periods[period]["days"].(int)) - response_data.AttendCount
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]any{

@@ -20,7 +20,7 @@ func (department_user_chart_response *DepartmentUserChartResponse) GetDepartment
 		return 0, err
 	}
 
-	return employee_count - 1, nil
+	return employee_count, nil
 }
 
 func (department_user_chart_response *DepartmentUserChartResponse) GetDepartmentUsersAttendanceBetween(start_date string, end_date string, department_id int, manager_id int) (int, error) {
@@ -36,5 +36,5 @@ func (department_user_chart_response *DepartmentUserChartResponse) GetDepartment
 		return 0, err
 	}
 
-	return employee_count - 1, nil
+	return employee_count, nil
 }
