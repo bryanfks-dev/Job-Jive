@@ -62,7 +62,7 @@
 
             @include('partials.admin.departments.create-modal')
 
-            @foreach ($departments as $department)
+            @foreach ($departments as $index => $department)
                 @include('partials.admin.departments.update-modal')
                 @include('partials.admin.departments.delete-modal')
             @endforeach
