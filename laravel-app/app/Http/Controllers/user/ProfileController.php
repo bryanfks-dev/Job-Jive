@@ -20,7 +20,8 @@ class ProfileController extends Controller
 
             if ($response->successful()) {
                 return view('user.profile', [
-                    'profile' => $response['data']
+                    'profile' => $response['data'],
+                    'is_manager' => ($request['data']['as'] === 'Manager')
                 ]);
             } else if ($response->unauthorized()) {
                 return redirect()->intended(route('user.login'));
