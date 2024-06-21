@@ -18,7 +18,7 @@
         {{ $user['gender'] }}
     </td>
     <td class="px-6 py-4">
-        {{ $user['department']['name'] }}
+        {{ isset($user['department']) ? $user['department']['name'] : '-' }}
     </td>
     <td class="flex items-center justify-end gap-2 px-6 py-4">
         {{-- Edit button --}}

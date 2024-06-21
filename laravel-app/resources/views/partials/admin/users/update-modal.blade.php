@@ -100,9 +100,12 @@
                             <select name="department_id" id="department_id"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                 required>
+                                <option value="" {{ !isset($user['department']) ? 'selected' : '' }} disabled
+                                    hidden>
+                                    Select Department</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department['id'] }}"
-                                        {{ $department['name'] == (empty(old('department_id')) ? $user['department'] : old('department_id')) ? 'selected' : '' }}>
+                                        {{ $department['id'] === (isset($user['department']) ? $user['department']['id'] : old('department_id')) ? 'selected' : '' }}>
                                         {{ $department['name'] }}</option>
                                 @endforeach
                             </select>

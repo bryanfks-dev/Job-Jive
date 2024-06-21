@@ -170,7 +170,8 @@ class DashboardController extends Controller
                             'is_late' => $isLate
                         ],
                         'motivation' => $motivation,
-                        'is_manager' => $isManager
+                        'is_manager' => $isManager,
+                        'profile' => $responseProfile['data']
                     ]);
                 } else if (
                     $responseConfig->unauthorized() || $responseTodayAttendance->unauthorized()

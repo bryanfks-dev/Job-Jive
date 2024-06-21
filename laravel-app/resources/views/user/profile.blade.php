@@ -57,10 +57,13 @@
                                 <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Gender</span>
                                 <span class="text-md font-normal truncate">{{ $profile['gender'] }}</span>
                             </li>
-                            <li class="flex flex-col">
-                                <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Salary</span>
-                                <span class="text-md font-normal truncate">Rp {{ $profile['salary']['current'] }}</span>
-                            </li>
+                            @if (!$is_manager)
+                                <li class="flex flex-col">
+                                    <span class="text-sm font-normal text-gray-600 dark:text-gray-400">Salary</span>
+                                    <span class="text-md font-normal truncate">Rp
+                                        {{ number_format($profile['salary']['current'], '.', '') }}</span>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </div>
