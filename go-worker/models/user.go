@@ -58,6 +58,43 @@ func (user User) Get() ([]User, error) {
 	return users, nil
 }
 
+func (user User) GetUsingDepartmentId(department_id int) ([]User, error) {
+	stmt := "SELECT * FROM `users` WHERE Department_ID = ?"
+
+	row, err := db.Conn.Query(stmt, department_id)
+
+	if err != nil {
+		return []User{}, err
+	}
+
+	defer row.Close()
+
+	var users []User
+
+	for row.Next() {
+		err := row.Scan(&user.Id,
+			&user.FullName,
+			&user.Email,
+			&user.Password,
+			&user.DateOfBirth,
+			&user.Address,
+			&user.NIK,
+			&user.Photo,
+			&user.Gender,
+			&user.PhoneNumber,
+			&user.DepartmentId,
+			&user.FirstLogin)
+
+		if err != nil {
+			return []User{}, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
 func (user User) GetEmployees(manager_id int, department_id int) ([]User, error) {
 	stmt := "SELECT * FROM `users` WHERE Department_ID = ? AND User_ID <> ? ORDER BY User_ID DESC"
 

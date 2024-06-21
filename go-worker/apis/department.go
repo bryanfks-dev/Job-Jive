@@ -591,6 +591,54 @@ func GetDepartmentUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetDepartmentsUsersHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		postMu.Lock()
+		defer postMu.Unlock()
+
+		// Set HTTP header
+		w.Header().Set("Content-Type", "application/json")
+
+		departments, err := models.Department{}.Get()
+
+		// Ensure no error get department
+		if err != nil {
+			log.Panic("Error get departments: ", err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]any{
+				"error": "server error",
+			})
+
+			return
+		}
+
+		var departments_users_response []responses.DepartmentsUsersResponse
+
+		for _, department := range departments {
+			var department_users_response responses.DepartmentsUsersResponse
+
+			err := department_users_response.Create(department)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]any{
+					"error": "server error",
+				})
+
+				return
+			}
+
+			departments_users_response = append(departments_users_response, department_users_response)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": departments_users_response,
+		})
+	}
+}
+
 func UpdateDeparmentUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPut {
 		postMu.Lock()

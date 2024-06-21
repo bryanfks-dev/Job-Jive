@@ -554,7 +554,7 @@ func GetEmployeeAttendanceStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Ensure no error get department worst user attendance
 		if err != nil {
-			log.Panic("Error get department best user attendance: ", err.Error())
+			log.Panic("Error get department worst user attendance: ", err.Error())
 
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]any{

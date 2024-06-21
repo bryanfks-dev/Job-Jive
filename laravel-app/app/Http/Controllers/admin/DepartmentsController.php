@@ -31,24 +31,21 @@ class DepartmentsController extends Controller
                         ->get(BackendServer::url() . '/api/departments');
             }
 
-            $responseUser =
+            $responseDepartmentsUser =
                 \Http::withHeaders($httpHeaders)
-                    ->get(BackendServer::url() . '/api/users');
+                    ->get(BackendServer::url() . '/api/departments/users');
 
-            if ($responseDepartment->successful() && $responseUser->successful()) {
+            if ($responseDepartment->successful() && $responseDepartmentsUser->successful()) {
                 $paginatedDepartments =
                     $this->paginate($responseDepartment['data'] ?? []);
 
-                $paginatedUsers =
-                    $this->paginate($responseUser['data'] ?? []);
-
                 return view('admin.departments', [
                     'departments' => $paginatedDepartments,
-                    'users' => $paginatedUsers,
+                    'users' => $responseDepartmentsUser['data'],
                 ]);
-            } else if ($responseDepartment->unauthorized() || $responseUser->unauthorized()) {
+            } else if ($responseDepartment->unauthorized() || $responseDepartmentsUser->unauthorized()) {
                 return redirect()->intended(route('admin.login'));
-            } else if ($responseDepartment->serverError() || $responseUser->serverError()) {
+            } else if ($responseDepartment->serverError() || $responseDepartmentsUser->serverError()) {
                 return abort(500);
             }
 

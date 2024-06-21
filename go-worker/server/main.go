@@ -95,6 +95,9 @@ func initEndPoints() {
 	mux.Handle("/api/departments/search/{query}",
 		auths.AuthenticationMiddlware(
 			auths.AdminMiddleware(http.HandlerFunc(apis.SearchDepartmentHandler))))
+	mux.Handle("/api/departments/users",
+		auths.AuthenticationMiddlware(
+			auths.AdminMiddleware(http.HandlerFunc(apis.GetDepartmentsUsersHandler))))
 
 	// Config endpoints
 	mux.Handle("/api/configs",
