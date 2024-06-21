@@ -19,11 +19,11 @@ type DepartmentUserStatsResponse struct {
 }
 
 func (department_user_stats_response DepartmentUserStatsResponse) GetBestDepartmentUserStats(curr_date time.Time, department_id int, manager_id int) ([]DepartmentUserStatsResponse, error) {
-	days_count := int(curr_date.Sub(curr_date.AddDate(0, -3, 0)).Hours() / 24)
+	curr_date_str := curr_date.Format(time.DateOnly)
 
-	stmt := "WITH UserAttendances AS (SELECT u.User_ID, u.Full_Name, COALESCE(SUM(a.Type = 'Check-Out'), 0) AS att FROM users u LEFT JOIN attendances a ON a.User_ID = u.User_ID AND DATE(a.Date_Time) >= DATE_SUB(?, INTERVAL 3 MONTH) AND u.Department_ID = ? AND u.User_ID <> ? GROUP BY u.User_ID, u.Full_Name) SELECT * FROM UserAttendances ua ORDER BY ua.att, ua.Full_Name DESC LIMIT 3"
+	stmt := "WITH `UserAttendances` AS (SELECT u.User_ID, u.Full_Name, COALESCE(SUM(CASE WHEN a.Type = 'Check-Out' THEN 1 ELSE 0 END), 0) AS AttendanceCount, (DATEDIFF(?, DATE_SUB(?, INTERVAL 3 MONTH)) - COALESCE(SUM(CASE WHEN a.Type = 'Check-Out' THEN 1 ELSE 0 END), 0)) AS AbsenceCount FROM `users` u LEFT JOIN `attendances` a ON u.User_ID = a.User_ID AND a.Date_Time >= DATE_SUB(?, INTERVAL 3 MONTH) WHERE u.Department_ID = ? AND u.User_ID <> ? GROUP BY u.User_ID, u.Full_Name) SELECT User_ID, Full_Name, AttendanceCount, AbsenceCount FROM `UserAttendances` ORDER BY AttendanceCount DESC, Full_Name ASC LIMIT 3"
 
-	row, err := db.Conn.Query(stmt, curr_date.Format(time.DateOnly), department_id, manager_id)
+	row, err := db.Conn.Query(stmt, curr_date_str, curr_date_str, curr_date_str, department_id, manager_id)
 
 	if err != nil {
 		return []DepartmentUserStatsResponse{}, err
@@ -34,13 +34,11 @@ func (department_user_stats_response DepartmentUserStatsResponse) GetBestDepartm
 	var response_users []DepartmentUserStatsResponse
 
 	for row.Next() {
-		err := row.Scan(&department_user_stats_response.UserId, &department_user_stats_response.UserFullName, &department_user_stats_response.AttendCount)
+		err := row.Scan(&department_user_stats_response.UserId, &department_user_stats_response.UserFullName, &department_user_stats_response.AttendCount, &department_user_stats_response.AbsenceCount)
 
 		if err != nil {
 			return []DepartmentUserStatsResponse{}, err
 		}
-
-		department_user_stats_response.AbsenceCount = days_count - department_user_stats_response.AttendCount
 
 		response_users = append(response_users, department_user_stats_response)
 	}
@@ -49,11 +47,11 @@ func (department_user_stats_response DepartmentUserStatsResponse) GetBestDepartm
 }
 
 func (department_user_stats_response DepartmentUserStatsResponse) GetWorstDepartmentUserStats(curr_date time.Time, department_id int, manager_id int) ([]DepartmentUserStatsResponse, error) {
-	days_count := int(curr_date.Sub(curr_date.AddDate(0, -3, 0)).Hours() / 24)
+	curr_date_str := curr_date.Format(time.DateOnly)
 
-	stmt := "WITH UserAttendances AS (SELECT u.User_ID, u.Full_Name, COALESCE(SUM(a.Type = 'Check-Out'), 0) AS att FROM users u LEFT JOIN attendances a ON a.User_ID = u.User_ID AND DATE(a.Date_Time) >= DATE_SUB(?, INTERVAL 3 MONTH) WHERE u.Department_ID = ? AND u.User_ID <> ? GROUP BY u.User_ID, u.Full_Name), BestUserAttendances AS (SELECT * FROM UserAttendances ua ORDER BY ua.att, ua.Full_Name DESC LIMIT 3) SELECT ua.* FROM UserAttendances ua, BestUserAttendances bua WHERE ua.User_ID NOT IN (bua.User_ID) ORDER BY ua.att, ua.Full_Name ASC LIMIT 3"
+	stmt := "WITH `UserAttendances` AS (SELECT u.User_ID, u.Full_Name, COALESCE(SUM(CASE WHEN a.Type = 'Check-Out' THEN 1 ELSE 0 END), 0) AS AttendanceCount, (DATEDIFF(?, DATE_SUB(?, INTERVAL 3 MONTH)) - COALESCE(SUM(CASE WHEN a.Type = 'Check-Out' THEN 1 ELSE 0 END), 0)) AS AbsenceCount FROM `users` u LEFT JOIN `attendances` a ON u.User_ID = a.User_ID AND a.Date_Time >= DATE_SUB(?, INTERVAL 3 MONTH) WHERE u.Department_ID = ? AND u.User_ID <> ? GROUP BY u.User_ID, u.Full_Name), `TopAttendees` AS (SELECT User_ID FROM `UserAttendances` ORDER BY AttendanceCount DESC, Full_Name ASC LIMIT 3) SELECT ua.User_ID, ua.Full_Name, ua.AttendanceCount, ua.AbsenceCount FROM `UserAttendances` ua LEFT JOIN `TopAttendees` ta ON ua.User_ID = ta.User_ID WHERE ta.User_ID IS NULL ORDER BY ua.AttendanceCount ASC, ua.Full_Name ASC LIMIT 3"
 
-	row, err := db.Conn.Query(stmt, curr_date.Format(time.DateOnly), department_id, manager_id)
+	row, err := db.Conn.Query(stmt, curr_date_str, curr_date_str, curr_date_str, department_id, manager_id)
 
 	if err != nil {
 		return []DepartmentUserStatsResponse{}, err
@@ -64,13 +62,11 @@ func (department_user_stats_response DepartmentUserStatsResponse) GetWorstDepart
 	var response_users []DepartmentUserStatsResponse
 
 	for row.Next() {
-		err := row.Scan(&department_user_stats_response.UserId, &department_user_stats_response.UserFullName, &department_user_stats_response.AttendCount)
+		err := row.Scan(&department_user_stats_response.UserId, &department_user_stats_response.UserFullName, &department_user_stats_response.AttendCount, &department_user_stats_response.AbsenceCount)
 
 		if err != nil {
 			return []DepartmentUserStatsResponse{}, err
 		}
-
-		department_user_stats_response.AbsenceCount = days_count - department_user_stats_response.AttendCount
 
 		response_users = append(response_users, department_user_stats_response)
 	}
