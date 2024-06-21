@@ -130,7 +130,6 @@
                                     modal.toggle();
                                 });
                             </script>
-
                             <div class="flex gap-2 mt-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="fill-red-500" width="1em"
                                     height="1em" viewBox="0 0 56 56">
@@ -142,7 +141,6 @@
                             </div>
                         @enderror
                     </div>
-
                 </div>
                 <button type="submit"
                     class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
