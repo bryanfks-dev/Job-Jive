@@ -85,14 +85,12 @@ To set up the application locally, follow these steps:
 
 8. **Build addAdmin.exe**
     ```  
-    cd utils
-    go build ./addAdmin.go
+    go build -o addAdmin.exe ./utils/addAdmin/main.go
     ```
 
 9. **Create admin account**
-    ``` 
-    cd ../
-    addAdmin admin 1234
+    ```
+    ./addAdmin <your-username> <your-password>
     ```
 
 ## Run the program
