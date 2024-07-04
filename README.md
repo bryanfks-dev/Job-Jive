@@ -28,3 +28,92 @@ In this application, we developed five main features:
 
 - **Language**: GOLANG for robust and efficient back-end processes.
 - **Features**: Handling authentication, authorization, web server, database, and all back-end funtionality.
+
+## Installation Instructions
+
+To set up the application locally, follow these steps:
+
+### Prerequisites
+- PHP 8.2 or higher
+- Golang
+- Composer
+- Node.js and npm
+- MySQL server
+
+## Front-End Installation
+
+1. **Clone the repository:**
+   ```
+   git clone https://github.com/bryanfks-dev/Job-Jive.git
+   cd Job-Jive/laravel-app/
+   ```
+
+2. **Install PHP dependencies:**
+    ```
+    composer install
+    ```
+
+3. **Install JavaScript dependencies:**
+    ```
+    npm install
+    ```
+
+4. **Set up the environment file:**
+    ```
+    cp .env.example .env
+    ```
+
+5. **Generate application key:**
+    ```
+    php artisan key:generate
+    ```
+
+6. **Run migrations and seed the database:**
+    ```
+    php artisan migrate --seed
+    ```
+
+## Back-End Installation
+
+7. **Copy BE environment variable**
+    ```
+   # Go to root dir
+    
+    cd go-worker
+    copy .env.example .env
+    ```
+
+8. **Build addAdmin.exe**
+    ```  
+    cd utils
+    go build ./addAdmin.go
+    ```
+
+9. **Create admin account**
+    ``` 
+    cd ../
+    addAdmin admin 1234
+    ```
+
+## Run the program
+
+10. **Start the Back-End server**
+    ```
+    go run .
+    ```
+
+11. **Build assets**
+    ```
+    # Go to root folder
+
+    cd laravel-app
+    npm run dev
+    ```
+
+12. **Start the development server:**
+    ```
+    php artisan serve
+    ```
+
+13. **Access the application:**
+Open your web browser and navigate to 'http://localhost:8000'
