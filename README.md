@@ -1,12 +1,10 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# Job Jive - Human Resource Management System
-
-## Overview
+# 🏢 Job Jive - Human Resource Management System
 
 The HR department in a company is responsible for managing employees, including attendance, storing employee biodata, and making decisions regarding employees. When a company has a large number of employees, manual administration can significantly increase the workload. Therefore, we developed **Job Jive** as a Human Resource Management System to streamline these tasks.
 
-## Features
+## ✨ Features
 
 In this application, we developed five main features:
 
@@ -16,7 +14,7 @@ In this application, we developed five main features:
 4. **Chart & Stats**: Visualize data and metrics through interactive charts for better decision-making.
 5. **Motivation Letter Generate by AI**:AI generating personalized motivation letters.
 
-## Technologies Used
+## 💻 Technologies Used
 
 ### Front-end
 
@@ -29,7 +27,7 @@ In this application, we developed five main features:
 - **Language**: GOLANG for robust and efficient back-end processes.
 - **Features**: Handling authentication, authorization, web server, database, and all back-end funtionality.
 
-## Installation Instructions
+## 📌 Installation Instructions
 
 To set up the application locally, follow these steps:
 
